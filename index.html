@@ -18,6 +18,7 @@
     --red:#e34850;
     --amber:#f4a62a;
     --purple:#8159e8;
+    --gold:#f0b429;
     --shadow:0 12px 35px rgba(26,39,66,.10);
   }
 
@@ -135,6 +136,266 @@
     font-weight:800;
     text-transform:uppercase;
     letter-spacing:.6px;
+  }
+
+  .reward-banner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:18px;
+    padding:16px 18px;
+    border-radius:20px;
+    color:#4d3900;
+    background:linear-gradient(135deg,#fff4c7,#ffe48d);
+    border:1px solid rgba(188,135,0,.18);
+    box-shadow:0 8px 22px rgba(125,92,0,.09);
+  }
+
+  .reward-banner__left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .reward-icon{
+    width:46px;
+    height:46px;
+    flex:0 0 46px;
+    display:grid;
+    place-items:center;
+    border-radius:15px;
+    background:rgba(255,255,255,.68);
+    font-size:24px;
+  }
+
+  .reward-banner strong{
+    display:block;
+    font-size:20px;
+    line-height:1.1;
+  }
+
+  .reward-banner span{
+    display:block;
+    margin-top:4px;
+    font-size:12px;
+    font-weight:800;
+    opacity:.72;
+  }
+
+  .reward-total{
+    white-space:nowrap;
+    font-size:27px;
+    font-weight:1000;
+  }
+
+  .reward-pop{
+    position:fixed;
+    left:50%;
+    top:22px;
+    transform:translate(-50%,-16px);
+    z-index:100;
+    opacity:0;
+    pointer-events:none;
+    background:#182033;
+    color:#fff;
+    border-radius:16px;
+    padding:12px 18px;
+    font-weight:950;
+    box-shadow:0 14px 40px rgba(0,0,0,.22);
+    transition:.25s ease;
+  }
+
+  .reward-pop.show{
+    opacity:1;
+    transform:translate(-50%,0);
+  }
+
+  .reward-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:10px 0 14px;
+  }
+
+  .reward-mini{
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px;
+    background:#fafbfe;
+  }
+
+  .reward-mini strong{
+    display:block;
+    font-size:22px;
+  }
+
+  .reward-mini span{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    font-weight:850;
+    margin-top:2px;
+  }
+
+  .setting-row{
+    display:grid;
+    grid-template-columns:1fr 120px;
+    gap:10px;
+    align-items:center;
+    margin:8px 0;
+  }
+
+  .setting-row label{
+    font-weight:800;
+    color:#46526a;
+  }
+
+  .setting-row input{
+    width:100%;
+    border:2px solid #dce2eb;
+    border-radius:12px;
+    padding:10px 12px;
+    text-align:center;
+    font-weight:900;
+  }
+
+  .reward-history{
+    display:grid;
+    gap:7px;
+    margin-top:12px;
+  }
+
+  .reward-history-row{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 11px;
+    border-radius:11px;
+    background:#f6f8fb;
+    color:#536076;
+    font-size:12px;
+    font-weight:750;
+  }
+
+  .streak-banner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:14px;
+    padding:16px 18px;
+    border-radius:20px;
+    background:linear-gradient(135deg,#fff1e7,#ffe0cb);
+    border:1px solid rgba(227,113,30,.16);
+    box-shadow:0 8px 22px rgba(110,57,20,.07);
+  }
+
+  .streak-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+  }
+
+  .streak-icon{
+    width:46px;
+    height:46px;
+    flex:0 0 46px;
+    display:grid;
+    place-items:center;
+    border-radius:15px;
+    background:rgba(255,255,255,.72);
+    font-size:25px;
+  }
+
+  .streak-banner strong{
+    display:block;
+    font-size:20px;
+    line-height:1.1;
+  }
+
+  .streak-banner span{
+    display:block;
+    margin-top:4px;
+    color:#8c5c3c;
+    font-size:12px;
+    font-weight:850;
+  }
+
+  .streak-count{
+    white-space:nowrap;
+    font-size:25px;
+    font-weight:1000;
+    color:#b45309;
+  }
+
+  .daily-progress{
+    margin:0 0 18px;
+    padding:12px 14px;
+    border-radius:16px;
+    background:#fff;
+    border:1px solid rgba(18,35,63,.07);
+    box-shadow:0 5px 18px rgba(26,39,66,.05);
+  }
+
+  .daily-progress-top{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+    margin-bottom:8px;
+    font-size:12px;
+    font-weight:900;
+    color:#5c687d;
+  }
+
+  .daily-progress-track{
+    height:9px;
+    background:#edf0f5;
+    border-radius:999px;
+    overflow:hidden;
+  }
+
+  .daily-progress-fill{
+    height:100%;
+    width:0;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#f59e0b,#ef6c3e);
+    transition:width .25s ease;
+  }
+
+  .milestone-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:9px;
+    margin:10px 0 12px;
+  }
+
+  .milestone-card{
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:11px;
+    background:#fbfcfe;
+  }
+
+  .milestone-card label{
+    display:block;
+    color:#536076;
+    font-size:12px;
+    font-weight:900;
+    margin-bottom:7px;
+  }
+
+  .milestone-card input{
+    width:100%;
+    border:2px solid #dce2eb;
+    border-radius:10px;
+    padding:9px 10px;
+    font-weight:900;
+    text-align:center;
   }
 
   .progress-track{
@@ -513,6 +774,11 @@
     .topbar{align-items:flex-start}
     .brand p{font-size:13px}
     .stats{grid-template-columns:repeat(2,1fr)}
+    .reward-banner{align-items:flex-start}
+    .reward-total{font-size:23px}
+    .streak-banner{align-items:flex-start}
+    .streak-count{font-size:22px}
+    .setting-row{grid-template-columns:1fr 95px}
     .game-card{min-height:510px;border-radius:22px;padding:22px 15px}
     .profile-bar{position:sticky;top:8px;z-index:10}
     .form-row{flex-direction:column}
@@ -540,6 +806,38 @@
     <div class="stat"><strong id="statMastered">0</strong><span>Mastered</span></div>
     <div class="stat"><strong id="statCorrect">0</strong><span>Correct</span></div>
     <div class="stat"><strong id="statAccuracy">0%</strong><span>Accuracy</span></div>
+  </div>
+
+  <div class="reward-banner">
+    <div class="reward-banner__left">
+      <div class="reward-icon">💰</div>
+      <div>
+        <strong>Robux Bank</strong>
+        <span>Earned through spelling progress</span>
+      </div>
+    </div>
+    <div class="reward-total" id="robuxBank">R$ 0</div>
+  </div>
+
+  <div class="streak-banner">
+    <div class="streak-left">
+      <div class="streak-icon">🔥</div>
+      <div>
+        <strong id="streakTitle">0 day streak</strong>
+        <span id="streakNext">Complete today's spelling target to start a streak.</span>
+      </div>
+    </div>
+    <div class="streak-count" id="streakCount">🔥 0</div>
+  </div>
+
+  <div class="daily-progress">
+    <div class="daily-progress-top">
+      <span>Today's practice</span>
+      <span id="dailyProgressText">0 / 3 words</span>
+    </div>
+    <div class="daily-progress-track">
+      <div class="daily-progress-fill" id="dailyProgressFill"></div>
+    </div>
   </div>
 
   <div class="progress-track">
@@ -586,6 +884,8 @@
 
 </div>
 
+<div class="reward-pop" id="rewardPop">+R$ 1</div>
+
 <div class="modal" id="parentModal" aria-hidden="true">
   <div class="modal-panel">
     <div class="modal-head">
@@ -613,6 +913,71 @@
 
     <div class="section-title">Words for <span id="parentProfileName"></span></div>
     <div class="word-list" id="parentWordList"></div>
+
+    <div class="section-title">Robux rewards</div>
+
+    <div class="reward-grid">
+      <div class="reward-mini"><strong id="rewardPending">0</strong><span>To pay</span></div>
+      <div class="reward-mini"><strong id="rewardPaid">0</strong><span>Paid</span></div>
+      <div class="reward-mini"><strong id="rewardLifetime">0</strong><span>Lifetime</span></div>
+    </div>
+
+    <div class="setting-row">
+      <label for="stageRewardInput">Robux for completing a stage</label>
+      <input id="stageRewardInput" type="number" min="0" max="100" step="1">
+    </div>
+
+    <div class="setting-row">
+      <label for="masterRewardInput">Bonus Robux for mastering a word</label>
+      <input id="masterRewardInput" type="number" min="0" max="500" step="1">
+    </div>
+
+    <div class="actions" style="justify-content:flex-start">
+      <button class="secondary" id="saveRewardsBtn">Save rewards</button>
+      <button class="success-btn" id="markPaidBtn">Mark Robux as paid</button>
+    </div>
+
+    <p class="foot-note" style="margin-top:10px">
+      This tracks rewards only — it does not connect to Roblox or transfer Robux automatically.
+      Each stage reward can only be earned once per word.
+    </p>
+
+    <div class="reward-history" id="rewardHistory"></div>
+
+    <div class="section-title">Daily streak rewards</div>
+
+    <div class="setting-row">
+      <label for="dailyTargetInput">Different words needed for a day to count</label>
+      <input id="dailyTargetInput" type="number" min="1" max="20" step="1">
+    </div>
+
+    <div class="milestone-grid">
+      <div class="milestone-card">
+        <label for="streak3Input">3-day streak bonus</label>
+        <input id="streak3Input" type="number" min="0" max="1000" step="1">
+      </div>
+      <div class="milestone-card">
+        <label for="streak5Input">5-day streak bonus</label>
+        <input id="streak5Input" type="number" min="0" max="1000" step="1">
+      </div>
+      <div class="milestone-card">
+        <label for="streak7Input">7-day streak bonus</label>
+        <input id="streak7Input" type="number" min="0" max="1000" step="1">
+      </div>
+      <div class="milestone-card">
+        <label for="streak14Input">14-day streak bonus</label>
+        <input id="streak14Input" type="number" min="0" max="2000" step="1">
+      </div>
+    </div>
+
+    <div class="actions" style="justify-content:flex-start">
+      <button class="secondary" id="saveStreakBtn">Save streak settings</button>
+    </div>
+
+    <p class="foot-note" style="margin-top:10px">
+      A day only counts once the child has answered the required number of different spelling words correctly.
+      Opening the app alone does not continue the streak.
+    </p>
 
     <div class="section-title">Progress controls</div>
     <div class="actions" style="justify-content:flex-start">
@@ -670,6 +1035,13 @@
     statCorrect: document.getElementById("statCorrect"),
     statAccuracy: document.getElementById("statAccuracy"),
     progressFill: document.getElementById("progressFill"),
+    robuxBank: document.getElementById("robuxBank"),
+    rewardPop: document.getElementById("rewardPop"),
+    streakTitle: document.getElementById("streakTitle"),
+    streakNext: document.getElementById("streakNext"),
+    streakCount: document.getElementById("streakCount"),
+    dailyProgressText: document.getElementById("dailyProgressText"),
+    dailyProgressFill: document.getElementById("dailyProgressFill"),
 
     gameCard: document.getElementById("gameCard"),
     masteredCard: document.getElementById("masteredCard"),
@@ -698,6 +1070,20 @@
     bulkAddBtn: document.getElementById("bulkAddBtn"),
     parentWordList: document.getElementById("parentWordList"),
     parentProfileName: document.getElementById("parentProfileName"),
+    rewardPending: document.getElementById("rewardPending"),
+    rewardPaid: document.getElementById("rewardPaid"),
+    rewardLifetime: document.getElementById("rewardLifetime"),
+    stageRewardInput: document.getElementById("stageRewardInput"),
+    masterRewardInput: document.getElementById("masterRewardInput"),
+    saveRewardsBtn: document.getElementById("saveRewardsBtn"),
+    markPaidBtn: document.getElementById("markPaidBtn"),
+    rewardHistory: document.getElementById("rewardHistory"),
+    dailyTargetInput: document.getElementById("dailyTargetInput"),
+    streak3Input: document.getElementById("streak3Input"),
+    streak5Input: document.getElementById("streak5Input"),
+    streak7Input: document.getElementById("streak7Input"),
+    streak14Input: document.getElementById("streak14Input"),
+    saveStreakBtn: document.getElementById("saveStreakBtn"),
     resetProgressBtn: document.getElementById("resetProgressBtn"),
     resetEverythingBtn: document.getElementById("resetEverythingBtn"),
     reviewBtn: document.getElementById("reviewBtn"),
@@ -721,7 +1107,9 @@
       correct: 0,
       incorrect: 0,
       attempts: 0,
-      lastPractised: null
+      lastPractised: null,
+      rewardedStages: [],
+      masterRewarded: false
     };
   }
 
@@ -729,7 +1117,25 @@
     return {
       name,
       words: DEFAULT_WORDS.map(freshWord),
-      totals: { correct:0, incorrect:0 }
+      totals: { correct:0, incorrect:0 },
+      rewards: {
+        pending:0,
+        paid:0,
+        lifetime:0,
+        stageAmount:1,
+        masterBonus:5,
+        history:[]
+      },
+      streak: {
+        current:0,
+        best:0,
+        lastCompletedDay:null,
+        todayKey:null,
+        todayWords:[],
+        rewardedMilestones:[],
+        dailyTarget:3,
+        milestones:{"3":5,"5":10,"7":20,"14":40}
+      }
     };
   }
 
@@ -752,6 +1158,50 @@
       if (!parsed.profiles?.child1 || !parsed.profiles?.child2) {
         return getDefaultState();
       }
+
+      Object.values(parsed.profiles).forEach(p => {
+        p.totals = p.totals || {correct:0, incorrect:0};
+        p.rewards = p.rewards || {
+          pending:0,
+          paid:0,
+          lifetime:0,
+          stageAmount:1,
+          masterBonus:5,
+          history:[]
+        };
+
+        p.rewards.pending = Number(p.rewards.pending || 0);
+        p.rewards.paid = Number(p.rewards.paid || 0);
+        p.rewards.lifetime = Number(p.rewards.lifetime || 0);
+        p.rewards.stageAmount = Number.isFinite(Number(p.rewards.stageAmount)) ? Number(p.rewards.stageAmount) : 1;
+        p.rewards.masterBonus = Number.isFinite(Number(p.rewards.masterBonus)) ? Number(p.rewards.masterBonus) : 5;
+        p.rewards.history = Array.isArray(p.rewards.history) ? p.rewards.history : [];
+
+        (p.words || []).forEach(w => {
+          w.rewardedStages = Array.isArray(w.rewardedStages) ? w.rewardedStages : [];
+          w.masterRewarded = Boolean(w.masterRewarded);
+        });
+
+        p.streak = p.streak || {
+          current:0,
+          best:0,
+          lastCompletedDay:null,
+          todayKey:null,
+          todayWords:[],
+          rewardedMilestones:[],
+          dailyTarget:3,
+          milestones:{"3":5,"5":10,"7":20,"14":40}
+        };
+        p.streak.current = Number(p.streak.current || 0);
+        p.streak.best = Number(p.streak.best || 0);
+        p.streak.lastCompletedDay = p.streak.lastCompletedDay || null;
+        p.streak.todayKey = p.streak.todayKey || null;
+        p.streak.todayWords = Array.isArray(p.streak.todayWords) ? p.streak.todayWords : [];
+        p.streak.rewardedMilestones = Array.isArray(p.streak.rewardedMilestones) ? p.streak.rewardedMilestones : [];
+        p.streak.dailyTarget = Math.max(1, Number(p.streak.dailyTarget || 3));
+        p.streak.milestones = Object.assign({"3":5,"5":10,"7":20,"14":40}, p.streak.milestones || {});
+      });
+
       return parsed;
     } catch {
       return getDefaultState();
@@ -863,6 +1313,40 @@
 
     const pct = total ? Math.round(mastered / total * 100) : 0;
     els.progressFill.style.width = pct + "%";
+
+    const rewards = p.rewards || {};
+    els.robuxBank.textContent = "R$ " + Math.max(0, Number(rewards.pending || 0));
+
+    const streak = ensureStreak();
+    const today = localDayKey();
+    const todayDone = streak.lastCompletedDay === today;
+    const current = Number(streak.current || 0);
+
+    els.streakTitle.textContent = `${current} day${current === 1 ? "" : "s"} streak`;
+    els.streakCount.textContent = `🔥 ${current}`;
+
+    const dailyDone = todayDone ? streak.dailyTarget : Math.min(streak.todayWords.length, streak.dailyTarget);
+    els.dailyProgressText.textContent = todayDone
+      ? `Done for today ✓`
+      : `${dailyDone} / ${streak.dailyTarget} different words`;
+
+    els.dailyProgressFill.style.width = `${todayDone ? 100 : Math.min(100, (dailyDone / streak.dailyTarget) * 100)}%`;
+
+    const next = nextStreakMilestone();
+    if (todayDone) {
+      if (next) {
+        const amount = Number(streak.milestones[String(next)] || 0);
+        const remaining = next - current;
+        els.streakNext.textContent = `${remaining} more day${remaining === 1 ? "" : "s"} until +R$ ${amount}.`;
+      } else {
+        els.streakNext.textContent = `14-day milestone reached — keep the streak going!`;
+      }
+    } else if (current > 0) {
+      const remainingWords = Math.max(0, streak.dailyTarget - streak.todayWords.length);
+      els.streakNext.textContent = `${remainingWords} more different word${remainingWords === 1 ? "" : "s"} today to protect the streak.`;
+    } else {
+      els.streakNext.textContent = `Complete ${streak.dailyTarget} different words today to start a streak.`;
+    }
   }
 
   function renderGame() {
@@ -1054,6 +1538,174 @@
     return copy;
   }
 
+  function localDayKey(date = new Date()) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2,"0");
+    const d = String(date.getDate()).padStart(2,"0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function dayDiff(fromKey, toKey) {
+    if (!fromKey || !toKey) return null;
+    const [fy,fm,fd] = fromKey.split("-").map(Number);
+    const [ty,tm,td] = toKey.split("-").map(Number);
+    const a = new Date(fy, fm - 1, fd);
+    const b = new Date(ty, tm - 1, td);
+    return Math.round((b - a) / 86400000);
+  }
+
+  function ensureStreak() {
+    const p = profile();
+    if (!p.streak) {
+      p.streak = {
+        current:0,
+        best:0,
+        lastCompletedDay:null,
+        todayKey:null,
+        todayWords:[],
+        rewardedMilestones:[],
+        dailyTarget:3,
+        milestones:{"3":5,"5":10,"7":20,"14":40}
+      };
+    }
+
+    p.streak.dailyTarget = Math.max(1, Number(p.streak.dailyTarget || 3));
+    p.streak.milestones = Object.assign({"3":5,"5":10,"7":20,"14":40}, p.streak.milestones || {});
+    p.streak.todayWords = Array.isArray(p.streak.todayWords) ? p.streak.todayWords : [];
+    p.streak.rewardedMilestones = Array.isArray(p.streak.rewardedMilestones) ? p.streak.rewardedMilestones : [];
+
+    const today = localDayKey();
+    if (p.streak.todayKey !== today) {
+      p.streak.todayKey = today;
+      p.streak.todayWords = [];
+    }
+
+    // If a full calendar day has been missed since the last completed day,
+    // reset the active streak and milestone eligibility.
+    if (p.streak.lastCompletedDay) {
+      const gap = dayDiff(p.streak.lastCompletedDay, today);
+      if (gap !== null && gap > 1) {
+        p.streak.current = 0;
+        p.streak.rewardedMilestones = [];
+      }
+    }
+
+    return p.streak;
+  }
+
+  function recordCorrectWordForStreak(word) {
+    const streak = ensureStreak();
+    const today = localDayKey();
+
+    if (streak.lastCompletedDay === today) {
+      return;
+    }
+
+    if (!streak.todayWords.includes(word.id)) {
+      streak.todayWords.push(word.id);
+    }
+
+    if (streak.todayWords.length >= streak.dailyTarget) {
+      completeStreakDay();
+    }
+  }
+
+  function completeStreakDay() {
+    const streak = ensureStreak();
+    const today = localDayKey();
+
+    if (streak.lastCompletedDay === today) return;
+
+    const gap = dayDiff(streak.lastCompletedDay, today);
+
+    if (!streak.lastCompletedDay || gap === null || gap > 1) {
+      streak.current = 1;
+      streak.rewardedMilestones = [];
+    } else if (gap === 1) {
+      streak.current += 1;
+    }
+
+    streak.lastCompletedDay = today;
+    streak.best = Math.max(Number(streak.best || 0), Number(streak.current || 0));
+
+    checkStreakMilestones();
+  }
+
+  function checkStreakMilestones() {
+    const streak = ensureStreak();
+    const milestones = [3,5,7,14];
+
+    milestones.forEach(days => {
+      if (streak.current >= days && !streak.rewardedMilestones.includes(days)) {
+        streak.rewardedMilestones.push(days);
+        const amount = Math.max(0, Math.floor(Number(streak.milestones[String(days)] || 0)));
+        if (amount > 0) {
+          awardRobux(amount, `${days}-day streak`, "");
+        }
+      }
+    });
+  }
+
+  function nextStreakMilestone() {
+    const streak = ensureStreak();
+    const milestones = [3,5,7,14];
+    return milestones.find(days => days > streak.current) || null;
+  }
+
+  function ensureRewards() {
+    const p = profile();
+    if (!p.rewards) {
+      p.rewards = {
+        pending:0,
+        paid:0,
+        lifetime:0,
+        stageAmount:1,
+        masterBonus:5,
+        history:[]
+      };
+    }
+    return p.rewards;
+  }
+
+  function awardRobux(amount, reason, wordText) {
+    amount = Math.max(0, Math.floor(Number(amount) || 0));
+    if (!amount) return;
+
+    const rewards = ensureRewards();
+    rewards.pending += amount;
+    rewards.lifetime += amount;
+
+    rewards.history.unshift({
+      amount,
+      reason,
+      word:wordText || "",
+      at:new Date().toISOString()
+    });
+
+    rewards.history = rewards.history.slice(0,30);
+    showRewardPop(amount, reason);
+  }
+
+  function showRewardPop(amount, reason) {
+    els.rewardPop.textContent = `+R$ ${amount} · ${reason}`;
+    els.rewardPop.classList.add("show");
+    setTimeout(() => els.rewardPop.classList.remove("show"), 1800);
+  }
+
+  function awardStageIfEligible(word, completedStage) {
+    word.rewardedStages = Array.isArray(word.rewardedStages) ? word.rewardedStages : [];
+    if (word.rewardedStages.includes(completedStage)) return;
+
+    word.rewardedStages.push(completedStage);
+    awardRobux(ensureRewards().stageAmount, `Stage ${completedStage}`, word.text);
+  }
+
+  function awardMasterIfEligible(word) {
+    if (word.masterRewarded) return;
+    word.masterRewarded = true;
+    awardRobux(ensureRewards().masterBonus, "Mastered", word.text);
+  }
+
   function checkAnswer() {
     const word = currentWord();
     if (!word) return;
@@ -1073,8 +1725,13 @@
       word.correct = (word.correct || 0) + 1;
       profile().totals.correct = (profile().totals.correct || 0) + 1;
 
+      const completedStage = Math.min(4, Math.max(1, word.stage || 1));
+      awardStageIfEligible(word, completedStage);
+      recordCorrectWordForStreak(word);
+
       if (word.stage >= 4) {
         word.mastered = true;
+        awardMasterIfEligible(word);
         showFeedback(`Correct — "${word.text}" is mastered! ★`, true);
       } else {
         word.stage = Math.min(4, (word.stage || 1) + 1);
@@ -1175,6 +1832,38 @@
     els.profileName2.value = state.profiles.child2.name;
     els.parentProfileName.textContent = p.name;
 
+    const rewards = ensureRewards();
+    els.rewardPending.textContent = rewards.pending || 0;
+    els.rewardPaid.textContent = rewards.paid || 0;
+    els.rewardLifetime.textContent = rewards.lifetime || 0;
+    els.stageRewardInput.value = rewards.stageAmount ?? 1;
+    els.masterRewardInput.value = rewards.masterBonus ?? 5;
+
+    const streak = ensureStreak();
+    els.dailyTargetInput.value = streak.dailyTarget || 3;
+    els.streak3Input.value = streak.milestones["3"] ?? 5;
+    els.streak5Input.value = streak.milestones["5"] ?? 10;
+    els.streak7Input.value = streak.milestones["7"] ?? 20;
+    els.streak14Input.value = streak.milestones["14"] ?? 40;
+
+    els.rewardHistory.innerHTML = "";
+    if (rewards.history?.length) {
+      rewards.history.slice(0,8).forEach(item => {
+        const row = document.createElement("div");
+        row.className = "reward-history-row";
+
+        const left = document.createElement("span");
+        const when = item.at ? new Date(item.at).toLocaleDateString() : "";
+        left.textContent = `${item.reason}${item.word ? ` · ${item.word}` : ""}${when ? ` · ${when}` : ""}`;
+
+        const right = document.createElement("strong");
+        right.textContent = item.amount ? `+R$ ${item.amount}` : "Paid ✓";
+
+        row.append(left,right);
+        els.rewardHistory.appendChild(row);
+      });
+    }
+
     els.parentWordList.innerHTML = "";
 
     if (!p.words.length) {
@@ -1250,7 +1939,9 @@
       correct:0,
       incorrect:0,
       attempts:0,
-      lastPractised:null
+      lastPractised:null,
+      rewardedStages:Array.isArray(w.rewardedStages) ? w.rewardedStages : [],
+      masterRewarded:Boolean(w.masterRewarded)
     }));
     profile().totals = {correct:0, incorrect:0};
 
@@ -1265,6 +1956,24 @@
 
     profile().words = [];
     profile().totals = {correct:0, incorrect:0};
+    profile().rewards = {
+      pending:0,
+      paid:0,
+      lifetime:0,
+      stageAmount:1,
+      masterBonus:5,
+      history:[]
+    };
+    profile().streak = {
+      current:0,
+      best:0,
+      lastCompletedDay:null,
+      todayKey:null,
+      todayWords:[],
+      rewardedMilestones:[],
+      dailyTarget:3,
+      milestones:{"3":5,"5":10,"7":20,"14":40}
+    };
     currentWordId = null;
     reviewMode = false;
     saveState();
@@ -1321,6 +2030,52 @@
       els.bulkWordsInput.value = "";
       render();
     }
+  });
+
+  els.saveRewardsBtn.addEventListener("click", () => {
+    const rewards = ensureRewards();
+    rewards.stageAmount = Math.max(0, Math.floor(Number(els.stageRewardInput.value) || 0));
+    rewards.masterBonus = Math.max(0, Math.floor(Number(els.masterRewardInput.value) || 0));
+    saveState();
+    render();
+  });
+
+  els.markPaidBtn.addEventListener("click", () => {
+    const rewards = ensureRewards();
+    const amount = Math.max(0, Number(rewards.pending || 0));
+
+    if (!amount) {
+      alert("There are no Robux waiting to be paid.");
+      return;
+    }
+
+    if (!confirm(`Mark R$ ${amount} as paid to ${profile().name}?`)) return;
+
+    rewards.pending = 0;
+    rewards.paid += amount;
+    rewards.history.unshift({
+      amount:0,
+      reason:`R$ ${amount} marked as paid`,
+      word:"",
+      at:new Date().toISOString()
+    });
+    rewards.history = rewards.history.slice(0,30);
+
+    saveState();
+    render();
+  });
+
+  els.saveStreakBtn.addEventListener("click", () => {
+    const streak = ensureStreak();
+
+    streak.dailyTarget = Math.max(1, Math.min(20, Math.floor(Number(els.dailyTargetInput.value) || 3)));
+    streak.milestones["3"] = Math.max(0, Math.floor(Number(els.streak3Input.value) || 0));
+    streak.milestones["5"] = Math.max(0, Math.floor(Number(els.streak5Input.value) || 0));
+    streak.milestones["7"] = Math.max(0, Math.floor(Number(els.streak7Input.value) || 0));
+    streak.milestones["14"] = Math.max(0, Math.floor(Number(els.streak14Input.value) || 0));
+
+    saveState();
+    render();
   });
 
   els.resetProgressBtn.addEventListener("click", resetProgressOnly);
