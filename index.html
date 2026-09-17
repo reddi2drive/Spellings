@@ -433,7 +433,7 @@
     align-items:center;
     gap:10px;
     flex-wrap:wrap;
-    margin-bottom:16px;
+    margin-bottom:8px;
   }
 
   .word-picker-label{
@@ -444,27 +444,89 @@
     letter-spacing:.55px;
   }
 
-  .word-picker{
-    min-width:min(320px,100%);
+  .word-change-btn{
     border:2px solid #dce2eb;
     background:#fff;
     color:var(--ink);
     border-radius:14px;
-    padding:11px 40px 11px 14px;
+    padding:11px 16px;
     font-weight:900;
-    outline:none;
+    min-width:160px;
   }
 
-  .word-picker:focus{
+  .word-change-btn:hover{
     border-color:var(--blue);
-    box-shadow:0 0 0 4px rgba(79,124,255,.10);
+  }
+
+  .word-change-btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
   }
 
   .word-focus-note{
-    margin:-5px auto 14px;
+    margin:0 auto 14px;
     color:#7a8599;
     font-size:12px;
     font-weight:800;
+  }
+
+  .word-chooser{
+    display:none;
+    width:min(620px,100%);
+    margin:8px auto 18px;
+    padding:14px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:#f8faff;
+  }
+
+  .word-chooser.open{
+    display:block;
+  }
+
+  .word-chooser-title{
+    margin:0 0 10px;
+    font-size:13px;
+    color:#59657a;
+    font-weight:900;
+  }
+
+  .word-choice-grid{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:9px;
+  }
+
+  .word-choice-btn{
+    border:1px solid #dce2eb;
+    background:#fff;
+    color:var(--ink);
+    border-radius:12px;
+    padding:10px 13px;
+    font-weight:900;
+  }
+
+  .word-choice-btn:hover{
+    border-color:var(--blue);
+    background:#f2f6ff;
+  }
+
+  .word-choice-btn small{
+    display:block;
+    margin-top:2px;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:800;
+  }
+
+  .word-chooser-close{
+    margin-top:10px;
+    border:0;
+    background:transparent;
+    color:#657188;
+    font-weight:900;
+    padding:7px 10px;
   }
 
   .stage-pill{
@@ -887,10 +949,19 @@
   <section class="game-card" id="gameCard">
 
     <div class="word-picker-wrap">
-      <span class="word-picker-label">Choose word</span>
-      <select class="word-picker" id="wordPicker" aria-label="Choose a spelling word"></select>
+      <span class="word-picker-label">Practice word</span>
+      <button class="word-change-btn" id="changeWordBtn" type="button">Change word</button>
     </div>
-    <div class="word-focus-note" id="wordFocusNote">Stay on this word until you choose another.</div>
+
+    <div class="word-focus-note" id="wordFocusNote">
+      Word selected — work through the stages to master it.
+    </div>
+
+    <div class="word-chooser" id="wordChooser" aria-hidden="true">
+      <p class="word-chooser-title">Choose a word to practise</p>
+      <div class="word-choice-grid" id="wordChoiceGrid"></div>
+      <button class="word-chooser-close" id="closeWordChooser" type="button">Close</button>
+    </div>
 
     <div class="stage-pill" id="stagePill">Stage 1 · Copy it</div>
     <p class="stage-help" id="stageHelp"></p>
@@ -1091,7 +1162,10 @@
     dailyProgressFill: document.getElementById("dailyProgressFill"),
 
     gameCard: document.getElementById("gameCard"),
-    wordPicker: document.getElementById("wordPicker"),
+    changeWordBtn: document.getElementById("changeWordBtn"),
+    wordChooser: document.getElementById("wordChooser"),
+    wordChoiceGrid: document.getElementById("wordChoiceGrid"),
+    closeWordChooser: document.getElementById("closeWordChooser"),
     wordFocusNote: document.getElementById("wordFocusNote"),
     masteredCard: document.getElementById("masteredCard"),
     masteredText: document.getElementById("masteredText"),
@@ -1409,33 +1483,60 @@
     const p = profile();
     const words = reviewMode ? p.words : p.words.filter(w => !w.mastered);
 
-    els.wordPicker.innerHTML = "";
+    els.wordChoiceGrid.innerHTML = "";
 
     if (!words.length) {
-      els.wordPicker.disabled = true;
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "No words available";
-      els.wordPicker.appendChild(opt);
+      els.changeWordBtn.disabled = true;
+      els.wordFocusNote.textContent = "No practice words available.";
       return;
     }
 
-    els.wordPicker.disabled = false;
+    els.changeWordBtn.disabled = false;
 
     words.forEach(word => {
-      const opt = document.createElement("option");
-      opt.value = word.id;
-      opt.textContent = `${word.text} — ${word.mastered ? "Mastered" : `Stage ${word.stage || 1}`}`;
-      els.wordPicker.appendChild(opt);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "word-choice-btn";
+
+      const label = document.createElement("span");
+      label.textContent = word.text;
+
+      const status = document.createElement("small");
+      status.textContent = word.mastered
+        ? "Mastered"
+        : `Stage ${word.stage || 1}`;
+
+      btn.append(label, status);
+      btn.addEventListener("click", () => {
+        chooseWord(word.id);
+        closeWordChooser();
+      });
+
+      els.wordChoiceGrid.appendChild(btn);
     });
 
     const word = currentWord();
     if (word) {
-      els.wordPicker.value = word.id;
       els.wordFocusNote.textContent = word.mastered
-        ? `Reviewing "${word.text}".`
-        : `Working on "${word.text}" until you choose another word or master it.`;
+        ? "Review word selected."
+        : "Word selected — work through the stages to master it.";
     }
+  }
+
+  function openWordChooser() {
+    if (previewRunning) return;
+    els.wordChooser.classList.add("open");
+    els.wordChooser.setAttribute("aria-hidden","false");
+  }
+
+  function closeWordChooser() {
+    els.wordChooser.classList.remove("open");
+    els.wordChooser.setAttribute("aria-hidden","true");
+  }
+
+  function setWordChangeLocked(locked) {
+    els.changeWordBtn.disabled = Boolean(locked);
+    if (locked) closeWordChooser();
   }
 
   function renderGame() {
@@ -1481,6 +1582,7 @@
     els.timerBar.style.transform = "scaleX(1)";
 
     previewRunning = false;
+    setWordChangeLocked(false);
 
     if (stage === 1) {
       els.wordDisplay.textContent = word.text;
@@ -1524,6 +1626,7 @@
     if (!word) return;
 
     previewRunning = true;
+    setWordChangeLocked(true);
     const seconds = stage === 2 ? 5 : 3;
 
     els.wordDisplay.textContent = word.text;
@@ -1834,6 +1937,7 @@
       renderParent();
       renderStageDots(word.stage, word.mastered);
 
+      setWordChangeLocked(true);
       lockCurrentInputs();
 
       setTimeout(() => {
@@ -1867,6 +1971,7 @@
           els.wordDisplay.textContent = word.text;
           els.wordDisplay.classList.add("hidden-word");
           clearFeedback();
+          setWordChangeLocked(false);
         }, 1800);
       } else {
         setTimeout(() => {
@@ -1877,6 +1982,7 @@
           }
           els.answerInput.focus();
           clearFeedback();
+          setWordChangeLocked(false);
         }, 1800);
       }
     }
@@ -2079,8 +2185,17 @@
   }
 
   // Event bindings
-  els.wordPicker.addEventListener("change", () => {
-    if (els.wordPicker.value) chooseWord(els.wordPicker.value);
+  els.changeWordBtn.addEventListener("click", openWordChooser);
+  els.closeWordChooser.addEventListener("click", closeWordChooser);
+
+  document.addEventListener("click", e => {
+    if (
+      els.wordChooser.classList.contains("open") &&
+      !els.wordChooser.contains(e.target) &&
+      e.target !== els.changeWordBtn
+    ) {
+      closeWordChooser();
+    }
   });
 
   els.parentBtn.addEventListener("click", openParent);
