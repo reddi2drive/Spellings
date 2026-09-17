@@ -94,6 +94,34 @@
     box-shadow:var(--shadow);
   }
 
+  .profile-avatar{
+    width:54px;
+    height:54px;
+    flex:0 0 54px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #fff;
+    box-shadow:0 4px 14px rgba(23,32,51,.13);
+    background:#e9eef7;
+  }
+
+  .profile-avatar-wrap{
+    position:relative;
+    flex:0 0 auto;
+  }
+
+  .profile-avatar-wrap::after{
+    content:"";
+    position:absolute;
+    right:1px;
+    bottom:1px;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:var(--green);
+    border:2px solid #fff;
+  }
+
   .profile-label{
     font-size:12px;
     font-weight:900;
@@ -1255,6 +1283,97 @@
     color:#68748a;
   }
 
+  .avatar-settings{
+    display:grid;
+    gap:12px;
+    margin:10px 0 4px;
+  }
+
+  .avatar-child-card{
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:14px;
+    background:#fafbfe;
+  }
+
+  .avatar-child-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
+  }
+
+  .avatar-child-preview{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #fff;
+    box-shadow:0 3px 10px rgba(23,32,51,.10);
+    background:#e9eef7;
+  }
+
+  .avatar-child-head strong{
+    font-size:15px;
+  }
+
+  .avatar-child-head small{
+    display:block;
+    color:var(--muted);
+    margin-top:2px;
+    font-weight:750;
+  }
+
+  .avatar-choice-row{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .avatar-choice{
+    border:2px solid transparent;
+    background:#fff;
+    border-radius:16px;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--ink);
+    font-weight:900;
+    text-align:left;
+    box-shadow:0 3px 10px rgba(23,32,51,.05);
+  }
+
+  .avatar-choice:hover{
+    border-color:#cdd8f6;
+  }
+
+  .avatar-choice.selected{
+    border-color:var(--blue);
+    background:#f2f6ff;
+    box-shadow:0 0 0 3px rgba(79,124,255,.08);
+  }
+
+  .avatar-choice img{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    object-fit:cover;
+    flex:0 0 48px;
+  }
+
+  .avatar-choice span{
+    min-width:0;
+  }
+
+  .avatar-choice small{
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:750;
+    margin-top:2px;
+  }
+
   .name-settings{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -1289,6 +1408,8 @@
     .game-card{min-height:510px;border-radius:22px;padding:22px 15px}
     .profile-bar{position:relative;top:auto;z-index:auto}
     .profile-label{font-size:11px}
+    .profile-avatar{width:46px;height:46px;flex-basis:46px}
+    .avatar-choice-row{grid-template-columns:1fr}
     .mastered-words-section{border-radius:20px;padding:16px}
     .form-row{flex-direction:column}
     .name-settings{grid-template-columns:1fr}
@@ -1309,6 +1430,9 @@
   </div>
 
   <div class="profile-bar">
+    <div class="profile-avatar-wrap">
+      <img class="profile-avatar" id="profileAvatar" alt="">
+    </div>
     <span class="profile-label">Learner</span>
     <select class="profile-select" id="profileSelect" aria-label="Choose learner"></select>
   </div>
@@ -1533,6 +1657,58 @@
     </div>
     <button class="secondary" id="saveNamesBtn">Save names</button>
 
+    <div class="section-title">Avatars</div>
+    <div class="avatar-settings">
+
+      <div class="avatar-child-card">
+        <div class="avatar-child-head">
+          <img class="avatar-child-preview" id="avatarPreviewChild1" alt="">
+          <div>
+            <strong id="avatarNameChild1">Child 1</strong>
+            <small>Choose an avatar</small>
+          </div>
+        </div>
+
+        <div class="avatar-choice-row">
+          <button class="avatar-choice" type="button" data-profile="child1" data-avatar="popstar">
+            <img src="assets/avatars/popstar.webp" alt="">
+            <span>Pop Star<small>Fedora & red stage jacket</small></span>
+          </button>
+
+          <button class="avatar-choice" type="button" data-profile="child1" data-avatar="speedster">
+            <img src="assets/avatars/speedster.webp" alt="">
+            <span>Blue Speedster<small>Fast game-style hero</small></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="avatar-child-card">
+        <div class="avatar-child-head">
+          <img class="avatar-child-preview" id="avatarPreviewChild2" alt="">
+          <div>
+            <strong id="avatarNameChild2">Child 2</strong>
+            <small>Choose an avatar</small>
+          </div>
+        </div>
+
+        <div class="avatar-choice-row">
+          <button class="avatar-choice" type="button" data-profile="child2" data-avatar="popstar">
+            <img src="assets/avatars/popstar.webp" alt="">
+            <span>Pop Star<small>Fedora & red stage jacket</small></span>
+          </button>
+
+          <button class="avatar-choice" type="button" data-profile="child2" data-avatar="speedster">
+            <img src="assets/avatars/speedster.webp" alt="">
+            <span>Blue Speedster<small>Fast game-style hero</small></span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <p class="foot-note" style="margin-top:10px">
+      Each learner keeps their own avatar along with their spelling progress, Robux and streaks.
+    </p>
+
     <div class="section-title">Add spellings</div>
     <div class="form-row">
       <input id="newWordInput" placeholder="Type a spelling word" maxlength="40">
@@ -1641,6 +1817,17 @@
 (() => {
   const STORAGE_KEY = "spellingSteps_v1";
 
+  const AVATARS = {
+    popstar: {
+      label: "Pop Star",
+      src: "assets/avatars/popstar.webp"
+    },
+    speedster: {
+      label: "Blue Speedster",
+      src: "assets/avatars/speedster.webp"
+    }
+  };
+
   const DEFAULT_WORDS = [
     "because",
     "friend",
@@ -1692,6 +1879,11 @@
 
   const els = {
     profileSelect: document.getElementById("profileSelect"),
+    profileAvatar: document.getElementById("profileAvatar"),
+    avatarPreviewChild1: document.getElementById("avatarPreviewChild1"),
+    avatarPreviewChild2: document.getElementById("avatarPreviewChild2"),
+    avatarNameChild1: document.getElementById("avatarNameChild1"),
+    avatarNameChild2: document.getElementById("avatarNameChild2"),
     appNav: document.getElementById("appNav"),
     progressTabBadge: document.getElementById("progressTabBadge"),
     masteredTabBadge: document.getElementById("masteredTabBadge"),
@@ -1811,9 +2003,10 @@
     };
   }
 
-  function defaultProfile(name) {
+  function defaultProfile(name, avatar = "popstar") {
     return {
       name,
+      avatar,
       words: DEFAULT_WORDS.map(freshWord),
       totals: { correct:0, incorrect:0 },
       activityLog: [],
@@ -1843,8 +2036,8 @@
       parentPin:null,
       currentProfileId:"child1",
       profiles:{
-        child1: defaultProfile("Child 1"),
-        child2: defaultProfile("Child 2")
+        child1: defaultProfile("Child 1", "popstar"),
+        child2: defaultProfile("Child 2", "speedster")
       }
     };
   }
@@ -1861,7 +2054,11 @@
 
       parsed.parentPin = parsed.parentPin || null;
 
-      Object.values(parsed.profiles).forEach(p => {
+      Object.entries(parsed.profiles).forEach(([profileId,p]) => {
+        p.avatar = AVATARS[p.avatar]
+          ? p.avatar
+          : (profileId === "child2" ? "speedster" : "popstar");
+
         p.totals = p.totals || {correct:0, incorrect:0};
         p.rewards = p.rewards || {
           pending:0,
@@ -1930,6 +2127,11 @@
 
   function profile() {
     return state.profiles[currentProfileId];
+  }
+
+  function avatarFor(profileData) {
+    const key = profileData?.avatar;
+    return AVATARS[key] || AVATARS.popstar;
   }
 
   function normalizeWord(word) {
@@ -2160,6 +2362,12 @@
     });
 
     els.profileSelect.value = currentProfileId;
+
+    const selected = profile();
+    const avatar = avatarFor(selected);
+    els.profileAvatar.src = avatar.src;
+    els.profileAvatar.alt = `${selected.name} avatar`;
+    els.profileAvatar.title = avatar.label;
   }
 
   function renderStats() {
@@ -2946,6 +3154,26 @@
     els.profileName2.value = state.profiles.child2.name;
     els.parentProfileName.textContent = p.name;
 
+    els.avatarNameChild1.textContent = state.profiles.child1.name;
+    els.avatarNameChild2.textContent = state.profiles.child2.name;
+
+    const child1Avatar = avatarFor(state.profiles.child1);
+    const child2Avatar = avatarFor(state.profiles.child2);
+
+    els.avatarPreviewChild1.src = child1Avatar.src;
+    els.avatarPreviewChild1.alt = `${state.profiles.child1.name} avatar`;
+
+    els.avatarPreviewChild2.src = child2Avatar.src;
+    els.avatarPreviewChild2.alt = `${state.profiles.child2.name} avatar`;
+
+    document.querySelectorAll(".avatar-choice").forEach(btn => {
+      const profileId = btn.dataset.profile;
+      const avatarKey = btn.dataset.avatar;
+      const selected = state.profiles[profileId]?.avatar === avatarKey;
+      btn.classList.toggle("selected", selected);
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
+    });
+
     const week = weeklySummary();
     els.weekWords.textContent = week.words;
     els.weekMastered.textContent = week.mastered;
@@ -3208,6 +3436,19 @@
   }
 
   // Event bindings
+  document.querySelectorAll(".avatar-choice").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const profileId = btn.dataset.profile;
+      const avatarKey = btn.dataset.avatar;
+
+      if (!state.profiles[profileId] || !AVATARS[avatarKey]) return;
+
+      state.profiles[profileId].avatar = avatarKey;
+      saveState();
+      render();
+    });
+  });
+
   els.profileSelect.addEventListener("change", () => {
     if (els.profileSelect.value) {
       switchProfile(els.profileSelect.value);
