@@ -86,26 +86,37 @@
     border:1px solid rgba(255,255,255,.9);
     backdrop-filter:blur(12px);
     border-radius:20px;
-    padding:12px;
+    padding:12px 14px;
     display:flex;
-    gap:10px;
+    align-items:center;
+    gap:12px;
     margin-bottom:18px;
     box-shadow:var(--shadow);
   }
 
-  .profile-btn{
-    flex:1;
-    border:0;
-    border-radius:14px;
-    padding:12px 10px;
-    background:#edf1f7;
-    color:#536076;
+  .profile-label{
+    font-size:12px;
     font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.65px;
+    color:var(--muted);
+    white-space:nowrap;
   }
 
-  .profile-btn.active{
-    background:var(--ink);
-    color:#fff;
+  .profile-select{
+    flex:1;
+    min-width:0;
+    border:0;
+    border-radius:14px;
+    padding:12px 44px 12px 14px;
+    background:#edf1f7;
+    color:var(--ink);
+    font-weight:950;
+    outline:none;
+  }
+
+  .profile-select:focus{
+    box-shadow:0 0 0 4px rgba(79,124,255,.10);
   }
 
   .stats{
@@ -713,6 +724,76 @@
   .stage-dot.done{background:var(--green)}
   .stage-dot.current{background:var(--blue); box-shadow:0 0 0 4px rgba(79,124,255,.13)}
 
+  .mastered-words-section{
+    margin-top:18px;
+    background:var(--card);
+    border:1px solid rgba(18,35,63,.07);
+    border-radius:24px;
+    padding:20px;
+    box-shadow:var(--shadow);
+  }
+
+  .mastered-words-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+  }
+
+  .mastered-words-head h2{
+    margin:0;
+    font-size:20px;
+    letter-spacing:-.3px;
+  }
+
+  .mastered-count{
+    background:#eaf8f0;
+    color:#168652;
+    border-radius:999px;
+    padding:7px 11px;
+    font-size:12px;
+    font-weight:950;
+  }
+
+  .mastered-words-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+  }
+
+  .mastered-word-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    border:1px solid #d9e8df;
+    background:#f5fcf8;
+    color:#1b6e49;
+    border-radius:12px;
+    padding:9px 12px;
+    font-weight:900;
+  }
+
+  .mastered-word-chip::before{
+    content:"✓";
+    display:inline-grid;
+    place-items:center;
+    width:19px;
+    height:19px;
+    border-radius:50%;
+    background:#20b26b;
+    color:#fff;
+    font-size:11px;
+    font-weight:1000;
+  }
+
+  .mastered-empty{
+    color:var(--muted);
+    font-weight:750;
+    font-size:14px;
+    padding:4px 0;
+  }
+
   .mastered-card{
     display:none;
     background:linear-gradient(145deg,#ffffff,#f7fff9);
@@ -883,6 +964,8 @@
     .setting-row{grid-template-columns:1fr 95px}
     .game-card{min-height:510px;border-radius:22px;padding:22px 15px}
     .profile-bar{position:sticky;top:8px;z-index:10}
+    .profile-label{font-size:11px}
+    .mastered-words-section{border-radius:20px;padding:16px}
     .form-row{flex-direction:column}
     .name-settings{grid-template-columns:1fr}
     .letter-btn{min-width:49px;min-height:49px}
@@ -901,7 +984,10 @@
     <button class="icon-btn" id="parentBtn">⚙ Parent</button>
   </div>
 
-  <div class="profile-bar" id="profileBar"></div>
+  <div class="profile-bar">
+    <span class="profile-label">Learner</span>
+    <select class="profile-select" id="profileSelect" aria-label="Choose learner"></select>
+  </div>
 
   <div class="stats">
     <div class="stat"><strong id="statWords">0</strong><span>Words</span></div>
@@ -998,6 +1084,14 @@
       <button class="primary" id="reviewBtn">Review mastered words</button>
       <button class="secondary" id="parentFromDoneBtn">Add more words</button>
     </div>
+  </section>
+
+  <section class="mastered-words-section">
+    <div class="mastered-words-head">
+      <h2>Mastered Words</h2>
+      <span class="mastered-count" id="masteredWordsCount">0 mastered</span>
+    </div>
+    <div class="mastered-words-grid" id="masteredWordsGrid"></div>
   </section>
 
 </div>
@@ -1147,7 +1241,7 @@
   };
 
   const els = {
-    profileBar: document.getElementById("profileBar"),
+    profileSelect: document.getElementById("profileSelect"),
     statWords: document.getElementById("statWords"),
     statMastered: document.getElementById("statMastered"),
     statCorrect: document.getElementById("statCorrect"),
@@ -1169,6 +1263,8 @@
     wordFocusNote: document.getElementById("wordFocusNote"),
     masteredCard: document.getElementById("masteredCard"),
     masteredText: document.getElementById("masteredText"),
+    masteredWordsCount: document.getElementById("masteredWordsCount"),
+    masteredWordsGrid: document.getElementById("masteredWordsGrid"),
 
     stagePill: document.getElementById("stagePill"),
     stageHelp: document.getElementById("stageHelp"),
@@ -1413,18 +1509,21 @@
     renderProfiles();
     renderStats();
     renderParent();
+    renderMasteredWords();
     renderGame();
   }
 
   function renderProfiles() {
-    els.profileBar.innerHTML = "";
+    els.profileSelect.innerHTML = "";
+
     Object.entries(state.profiles).forEach(([id,p]) => {
-      const btn = document.createElement("button");
-      btn.className = "profile-btn" + (id === currentProfileId ? " active" : "");
-      btn.textContent = p.name;
-      btn.addEventListener("click", () => switchProfile(id));
-      els.profileBar.appendChild(btn);
+      const option = document.createElement("option");
+      option.value = id;
+      option.textContent = p.name;
+      els.profileSelect.appendChild(option);
     });
+
+    els.profileSelect.value = currentProfileId;
   }
 
   function renderStats() {
@@ -1537,6 +1636,32 @@
   function setWordChangeLocked(locked) {
     els.changeWordBtn.disabled = Boolean(locked);
     if (locked) closeWordChooser();
+  }
+
+  function renderMasteredWords() {
+    const mastered = profile().words
+      .filter(w => w.mastered)
+      .sort((a,b) => a.text.localeCompare(b.text));
+
+    els.masteredWordsCount.textContent =
+      `${mastered.length} mastered`;
+
+    els.masteredWordsGrid.innerHTML = "";
+
+    if (!mastered.length) {
+      const empty = document.createElement("div");
+      empty.className = "mastered-empty";
+      empty.textContent = "No mastered words yet. Complete all four stages of a word and it will appear here.";
+      els.masteredWordsGrid.appendChild(empty);
+      return;
+    }
+
+    mastered.forEach(word => {
+      const chip = document.createElement("div");
+      chip.className = "mastered-word-chip";
+      chip.textContent = word.text;
+      els.masteredWordsGrid.appendChild(chip);
+    });
   }
 
   function renderGame() {
@@ -2185,6 +2310,12 @@
   }
 
   // Event bindings
+  els.profileSelect.addEventListener("change", () => {
+    if (els.profileSelect.value) {
+      switchProfile(els.profileSelect.value);
+    }
+  });
+
   els.changeWordBtn.addEventListener("click", openWordChooser);
   els.closeWordChooser.addEventListener("click", closeWordChooser);
 
