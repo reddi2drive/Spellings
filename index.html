@@ -724,6 +724,150 @@
   .stage-dot.done{background:var(--green)}
   .stage-dot.current{background:var(--blue); box-shadow:0 0 0 4px rgba(79,124,255,.13)}
 
+  .review-due-section{
+    margin-top:18px;
+    background:linear-gradient(145deg,#ffffff,#fffaf1);
+    border:1px solid rgba(196,123,20,.13);
+    border-radius:24px;
+    padding:20px;
+    box-shadow:var(--shadow);
+  }
+
+  .review-due-head,
+  .parent-section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+  }
+
+  .review-due-head h2,
+  .parent-section-head h3{
+    margin:0;
+  }
+
+  .review-count{
+    background:#fff1cf;
+    color:#9a6410;
+    border-radius:999px;
+    padding:7px 11px;
+    font-size:12px;
+    font-weight:950;
+  }
+
+  .review-due-list,
+  .problem-list{
+    display:grid;
+    gap:9px;
+  }
+
+  .review-due-row,
+  .problem-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:11px 12px;
+    background:#fff;
+  }
+
+  .review-due-row strong,
+  .problem-row strong{display:block}
+
+  .review-due-row small,
+  .problem-row small{
+    color:var(--muted);
+    font-weight:750;
+  }
+
+  .audio-btn{
+    border:0;
+    border-radius:15px;
+    padding:13px 18px;
+    font-weight:950;
+    background:#eef3ff;
+    color:#385bcb;
+  }
+
+  .sentence-btn{
+    border:0;
+    border-radius:15px;
+    padding:13px 18px;
+    font-weight:950;
+    background:#f3efff;
+    color:#6742c5;
+  }
+
+  .weekly-summary-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+  }
+
+  .weekly-summary-card{
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:#fafbfe;
+    padding:12px;
+  }
+
+  .weekly-summary-card strong{
+    display:block;
+    font-size:21px;
+  }
+
+  .weekly-summary-card span{
+    display:block;
+    margin-top:2px;
+    color:var(--muted);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.45px;
+    font-weight:850;
+  }
+
+  .parent-tool-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:9px;
+  }
+
+  .word-row-actions{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+
+  .sentence-edit-btn{
+    border:0;
+    border-radius:10px;
+    padding:8px 10px;
+    background:#eef3ff;
+    color:#385bcb;
+    font-weight:900;
+  }
+
+  .mastered-word-chip{
+    flex-wrap:wrap;
+  }
+
+  .mastered-word-chip small{
+    width:100%;
+    margin-left:26px;
+    color:#57806b;
+    font-size:10px;
+  }
+
+  @media (max-width:650px){
+    .weekly-summary-grid{grid-template-columns:repeat(2,1fr)}
+    .parent-tool-grid{grid-template-columns:1fr}
+    .review-due-section{border-radius:20px;padding:16px}
+  }
+
   .mastered-words-section{
     margin-top:18px;
     background:var(--card);
@@ -1086,6 +1230,14 @@
     </div>
   </section>
 
+  <section class="review-due-section" id="reviewDueSection">
+    <div class="review-due-head">
+      <h2>Review Due</h2>
+      <span class="review-count" id="reviewDueCount">0 due</span>
+    </div>
+    <div class="review-due-list" id="reviewDueList"></div>
+  </section>
+
   <section class="mastered-words-section">
     <div class="mastered-words-head">
       <h2>Mastered Words</h2>
@@ -1112,6 +1264,16 @@
     </div>
     <button class="secondary" id="saveNamesBtn">Save names</button>
 
+    <div class="section-title">This week's summary</div>
+    <div class="weekly-summary-grid">
+      <div class="weekly-summary-card"><strong id="weekWords">0</strong><span>Words practised</span></div>
+      <div class="weekly-summary-card"><strong id="weekMastered">0</strong><span>Mastered</span></div>
+      <div class="weekly-summary-card"><strong id="weekCorrect">0</strong><span>Correct</span></div>
+      <div class="weekly-summary-card"><strong id="weekAccuracy">0%</strong><span>Accuracy</span></div>
+      <div class="weekly-summary-card"><strong id="weekStreak">0</strong><span>Current streak</span></div>
+      <div class="weekly-summary-card"><strong id="weekRobux">R$ 0</strong><span>Robux earned</span></div>
+    </div>
+
     <div class="section-title">Add spellings</div>
     <div class="form-row">
       <input id="newWordInput" placeholder="Type a spelling word" maxlength="40">
@@ -1125,6 +1287,9 @@
 
     <div class="section-title">Words for <span id="parentProfileName"></span></div>
     <div class="word-list" id="parentWordList"></div>
+
+    <div class="section-title">Problem words</div>
+    <div class="problem-list" id="problemWordsList"></div>
 
     <div class="section-title">Robux rewards</div>
 
@@ -1191,6 +1356,19 @@
       Opening the app alone does not continue the streak.
     </p>
 
+    <div class="section-title">Parent security</div>
+    <div class="actions" style="justify-content:flex-start">
+      <button class="secondary" id="changePinBtn">Change Parent PIN</button>
+    </div>
+    <p class="foot-note" style="margin-top:10px">The Parent area is protected by a 4-digit PIN stored on this device.</p>
+
+    <div class="section-title">Backup & restore</div>
+    <div class="parent-tool-grid">
+      <button class="secondary" id="exportBtn">Export progress backup</button>
+      <button class="secondary" id="importBtn">Import progress backup</button>
+    </div>
+    <input id="importFileInput" type="file" accept="application/json,.json" hidden>
+
     <div class="section-title">Progress controls</div>
     <div class="actions" style="justify-content:flex-start">
       <button class="secondary" id="resetProgressBtn">Reset progress only</button>
@@ -1198,8 +1376,7 @@
     </div>
 
     <p class="foot-note">
-      Progress is saved automatically on this device using browser localStorage.
-      Clearing browser/site data will also clear this progress.
+      Progress is saved automatically on this device using browser localStorage. Use Export progress backup before clearing browser/site data or moving to another device.
     </p>
   </div>
 </div>
@@ -1221,6 +1398,19 @@
     "again"
   ];
 
+  const DEFAULT_SENTENCES = {
+    because:"I wore my coat because it was raining.",
+    friend:"My friend came to play after school.",
+    people:"Lots of people visited the park today.",
+    school:"We walked to school in the morning.",
+    different:"The two pictures look different from each other.",
+    beautiful:"The garden looked beautiful in the sunshine.",
+    thought:"I thought I had left my book at home.",
+    through:"We walked through the gate into the field.",
+    where:"Do you know where I put my shoes?",
+    again:"Please read the sentence again."
+  };
+
   const STAGES = {
     1: {
       title: "Stage 1 · Copy it",
@@ -1237,6 +1427,10 @@
     4: {
       title: "Stage 4 · Letter challenge",
       help: "Look at the word for 3 seconds. When it disappears, build it from the letters below."
+    },
+    5: {
+      title: "Stage 5 · Hear it & spell it",
+      help: "No visual clue this time. Listen to the word, then type the whole spelling independently."
     }
   };
 
@@ -1265,6 +1459,9 @@
     masteredText: document.getElementById("masteredText"),
     masteredWordsCount: document.getElementById("masteredWordsCount"),
     masteredWordsGrid: document.getElementById("masteredWordsGrid"),
+    reviewDueSection: document.getElementById("reviewDueSection"),
+    reviewDueCount: document.getElementById("reviewDueCount"),
+    reviewDueList: document.getElementById("reviewDueList"),
 
     stagePill: document.getElementById("stagePill"),
     stageHelp: document.getElementById("stageHelp"),
@@ -1289,6 +1486,13 @@
     bulkAddBtn: document.getElementById("bulkAddBtn"),
     parentWordList: document.getElementById("parentWordList"),
     parentProfileName: document.getElementById("parentProfileName"),
+    weekWords: document.getElementById("weekWords"),
+    weekMastered: document.getElementById("weekMastered"),
+    weekCorrect: document.getElementById("weekCorrect"),
+    weekAccuracy: document.getElementById("weekAccuracy"),
+    weekStreak: document.getElementById("weekStreak"),
+    weekRobux: document.getElementById("weekRobux"),
+    problemWordsList: document.getElementById("problemWordsList"),
     rewardPending: document.getElementById("rewardPending"),
     rewardPaid: document.getElementById("rewardPaid"),
     rewardLifetime: document.getElementById("rewardLifetime"),
@@ -1304,6 +1508,10 @@
     streak14Input: document.getElementById("streak14Input"),
     saveStreakBtn: document.getElementById("saveStreakBtn"),
     resetProgressBtn: document.getElementById("resetProgressBtn"),
+    changePinBtn: document.getElementById("changePinBtn"),
+    exportBtn: document.getElementById("exportBtn"),
+    importBtn: document.getElementById("importBtn"),
+    importFileInput: document.getElementById("importFileInput"),
     resetEverythingBtn: document.getElementById("resetEverythingBtn"),
     reviewBtn: document.getElementById("reviewBtn"),
     parentFromDoneBtn: document.getElementById("parentFromDoneBtn")
@@ -1316,6 +1524,7 @@
   let previewTimeout = null;
   let timerAnimation = null;
   let reviewMode = false;
+  let reviewCountsForSchedule = false;
 
   function freshWord(text) {
     return {
@@ -1328,7 +1537,12 @@
       attempts: 0,
       lastPractised: null,
       rewardedStages: [],
-      masterRewarded: false
+      masterRewarded: false,
+      sentence: DEFAULT_SENTENCES[normalizeWord(text)] || "",
+      masteredAt: null,
+      reviewDue: null,
+      reviewIndex: 0,
+      reviewComplete: false
     };
   }
 
@@ -1337,6 +1551,7 @@
       name,
       words: DEFAULT_WORDS.map(freshWord),
       totals: { correct:0, incorrect:0 },
+      activityLog: [],
       rewards: {
         pending:0,
         paid:0,
@@ -1360,6 +1575,7 @@
 
   function getDefaultState() {
     return {
+      parentPin:null,
       currentProfileId:"child1",
       profiles:{
         child1: defaultProfile("Child 1"),
@@ -1377,6 +1593,8 @@
       if (!parsed.profiles?.child1 || !parsed.profiles?.child2) {
         return getDefaultState();
       }
+
+      parsed.parentPin = parsed.parentPin || null;
 
       Object.values(parsed.profiles).forEach(p => {
         p.totals = p.totals || {correct:0, incorrect:0};
@@ -1396,9 +1614,22 @@
         p.rewards.masterBonus = Number.isFinite(Number(p.rewards.masterBonus)) ? Number(p.rewards.masterBonus) : 5;
         p.rewards.history = Array.isArray(p.rewards.history) ? p.rewards.history : [];
 
+        p.activityLog = Array.isArray(p.activityLog) ? p.activityLog : [];
+
         (p.words || []).forEach(w => {
           w.rewardedStages = Array.isArray(w.rewardedStages) ? w.rewardedStages : [];
           w.masterRewarded = Boolean(w.masterRewarded);
+          w.sentence = typeof w.sentence === "string" ? w.sentence : (DEFAULT_SENTENCES[normalizeWord(w.text)] || "");
+          w.masteredAt = w.masteredAt || (w.mastered ? (w.lastPractised || new Date().toISOString()) : null);
+          w.reviewIndex = Number.isFinite(Number(w.reviewIndex)) ? Number(w.reviewIndex) : 0;
+          w.reviewComplete = Boolean(w.reviewComplete);
+          if (w.mastered && !w.reviewComplete && !w.reviewDue) {
+            w.reviewDue = addDaysKey(localDayKey(), 3);
+          }
+          if (!w.mastered) {
+            w.reviewDue = null;
+            w.reviewComplete = false;
+          }
         });
 
         p.streak = p.streak || {
@@ -1448,10 +1679,119 @@
     return "w_" + Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
 
+  function addDaysKey(fromKey, days) {
+    const [y,m,d] = String(fromKey).split("-").map(Number);
+    const date = new Date(y, (m || 1) - 1, d || 1);
+    date.setDate(date.getDate() + Number(days || 0));
+    return localDayKey(date);
+  }
+
+  function formatDayKey(key) {
+    if (!key) return "";
+    const [y,m,d] = key.split("-").map(Number);
+    return new Date(y,m-1,d).toLocaleDateString(undefined,{day:"numeric",month:"short"});
+  }
+
+  function logActivity(type, word, data = {}) {
+    const p = profile();
+    p.activityLog = Array.isArray(p.activityLog) ? p.activityLog : [];
+    p.activityLog.push({
+      at:new Date().toISOString(),
+      type,
+      wordId:word?.id || null,
+      word:word?.text || "",
+      ...data
+    });
+    p.activityLog = p.activityLog.slice(-1000);
+  }
+
+  function weeklySummary() {
+    const p = profile();
+    const cutoff = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const activity = (p.activityLog || []).filter(x => new Date(x.at).getTime() >= cutoff);
+    const answers = activity.filter(x => x.type === "answer");
+    const correct = answers.filter(x => x.correct).length;
+    const wrong = answers.length - correct;
+    const words = new Set(answers.map(x => x.wordId || x.word).filter(Boolean)).size;
+    const mastered = activity.filter(x => x.type === "mastered").length;
+    const robux = (p.rewards?.history || [])
+      .filter(x => x.amount && new Date(x.at).getTime() >= cutoff)
+      .reduce((sum,x) => sum + Number(x.amount || 0), 0);
+    return {
+      words,
+      mastered,
+      correct,
+      accuracy:(correct + wrong) ? Math.round(correct / (correct + wrong) * 100) : 0,
+      robux
+    };
+  }
+
+  function sentenceFor(word) {
+    return (word?.sentence || "").trim() || `I am practising the word ${word.text} today.`;
+  }
+
+  function speakText(text) {
+    if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+      alert("Speech is not available in this browser.");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-GB";
+    utterance.rate = 0.82;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function speakCurrentWord() {
+    const word = currentWord();
+    if (word) speakText(word.text);
+  }
+
+  function speakCurrentSentence() {
+    const word = currentWord();
+    if (word) speakText(sentenceFor(word));
+  }
+
+  function scheduleFirstReview(word) {
+    word.masteredAt = new Date().toISOString();
+    word.reviewIndex = 0;
+    word.reviewComplete = false;
+    word.reviewDue = addDaysKey(localDayKey(), 3);
+  }
+
+  function completeScheduledReview(word) {
+    const intervals = [3,7,14];
+    const nextIndex = Number(word.reviewIndex || 0) + 1;
+    if (nextIndex >= intervals.length) {
+      word.reviewIndex = intervals.length;
+      word.reviewDue = null;
+      word.reviewComplete = true;
+    } else {
+      word.reviewIndex = nextIndex;
+      word.reviewDue = addDaysKey(localDayKey(), intervals[nextIndex]);
+      word.reviewComplete = false;
+    }
+  }
+
+  function isReviewDue(word) {
+    return Boolean(word.mastered && !word.reviewComplete && word.reviewDue && word.reviewDue <= localDayKey());
+  }
+
+  function startReview(wordId, countsForSchedule = true) {
+    clearPreview();
+    const word = profile().words.find(w => w.id === wordId && w.mastered);
+    if (!word) return;
+    reviewMode = true;
+    reviewCountsForSchedule = Boolean(countsForSchedule);
+    currentWordId = word.id;
+    render();
+    setTimeout(() => speakCurrentWord(), 150);
+  }
+
   function currentWord() {
     const p = profile();
     const candidates = reviewMode
-      ? p.words
+      ? p.words.filter(w => w.id === currentWordId && w.mastered)
       : p.words.filter(w => !w.mastered);
 
     if (!candidates.length) return null;
@@ -1469,6 +1809,10 @@
 
   function nextWord() {
     clearPreview();
+    if (reviewMode) {
+      reviewMode = false;
+      reviewCountsForSchedule = false;
+    }
     const p = profile();
     const available = reviewMode ? p.words : p.words.filter(w => !w.mastered);
 
@@ -1491,6 +1835,8 @@
     if (!selected) return;
     if (!reviewMode && selected.mastered) return;
 
+    reviewMode = false;
+    reviewCountsForSchedule = false;
     currentWordId = selected.id;
     previewRunning = false;
     render();
@@ -1501,6 +1847,7 @@
     currentProfileId = id;
     currentWordId = null;
     reviewMode = false;
+    reviewCountsForSchedule = false;
     saveState();
     render();
   }
@@ -1509,6 +1856,7 @@
     renderProfiles();
     renderStats();
     renderParent();
+    renderReviewDue();
     renderMasteredWords();
     renderGame();
   }
@@ -1580,7 +1928,9 @@
 
   function renderWordPicker() {
     const p = profile();
-    const words = reviewMode ? p.words : p.words.filter(w => !w.mastered);
+    const words = reviewMode
+      ? p.words.filter(w => w.id === currentWordId)
+      : p.words.filter(w => !w.mastered);
 
     els.wordChoiceGrid.innerHTML = "";
 
@@ -1616,8 +1966,8 @@
 
     const word = currentWord();
     if (word) {
-      els.wordFocusNote.textContent = word.mastered
-        ? "Review word selected."
+      els.wordFocusNote.textContent = reviewMode
+        ? "Review due — listen carefully and spell the word independently."
         : "Word selected — work through the stages to master it.";
     }
   }
@@ -1634,8 +1984,41 @@
   }
 
   function setWordChangeLocked(locked) {
-    els.changeWordBtn.disabled = Boolean(locked);
+    els.changeWordBtn.disabled = Boolean(locked || reviewMode);
     if (locked) closeWordChooser();
+  }
+
+  function renderReviewDue() {
+    const due = profile().words
+      .filter(isReviewDue)
+      .sort((a,b) => String(a.reviewDue).localeCompare(String(b.reviewDue)) || a.text.localeCompare(b.text));
+
+    els.reviewDueCount.textContent = `${due.length} due`;
+    els.reviewDueList.innerHTML = "";
+
+    if (!due.length) {
+      const empty = document.createElement("div");
+      empty.className = "mastered-empty";
+      empty.textContent = "No reviews due today.";
+      els.reviewDueList.appendChild(empty);
+      return;
+    }
+
+    due.forEach(word => {
+      const row = document.createElement("div");
+      row.className = "review-due-row";
+
+      const info = document.createElement("div");
+      const strong = document.createElement("strong");
+      strong.textContent = word.text;
+      const small = document.createElement("small");
+      small.textContent = `Review due ${formatDayKey(word.reviewDue)}`;
+      info.append(strong,small);
+
+      const btn = button("Review", "primary", () => startReview(word.id, true));
+      row.append(info,btn);
+      els.reviewDueList.appendChild(row);
+    });
   }
 
   function renderMasteredWords() {
@@ -1651,7 +2034,7 @@
     if (!mastered.length) {
       const empty = document.createElement("div");
       empty.className = "mastered-empty";
-      empty.textContent = "No mastered words yet. Complete all four stages of a word and it will appear here.";
+      empty.textContent = "No mastered words yet. Complete all five stages of a word and it will appear here.";
       els.masteredWordsGrid.appendChild(empty);
       return;
     }
@@ -1659,7 +2042,13 @@
     mastered.forEach(word => {
       const chip = document.createElement("div");
       chip.className = "mastered-word-chip";
-      chip.textContent = word.text;
+      const label = document.createElement("span");
+      label.textContent = word.text;
+      const status = document.createElement("small");
+      status.textContent = word.reviewComplete
+        ? "Spaced review complete"
+        : (isReviewDue(word) ? "Review due now" : (word.reviewDue ? `Next review ${formatDayKey(word.reviewDue)}` : "Mastered"));
+      chip.append(label,status);
       els.masteredWordsGrid.appendChild(chip);
     });
   }
@@ -1692,8 +2081,8 @@
     const word = currentWord();
     if (!word) return;
 
-    const stage = Math.min(4, Math.max(1, word.stage || 1));
-    els.stagePill.textContent = STAGES[stage].title + (reviewMode ? " · Review" : "");
+    const stage = reviewMode ? 5 : Math.min(5, Math.max(1, word.stage || 1));
+    els.stagePill.textContent = reviewMode ? "Review · Hear it & spell it" : STAGES[stage].title;
     els.stageHelp.textContent = STAGES[stage].help;
 
     els.answerInput.value = "";
@@ -1714,6 +2103,12 @@
       els.wordDisplay.classList.remove("hidden-word");
       renderCheckActions(stage);
       setTimeout(() => els.answerInput.focus(), 100);
+    } else if (stage === 5) {
+      els.wordDisplay.textContent = "Listen & spell";
+      els.wordDisplay.classList.remove("hidden-word");
+      renderAudioStageActions();
+      setWordChangeLocked(reviewMode);
+      setTimeout(() => els.answerInput.focus(), 100);
     } else {
       els.wordDisplay.textContent = "Ready?";
       els.wordDisplay.classList.remove("hidden-word");
@@ -1726,14 +2121,29 @@
   function renderStartAction(stage) {
     els.actions.innerHTML = "";
     const start = button("Start", "primary", () => startPreview(stage));
-    els.actions.appendChild(start);
+    const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
+    const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
+    els.actions.append(start, hear, sentence);
   }
 
   function renderCheckActions(stage) {
     els.actions.innerHTML = "";
     const check = button("Check", "primary", checkAnswer);
+    const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
+    const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
     const skip = button("Choose next word", "secondary", nextWord);
-    els.actions.append(check, skip);
+    els.actions.append(check, hear, sentence, skip);
+  }
+
+  function renderAudioStageActions() {
+    els.actions.innerHTML = "";
+    const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
+    const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
+    const check = button("Check", "primary", checkAnswer);
+    els.actions.append(hear, sentence, check);
+    if (!reviewMode) {
+      els.actions.appendChild(button("Choose next word", "secondary", nextWord));
+    }
   }
 
   function button(text, className, handler) {
@@ -1825,8 +2235,10 @@
     els.actions.innerHTML = "";
     const undo = button("Undo", "secondary", undoLetter);
     const check = button("Check", "primary", checkAnswer);
+    const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
+    const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
     const skip = button("Choose next word", "secondary", nextWord);
-    els.actions.append(undo, check, skip);
+    els.actions.append(undo, check, hear, sentence, skip);
   }
 
   function undoLetter() {
@@ -2037,29 +2449,59 @@
       return;
     }
 
+    const stageAtAttempt = reviewMode ? 5 : Math.min(5, Math.max(1, word.stage || 1));
+    const isReviewAttempt = Boolean(reviewMode && word.mastered);
+
     word.attempts = (word.attempts || 0) + 1;
     word.lastPractised = new Date().toISOString();
 
     if (entered === target) {
       word.correct = (word.correct || 0) + 1;
       profile().totals.correct = (profile().totals.correct || 0) + 1;
-
-      const completedStage = Math.min(4, Math.max(1, word.stage || 1));
-      awardStageIfEligible(word, completedStage);
+      logActivity("answer", word, {correct:true, stage:stageAtAttempt, review:isReviewAttempt});
       recordCorrectWordForStreak(word);
 
-      if (word.stage >= 4) {
+      if (isReviewAttempt) {
+        if (reviewCountsForSchedule) completeScheduledReview(word);
+        showFeedback(`Correct — review passed! ★`, true);
+
+        saveState();
+        renderStats();
+        renderParent();
+        renderReviewDue();
+        renderMasteredWords();
+        setWordChangeLocked(true);
+        lockCurrentInputs();
+
+        setTimeout(() => {
+          reviewMode = false;
+          reviewCountsForSchedule = false;
+          const remaining = profile().words.filter(w => !w.mastered);
+          currentWordId = remaining.length ? remaining[0].id : null;
+          render();
+        }, 1200);
+        return;
+      }
+
+      const completedStage = Math.min(5, Math.max(1, word.stage || 1));
+      awardStageIfEligible(word, completedStage);
+
+      if (word.stage >= 5) {
         word.mastered = true;
+        scheduleFirstReview(word);
+        logActivity("mastered", word, {});
         awardMasterIfEligible(word);
         showFeedback(`Correct — "${word.text}" is mastered! ★`, true);
       } else {
-        word.stage = Math.min(4, (word.stage || 1) + 1);
+        word.stage = Math.min(5, (word.stage || 1) + 1);
         showFeedback(`Correct! "${word.text}" moves to Stage ${word.stage}.`, true);
       }
 
       saveState();
       renderStats();
       renderParent();
+      renderReviewDue();
+      renderMasteredWords();
       renderStageDots(word.stage, word.mastered);
 
       setWordChangeLocked(true);
@@ -2070,7 +2512,6 @@
           const remaining = profile().words.filter(w => !w.mastered);
           currentWordId = remaining.length ? remaining[0].id : null;
         } else {
-          // Continue straight into the next stage of the same word.
           currentWordId = word.id;
         }
         render();
@@ -2079,17 +2520,17 @@
     } else {
       word.incorrect = (word.incorrect || 0) + 1;
       profile().totals.incorrect = (profile().totals.incorrect || 0) + 1;
+      logActivity("answer", word, {correct:false, stage:stageAtAttempt, review:isReviewAttempt});
       saveState();
       renderStats();
       renderParent();
 
       showFeedback(`Not quite. The word is "${word.text}". Try it again.`, false);
 
-      // Give visual support after a mistake, without removing progress.
       els.wordDisplay.textContent = word.text;
       els.wordDisplay.classList.remove("hidden-word");
 
-      if (word.stage === 4) {
+      if (!isReviewAttempt && word.stage === 4) {
         setTimeout(() => {
           els.answerInput.value = "";
           createLetterBank(word.text);
@@ -2101,13 +2542,17 @@
       } else {
         setTimeout(() => {
           els.answerInput.value = "";
-          if (word.stage > 1) {
+          if (stageAtAttempt === 5) {
+            els.wordDisplay.textContent = "Listen & spell";
+            els.wordDisplay.classList.remove("hidden-word");
+            renderAudioStageActions();
+          } else if (word.stage > 1) {
             els.wordDisplay.textContent = word.text;
             els.wordDisplay.classList.add("hidden-word");
           }
           els.answerInput.focus();
           clearFeedback();
-          setWordChangeLocked(false);
+          setWordChangeLocked(isReviewAttempt);
         }, 1800);
       }
     }
@@ -2131,7 +2576,7 @@
 
   function renderStageDots(stage, mastered) {
     els.stageDots.innerHTML = "";
-    for (let i=1;i<=4;i++) {
+    for (let i=1;i<=5;i++) {
       const dot = document.createElement("span");
       dot.className = "stage-dot";
 
@@ -2143,9 +2588,51 @@
   }
 
   function openParent() {
+    if (!unlockParentArea()) return;
     renderParent();
     els.parentModal.classList.add("open");
     els.parentModal.setAttribute("aria-hidden","false");
+  }
+
+  function unlockParentArea() {
+    if (!state.parentPin) {
+      const pin = prompt("Create a 4-digit Parent PIN:");
+      if (pin === null) return false;
+      if (!/^\d{4}$/.test(pin)) {
+        alert("Please use exactly 4 numbers.");
+        return false;
+      }
+      state.parentPin = pin;
+      saveState();
+      alert("Parent PIN set.");
+      return true;
+    }
+
+    const entered = prompt("Enter Parent PIN:");
+    if (entered === null) return false;
+    if (entered !== state.parentPin) {
+      alert("Incorrect Parent PIN.");
+      return false;
+    }
+    return true;
+  }
+
+  function changeParentPin() {
+    const current = prompt("Enter your current Parent PIN:");
+    if (current === null) return;
+    if (current !== state.parentPin) {
+      alert("Incorrect Parent PIN.");
+      return;
+    }
+    const next = prompt("Enter a new 4-digit Parent PIN:");
+    if (next === null) return;
+    if (!/^\d{4}$/.test(next)) {
+      alert("Please use exactly 4 numbers.");
+      return;
+    }
+    state.parentPin = next;
+    saveState();
+    alert("Parent PIN changed.");
   }
 
   function closeParent() {
@@ -2159,6 +2646,14 @@
     els.profileName1.value = state.profiles.child1.name;
     els.profileName2.value = state.profiles.child2.name;
     els.parentProfileName.textContent = p.name;
+
+    const week = weeklySummary();
+    els.weekWords.textContent = week.words;
+    els.weekMastered.textContent = week.mastered;
+    els.weekCorrect.textContent = week.correct;
+    els.weekAccuracy.textContent = week.accuracy + "%";
+    els.weekStreak.textContent = ensureStreak().current || 0;
+    els.weekRobux.textContent = "R$ " + week.robux;
 
     const rewards = ensureRewards();
     els.rewardPending.textContent = rewards.pending || 0;
@@ -2189,6 +2684,39 @@
 
         row.append(left,right);
         els.rewardHistory.appendChild(row);
+      });
+    }
+
+    els.problemWordsList.innerHTML = "";
+    const problemWords = [...p.words]
+      .filter(w => Number(w.incorrect || 0) >= 2)
+      .sort((a,b) => Number(b.incorrect || 0) - Number(a.incorrect || 0) || a.text.localeCompare(b.text))
+      .slice(0,10);
+
+    if (!problemWords.length) {
+      const emptyProblem = document.createElement("div");
+      emptyProblem.className = "mastered-empty";
+      emptyProblem.textContent = "No problem words yet.";
+      els.problemWordsList.appendChild(emptyProblem);
+    } else {
+      problemWords.forEach(word => {
+        const row = document.createElement("div");
+        row.className = "problem-row";
+        const info = document.createElement("div");
+        const strong = document.createElement("strong");
+        strong.textContent = word.text;
+        const small = document.createElement("small");
+        small.textContent = `${word.incorrect || 0} incorrect attempts · Stage ${word.stage || 1}`;
+        info.append(strong,small);
+        const practise = button("Practise", "secondary", () => {
+          closeParent();
+          reviewMode = false;
+          reviewCountsForSchedule = false;
+          currentWordId = word.id;
+          render();
+        });
+        row.append(info,practise);
+        els.problemWordsList.appendChild(row);
       });
     }
 
@@ -2224,14 +2752,34 @@
 
         info.append(strong, small);
 
+        const actions = document.createElement("div");
+        actions.className = "word-row-actions";
+
+        const sentenceBtn = document.createElement("button");
+        sentenceBtn.className = "sentence-edit-btn";
+        sentenceBtn.textContent = word.sentence ? "Edit sentence" : "Add sentence";
+        sentenceBtn.addEventListener("click", () => editSentence(word.id));
+
         const del = document.createElement("button");
         del.className = "tiny-btn";
         del.textContent = "Remove";
         del.addEventListener("click", () => removeWord(word.id));
 
-        row.append(info, del);
+        actions.append(sentenceBtn,del);
+        row.append(info, actions);
         els.parentWordList.appendChild(row);
       });
+  }
+
+  function editSentence(wordId) {
+    const word = profile().words.find(w => w.id === wordId);
+    if (!word) return;
+    const current = word.sentence || sentenceFor(word);
+    const value = prompt(`Sentence for "${word.text}":`, current);
+    if (value === null) return;
+    word.sentence = value.trim();
+    saveState();
+    renderParent();
   }
 
   function addWord(text) {
@@ -2270,9 +2818,14 @@
       attempts:0,
       lastPractised:null,
       rewardedStages:Array.isArray(w.rewardedStages) ? w.rewardedStages : [],
-      masterRewarded:Boolean(w.masterRewarded)
+      masterRewarded:Boolean(w.masterRewarded),
+      masteredAt:null,
+      reviewDue:null,
+      reviewIndex:0,
+      reviewComplete:false
     }));
     profile().totals = {correct:0, incorrect:0};
+    profile().activityLog = [];
 
     currentWordId = null;
     reviewMode = false;
@@ -2285,6 +2838,7 @@
 
     profile().words = [];
     profile().totals = {correct:0, incorrect:0};
+    profile().activityLog = [];
     profile().rewards = {
       pending:0,
       paid:0,
@@ -2309,6 +2863,50 @@
     render();
   }
 
+  function exportProgress() {
+    saveState();
+    const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `spelling-steps-backup-${localDayKey()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function importProgress(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const imported = JSON.parse(String(reader.result || ""));
+        if (!imported?.profiles?.child1 || !imported?.profiles?.child2) {
+          throw new Error("Invalid backup");
+        }
+        if (!confirm("Replace the current spelling data with this backup?")) return;
+        state = imported;
+        state.parentPin = state.parentPin || null;
+        currentProfileId = state.currentProfileId && state.profiles[state.currentProfileId]
+          ? state.currentProfileId
+          : "child1";
+        currentWordId = null;
+        reviewMode = false;
+        reviewCountsForSchedule = false;
+        saveState();
+        closeParent();
+        render();
+        alert("Backup restored.");
+      } catch (err) {
+        alert("That file is not a valid Spelling Steps backup.");
+      } finally {
+        els.importFileInput.value = "";
+      }
+    };
+    reader.readAsText(file);
+  }
+
   // Event bindings
   els.profileSelect.addEventListener("change", () => {
     if (els.profileSelect.value) {
@@ -2328,6 +2926,11 @@
       closeWordChooser();
     }
   });
+
+  els.changePinBtn.addEventListener("click", changeParentPin);
+  els.exportBtn.addEventListener("click", exportProgress);
+  els.importBtn.addEventListener("click", () => els.importFileInput.click());
+  els.importFileInput.addEventListener("change", () => importProgress(els.importFileInput.files?.[0]));
 
   els.parentBtn.addEventListener("click", openParent);
   els.parentFromDoneBtn.addEventListener("click", openParent);
@@ -2430,19 +3033,9 @@
   els.resetEverythingBtn.addEventListener("click", resetEverything);
 
   els.reviewBtn.addEventListener("click", () => {
-    reviewMode = true;
-
-    // Reopen all mastered words at stage 4 for review without erasing stats.
-    profile().words.forEach(w => {
-      if (w.mastered) {
-        w.mastered = false;
-        w.stage = 4;
-      }
-    });
-
-    currentWordId = null;
-    saveState();
-    render();
+    const mastered = profile().words.filter(w => w.mastered);
+    if (!mastered.length) return;
+    startReview(mastered[0].id, false);
   });
 
   els.answerInput.addEventListener("keydown", e => {
