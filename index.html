@@ -427,6 +427,46 @@
     justify-content:center;
   }
 
+  .word-picker-wrap{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+
+  .word-picker-label{
+    font-size:12px;
+    font-weight:900;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.55px;
+  }
+
+  .word-picker{
+    min-width:min(320px,100%);
+    border:2px solid #dce2eb;
+    background:#fff;
+    color:var(--ink);
+    border-radius:14px;
+    padding:11px 40px 11px 14px;
+    font-weight:900;
+    outline:none;
+  }
+
+  .word-picker:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 0 4px rgba(79,124,255,.10);
+  }
+
+  .word-focus-note{
+    margin:-5px auto 14px;
+    color:#7a8599;
+    font-size:12px;
+    font-weight:800;
+  }
+
   .stage-pill{
     display:inline-flex;
     align-self:center;
@@ -845,6 +885,13 @@
   </div>
 
   <section class="game-card" id="gameCard">
+
+    <div class="word-picker-wrap">
+      <span class="word-picker-label">Choose word</span>
+      <select class="word-picker" id="wordPicker" aria-label="Choose a spelling word"></select>
+    </div>
+    <div class="word-focus-note" id="wordFocusNote">Stay on this word until you choose another.</div>
+
     <div class="stage-pill" id="stagePill">Stage 1 · Copy it</div>
     <p class="stage-help" id="stageHelp"></p>
 
@@ -1044,6 +1091,8 @@
     dailyProgressFill: document.getElementById("dailyProgressFill"),
 
     gameCard: document.getElementById("gameCard"),
+    wordPicker: document.getElementById("wordPicker"),
+    wordFocusNote: document.getElementById("wordFocusNote"),
     masteredCard: document.getElementById("masteredCard"),
     masteredText: document.getElementById("masteredText"),
 
@@ -1231,31 +1280,27 @@
 
   function currentWord() {
     const p = profile();
-    let candidates = p.words.filter(w => !w.mastered);
-
-    if (reviewMode && !candidates.length) {
-      candidates = p.words;
-    }
+    const candidates = reviewMode
+      ? p.words
+      : p.words.filter(w => !w.mastered);
 
     if (!candidates.length) return null;
 
+    // Keep the chosen word active until it is mastered or another is selected.
     let word = candidates.find(w => w.id === currentWordId);
+
     if (!word) {
-      candidates.sort((a,b) => {
-        if (a.stage !== b.stage) return a.stage - b.stage;
-        if ((a.attempts || 0) !== (b.attempts || 0)) return (a.attempts || 0) - (b.attempts || 0);
-        return a.text.localeCompare(b.text);
-      });
       word = candidates[0];
       currentWordId = word.id;
     }
+
     return word;
   }
 
   function nextWord() {
     clearPreview();
     const p = profile();
-    const available = p.words.filter(w => reviewMode ? true : !w.mastered);
+    const available = reviewMode ? p.words : p.words.filter(w => !w.mastered);
 
     if (!available.length) {
       currentWordId = null;
@@ -1263,9 +1308,20 @@
       return;
     }
 
-    const idx = Math.max(0, available.findIndex(w => w.id === currentWordId));
-    const next = available[(idx + 1) % available.length];
+    const idx = available.findIndex(w => w.id === currentWordId);
+    const next = available[idx >= 0 ? (idx + 1) % available.length : 0];
     currentWordId = next.id;
+    previewRunning = false;
+    render();
+  }
+
+  function chooseWord(id) {
+    clearPreview();
+    const selected = profile().words.find(w => w.id === id);
+    if (!selected) return;
+    if (!reviewMode && selected.mastered) return;
+
+    currentWordId = selected.id;
     previewRunning = false;
     render();
   }
@@ -1349,6 +1405,39 @@
     }
   }
 
+  function renderWordPicker() {
+    const p = profile();
+    const words = reviewMode ? p.words : p.words.filter(w => !w.mastered);
+
+    els.wordPicker.innerHTML = "";
+
+    if (!words.length) {
+      els.wordPicker.disabled = true;
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "No words available";
+      els.wordPicker.appendChild(opt);
+      return;
+    }
+
+    els.wordPicker.disabled = false;
+
+    words.forEach(word => {
+      const opt = document.createElement("option");
+      opt.value = word.id;
+      opt.textContent = `${word.text} — ${word.mastered ? "Mastered" : `Stage ${word.stage || 1}`}`;
+      els.wordPicker.appendChild(opt);
+    });
+
+    const word = currentWord();
+    if (word) {
+      els.wordPicker.value = word.id;
+      els.wordFocusNote.textContent = word.mastered
+        ? `Reviewing "${word.text}".`
+        : `Working on "${word.text}" until you choose another word or master it.`;
+    }
+  }
+
   function renderGame() {
     clearFeedback();
 
@@ -1371,6 +1460,8 @@
 
     els.gameCard.style.display = "flex";
     els.masteredCard.classList.remove("show");
+
+    renderWordPicker();
 
     const word = currentWord();
     if (!word) return;
@@ -1414,7 +1505,7 @@
   function renderCheckActions(stage) {
     els.actions.innerHTML = "";
     const check = button("Check", "primary", checkAnswer);
-    const skip = button("Next word", "secondary", nextWord);
+    const skip = button("Choose next word", "secondary", nextWord);
     els.actions.append(check, skip);
   }
 
@@ -1506,7 +1597,7 @@
     els.actions.innerHTML = "";
     const undo = button("Undo", "secondary", undoLetter);
     const check = button("Check", "primary", checkAnswer);
-    const skip = button("Next word", "secondary", nextWord);
+    const skip = button("Choose next word", "secondary", nextWord);
     els.actions.append(undo, check, skip);
   }
 
@@ -1746,7 +1837,13 @@
       lockCurrentInputs();
 
       setTimeout(() => {
-        currentWordId = null;
+        if (word.mastered) {
+          const remaining = profile().words.filter(w => !w.mastered);
+          currentWordId = remaining.length ? remaining[0].id : null;
+        } else {
+          // Continue straight into the next stage of the same word.
+          currentWordId = word.id;
+        }
         render();
       }, 1200);
 
@@ -1913,8 +2010,9 @@
     const p = profile();
     if (p.words.some(w => normalizeWord(w.text) === clean)) return false;
 
-    p.words.push(freshWord(clean));
-    currentWordId = null;
+    const newEntry = freshWord(clean);
+    p.words.push(newEntry);
+    currentWordId = newEntry.id;
     reviewMode = false;
     saveState();
     render();
@@ -1981,6 +2079,10 @@
   }
 
   // Event bindings
+  els.wordPicker.addEventListener("change", () => {
+    if (els.wordPicker.value) chooseWord(els.wordPicker.value);
+  });
+
   els.parentBtn.addEventListener("click", openParent);
   els.parentFromDoneBtn.addEventListener("click", openParent);
   els.closeModal.addEventListener("click", closeParent);
