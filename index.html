@@ -119,6 +119,169 @@
     box-shadow:0 0 0 4px rgba(79,124,255,.10);
   }
 
+  .app-nav{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin:0 0 18px;
+    padding:7px;
+    border:1px solid rgba(18,35,63,.07);
+    border-radius:19px;
+    background:rgba(255,255,255,.82);
+    backdrop-filter:blur(12px);
+    box-shadow:0 7px 24px rgba(26,39,66,.07);
+    position:sticky;
+    top:8px;
+    z-index:20;
+  }
+
+  .app-tab{
+    min-width:0;
+    border:0;
+    border-radius:13px;
+    padding:12px 10px;
+    background:transparent;
+    color:#6a7589;
+    font-weight:950;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    transition:.18s ease;
+  }
+
+  .app-tab:hover{
+    background:#f1f4f9;
+    color:var(--ink);
+  }
+
+  .app-tab.active{
+    background:var(--ink);
+    color:#fff;
+    box-shadow:0 6px 16px rgba(23,32,51,.16);
+  }
+
+  .tab-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:24px;
+    height:21px;
+    padding:0 7px;
+    border-radius:999px;
+    background:rgba(79,124,255,.12);
+    color:#4268dd;
+    font-size:10px;
+    font-weight:1000;
+    white-space:nowrap;
+  }
+
+  .app-tab.active .tab-badge{
+    background:rgba(255,255,255,.18);
+    color:#fff;
+  }
+
+  .tab-panel{
+    display:none;
+    animation:tabFade .18s ease;
+  }
+
+  .tab-panel.active{
+    display:block;
+  }
+
+  @keyframes tabFade{
+    from{opacity:.35;transform:translateY(4px)}
+    to{opacity:1;transform:none}
+  }
+
+  .panel-heading{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    margin:2px 2px 16px;
+  }
+
+  .panel-heading h2{
+    margin:0;
+    font-size:clamp(23px,4vw,31px);
+    letter-spacing:-.7px;
+  }
+
+  .panel-heading p{
+    margin:5px 0 0;
+    color:var(--muted);
+    font-weight:700;
+    line-height:1.45;
+  }
+
+  .dashboard-card{
+    background:var(--card);
+    border:1px solid rgba(18,35,63,.07);
+    border-radius:24px;
+    padding:20px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+  }
+
+  .dashboard-card-title{
+    margin:0 0 14px;
+    font-size:18px;
+    letter-spacing:-.25px;
+  }
+
+  .mastery-progress-card{
+    margin-bottom:18px;
+    background:#fff;
+    border:1px solid rgba(18,35,63,.07);
+    border-radius:18px;
+    padding:15px 16px;
+    box-shadow:0 6px 20px rgba(26,39,66,.05);
+  }
+
+  .mastery-progress-top{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    align-items:center;
+    margin-bottom:9px;
+    color:#5f6c82;
+    font-size:12px;
+    font-weight:900;
+  }
+
+  .reward-overview-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-bottom:18px;
+  }
+
+  .reward-overview-card{
+    background:#fff;
+    border:1px solid rgba(18,35,63,.07);
+    border-radius:18px;
+    padding:16px;
+    box-shadow:0 6px 20px rgba(26,39,66,.05);
+  }
+
+  .reward-overview-card strong{
+    display:block;
+    font-size:24px;
+    line-height:1.1;
+  }
+
+  .reward-overview-card span{
+    display:block;
+    margin-top:5px;
+    color:var(--muted);
+    font-size:11px;
+    font-weight:850;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+
   .stats{
     display:grid;
     grid-template-columns:repeat(4,1fr);
@@ -863,6 +1026,23 @@
   }
 
   @media (max-width:650px){
+    .app-nav{
+      display:flex;
+      overflow-x:auto;
+      scrollbar-width:none;
+      padding:6px;
+      gap:6px;
+    }
+    .app-nav::-webkit-scrollbar{display:none}
+    .app-tab{
+      flex:0 0 auto;
+      min-width:112px;
+      padding:11px 13px;
+    }
+    .reward-overview-grid{
+      grid-template-columns:1fr;
+    }
+
     .weekly-summary-grid{grid-template-columns:repeat(2,1fr)}
     .parent-tool-grid{grid-template-columns:1fr}
     .review-due-section{border-radius:20px;padding:16px}
@@ -1107,7 +1287,7 @@
     .streak-count{font-size:22px}
     .setting-row{grid-template-columns:1fr 95px}
     .game-card{min-height:510px;border-radius:22px;padding:22px 15px}
-    .profile-bar{position:sticky;top:8px;z-index:10}
+    .profile-bar{position:relative;top:auto;z-index:auto}
     .profile-label{font-size:11px}
     .mastered-words-section{border-radius:20px;padding:16px}
     .form-row{flex-direction:column}
@@ -1123,7 +1303,7 @@
   <div class="topbar">
     <div class="brand">
       <h1>Spelling Steps</h1>
-      <p>See it. Remember it. Spell it.</p>
+      <p>Practice, progress and rewards — all in one place.</p>
     </div>
     <button class="icon-btn" id="parentBtn">⚙ Parent</button>
   </div>
@@ -1133,48 +1313,28 @@
     <select class="profile-select" id="profileSelect" aria-label="Choose learner"></select>
   </div>
 
-  <div class="stats">
-    <div class="stat"><strong id="statWords">0</strong><span>Words</span></div>
-    <div class="stat"><strong id="statMastered">0</strong><span>Mastered</span></div>
-    <div class="stat"><strong id="statCorrect">0</strong><span>Correct</span></div>
-    <div class="stat"><strong id="statAccuracy">0%</strong><span>Accuracy</span></div>
-  </div>
+  <nav class="app-nav" id="appNav" role="tablist" aria-label="Spelling Steps sections">
+    <button class="app-tab active" type="button" role="tab" aria-selected="true" data-tab="practice">
+      Practice
+    </button>
+    <button class="app-tab" type="button" role="tab" aria-selected="false" data-tab="progress">
+      Progress <span class="tab-badge" id="progressTabBadge">0%</span>
+    </button>
+    <button class="app-tab" type="button" role="tab" aria-selected="false" data-tab="mastered">
+      Mastered <span class="tab-badge" id="masteredTabBadge">0</span>
+    </button>
+    <button class="app-tab" type="button" role="tab" aria-selected="false" data-tab="rewards">
+      Rewards <span class="tab-badge" id="rewardsTabBadge">R$ 0</span>
+    </button>
+  </nav>
 
-  <div class="reward-banner">
-    <div class="reward-banner__left">
-      <div class="reward-icon">💰</div>
+  <section class="tab-panel active" id="tab-practice" data-panel="practice">
+    <div class="panel-heading">
       <div>
-        <strong>Robux Bank</strong>
-        <span>Earned through spelling progress</span>
+        <h2>Practice</h2>
+        <p>Choose one word and work through each stage until it is mastered.</p>
       </div>
     </div>
-    <div class="reward-total" id="robuxBank">R$ 0</div>
-  </div>
-
-  <div class="streak-banner">
-    <div class="streak-left">
-      <div class="streak-icon">🔥</div>
-      <div>
-        <strong id="streakTitle">0 day streak</strong>
-        <span id="streakNext">Complete today's spelling target to start a streak.</span>
-      </div>
-    </div>
-    <div class="streak-count" id="streakCount">🔥 0</div>
-  </div>
-
-  <div class="daily-progress">
-    <div class="daily-progress-top">
-      <span>Today's practice</span>
-      <span id="dailyProgressText">0 / 3 words</span>
-    </div>
-    <div class="daily-progress-track">
-      <div class="daily-progress-fill" id="dailyProgressFill"></div>
-    </div>
-  </div>
-
-  <div class="progress-track">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
 
   <section class="game-card" id="gameCard">
 
@@ -1229,6 +1389,58 @@
       <button class="secondary" id="parentFromDoneBtn">Add more words</button>
     </div>
   </section>
+  </section>
+
+  <section class="tab-panel" id="tab-progress" data-panel="progress">
+    <div class="panel-heading">
+      <div>
+        <h2>Progress</h2>
+        <p>Overall performance, this week's activity and words that need extra practice.</p>
+      </div>
+    </div>
+
+  <div class="stats">
+    <div class="stat"><strong id="statWords">0</strong><span>Words</span></div>
+    <div class="stat"><strong id="statMastered">0</strong><span>Mastered</span></div>
+    <div class="stat"><strong id="statCorrect">0</strong><span>Correct</span></div>
+    <div class="stat"><strong id="statAccuracy">0%</strong><span>Accuracy</span></div>
+  </div>
+
+    <div class="mastery-progress-card">
+      <div class="mastery-progress-top">
+        <span>Overall mastery</span>
+        <span id="masteryProgressText">0 / 0 mastered</span>
+      </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+    </div>
+
+    <div class="dashboard-card">
+      <h3 class="dashboard-card-title">This week's summary</h3>
+      <div class="weekly-summary-grid">
+        <div class="weekly-summary-card"><strong id="weekWords">0</strong><span>Words practised</span></div>
+        <div class="weekly-summary-card"><strong id="weekMastered">0</strong><span>Mastered</span></div>
+        <div class="weekly-summary-card"><strong id="weekCorrect">0</strong><span>Correct</span></div>
+        <div class="weekly-summary-card"><strong id="weekAccuracy">0%</strong><span>Accuracy</span></div>
+        <div class="weekly-summary-card"><strong id="weekStreak">0</strong><span>Current streak</span></div>
+        <div class="weekly-summary-card"><strong id="weekRobux">R$ 0</strong><span>Robux earned</span></div>
+      </div>
+    </div>
+
+    <div class="dashboard-card">
+      <h3 class="dashboard-card-title">Problem words</h3>
+      <div class="problem-list" id="problemWordsList"></div>
+    </div>
+  </section>
+
+  <section class="tab-panel" id="tab-mastered" data-panel="mastered">
+    <div class="panel-heading">
+      <div>
+        <h2>Mastered</h2>
+        <p>Completed words stay here and return automatically when a spaced review is due.</p>
+      </div>
+    </div>
 
   <section class="review-due-section" id="reviewDueSection">
     <div class="review-due-head">
@@ -1245,6 +1457,63 @@
     </div>
     <div class="mastered-words-grid" id="masteredWordsGrid"></div>
   </section>
+  </section>
+
+  <section class="tab-panel" id="tab-rewards" data-panel="rewards">
+    <div class="panel-heading">
+      <div>
+        <h2>Rewards</h2>
+        <p>Robux earned from progress plus the daily practice streak.</p>
+      </div>
+    </div>
+
+  <div class="reward-banner">
+    <div class="reward-banner__left">
+      <div class="reward-icon">💰</div>
+      <div>
+        <strong>Robux Bank</strong>
+        <span>Earned through spelling progress</span>
+      </div>
+    </div>
+    <div class="reward-total" id="robuxBank">R$ 0</div>
+  </div>
+
+  <div class="streak-banner">
+    <div class="streak-left">
+      <div class="streak-icon">🔥</div>
+      <div>
+        <strong id="streakTitle">0 day streak</strong>
+        <span id="streakNext">Complete today's spelling target to start a streak.</span>
+      </div>
+    </div>
+    <div class="streak-count" id="streakCount">🔥 0</div>
+  </div>
+
+  <div class="daily-progress">
+    <div class="daily-progress-top">
+      <span>Today's practice</span>
+      <span id="dailyProgressText">0 / 3 words</span>
+    </div>
+    <div class="daily-progress-track">
+      <div class="daily-progress-fill" id="dailyProgressFill"></div>
+    </div>
+  </div>
+
+    <div class="reward-overview-grid">
+      <div class="reward-overview-card">
+        <strong id="rewardStageDisplay">R$ 1</strong>
+        <span>Per stage</span>
+      </div>
+      <div class="reward-overview-card">
+        <strong id="rewardMasterDisplay">R$ 5</strong>
+        <span>Mastered bonus</span>
+      </div>
+      <div class="reward-overview-card">
+        <strong id="rewardNextDisplay">R$ 5</strong>
+        <span>Next streak bonus</span>
+      </div>
+    </div>
+  </section>
 
 </div>
 
@@ -1253,7 +1522,7 @@
 <div class="modal" id="parentModal" aria-hidden="true">
   <div class="modal-panel">
     <div class="modal-head">
-      <h2>Parent area</h2>
+      <h2>Parent settings</h2>
       <button class="close-btn" id="closeModal">×</button>
     </div>
 
@@ -1263,16 +1532,6 @@
       <input id="profileName2" maxlength="20" placeholder="Child 2">
     </div>
     <button class="secondary" id="saveNamesBtn">Save names</button>
-
-    <div class="section-title">This week's summary</div>
-    <div class="weekly-summary-grid">
-      <div class="weekly-summary-card"><strong id="weekWords">0</strong><span>Words practised</span></div>
-      <div class="weekly-summary-card"><strong id="weekMastered">0</strong><span>Mastered</span></div>
-      <div class="weekly-summary-card"><strong id="weekCorrect">0</strong><span>Correct</span></div>
-      <div class="weekly-summary-card"><strong id="weekAccuracy">0%</strong><span>Accuracy</span></div>
-      <div class="weekly-summary-card"><strong id="weekStreak">0</strong><span>Current streak</span></div>
-      <div class="weekly-summary-card"><strong id="weekRobux">R$ 0</strong><span>Robux earned</span></div>
-    </div>
 
     <div class="section-title">Add spellings</div>
     <div class="form-row">
@@ -1287,9 +1546,6 @@
 
     <div class="section-title">Words for <span id="parentProfileName"></span></div>
     <div class="word-list" id="parentWordList"></div>
-
-    <div class="section-title">Problem words</div>
-    <div class="problem-list" id="problemWordsList"></div>
 
     <div class="section-title">Robux rewards</div>
 
@@ -1436,6 +1692,14 @@
 
   const els = {
     profileSelect: document.getElementById("profileSelect"),
+    appNav: document.getElementById("appNav"),
+    progressTabBadge: document.getElementById("progressTabBadge"),
+    masteredTabBadge: document.getElementById("masteredTabBadge"),
+    rewardsTabBadge: document.getElementById("rewardsTabBadge"),
+    masteryProgressText: document.getElementById("masteryProgressText"),
+    rewardStageDisplay: document.getElementById("rewardStageDisplay"),
+    rewardMasterDisplay: document.getElementById("rewardMasterDisplay"),
+    rewardNextDisplay: document.getElementById("rewardNextDisplay"),
     statWords: document.getElementById("statWords"),
     statMastered: document.getElementById("statMastered"),
     statCorrect: document.getElementById("statCorrect"),
@@ -1519,6 +1783,7 @@
 
   let state = loadState();
   let currentProfileId = state.currentProfileId || "child1";
+  let activeTab = localStorage.getItem("spellingSteps_activeTab_v1") || "practice";
   let currentWordId = null;
   let previewRunning = false;
   let previewTimeout = null;
@@ -1779,6 +2044,7 @@
 
   function startReview(wordId, countsForSchedule = true) {
     clearPreview();
+    setActiveTab("practice");
     const word = profile().words.find(w => w.id === wordId && w.mastered);
     if (!word) return;
     reviewMode = true;
@@ -1831,6 +2097,7 @@
 
   function chooseWord(id) {
     clearPreview();
+    setActiveTab("practice");
     const selected = profile().words.find(w => w.id === id);
     if (!selected) return;
     if (!reviewMode && selected.mastered) return;
@@ -1852,6 +2119,26 @@
     render();
   }
 
+  function setActiveTab(tabName, save = true) {
+    const valid = ["practice","progress","mastered","rewards"];
+    const tab = valid.includes(tabName) ? tabName : "practice";
+    activeTab = tab;
+
+    document.querySelectorAll(".app-tab").forEach(btn => {
+      const isActive = btn.dataset.tab === tab;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+
+    document.querySelectorAll(".tab-panel").forEach(panel => {
+      panel.classList.toggle("active", panel.dataset.panel === tab);
+    });
+
+    if (save) {
+      localStorage.setItem("spellingSteps_activeTab_v1", tab);
+    }
+  }
+
   function render() {
     renderProfiles();
     renderStats();
@@ -1859,6 +2146,7 @@
     renderReviewDue();
     renderMasteredWords();
     renderGame();
+    setActiveTab(activeTab, false);
   }
 
   function renderProfiles() {
@@ -1887,12 +2175,19 @@
     els.statMastered.textContent = mastered;
     els.statCorrect.textContent = correct;
     els.statAccuracy.textContent = accuracy + "%";
+    els.progressTabBadge.textContent = accuracy + "%";
+    els.masteredTabBadge.textContent = mastered;
+    els.masteryProgressText.textContent = `${mastered} / ${total} mastered`;
 
     const pct = total ? Math.round(mastered / total * 100) : 0;
     els.progressFill.style.width = pct + "%";
 
     const rewards = p.rewards || {};
-    els.robuxBank.textContent = "R$ " + Math.max(0, Number(rewards.pending || 0));
+    const pendingRobux = Math.max(0, Number(rewards.pending || 0));
+    els.robuxBank.textContent = "R$ " + pendingRobux;
+    els.rewardsTabBadge.textContent = "R$ " + pendingRobux;
+    els.rewardStageDisplay.textContent = "R$ " + Math.max(0, Number(rewards.stageAmount ?? 1));
+    els.rewardMasterDisplay.textContent = "R$ " + Math.max(0, Number(rewards.masterBonus ?? 5));
 
     const streak = ensureStreak();
     const today = localDayKey();
@@ -1910,6 +2205,10 @@
     els.dailyProgressFill.style.width = `${todayDone ? 100 : Math.min(100, (dailyDone / streak.dailyTarget) * 100)}%`;
 
     const next = nextStreakMilestone();
+    els.rewardNextDisplay.textContent = next
+      ? "R$ " + Math.max(0, Number(streak.milestones[String(next)] || 0))
+      : "✓";
+
     if (todayDone) {
       if (next) {
         const amount = Number(streak.milestones[String(next)] || 0);
@@ -2710,6 +3009,7 @@
         info.append(strong,small);
         const practise = button("Practise", "secondary", () => {
           closeParent();
+          setActiveTab("practice");
           reviewMode = false;
           reviewCountsForSchedule = false;
           currentWordId = word.id;
@@ -2925,6 +3225,10 @@
     ) {
       closeWordChooser();
     }
+  });
+
+  document.querySelectorAll(".app-tab").forEach(btn => {
+    btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
   });
 
   els.changePinBtn.addEventListener("click", changeParentPin);
