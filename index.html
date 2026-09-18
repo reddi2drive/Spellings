@@ -2891,7 +2891,7 @@ function useHint() {
   const target = normalizeWord(word.text).replace(/\s+/g, "");
   const entered = normalizeWord(els.answerInput.value).replace(/\s+/g, "");
 
-  // Work out how many letters at the start are currently correct.
+  // Find how many letters from the beginning are correct.
   let correctPrefixLength = 0;
 
   while (
@@ -2916,12 +2916,6 @@ function useHint() {
 
   els.hintPanel.classList.add("show");
 }
-
-  message +=
-    " Spell it correctly now for practice, then complete this stage again without a hint.";
-
-  els.hintPanel.textContent = message;
-  els.hintPanel.classList.add("show");
 
 
   function scheduleFirstReview(word) {
