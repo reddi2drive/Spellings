@@ -1054,6 +1054,33 @@
   display:block;
 }
 
+  .built-word{
+  display:none;
+  width:min(600px,100%);
+  min-height:68px;
+  margin:4px auto 18px;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.built-letter{
+  width:42px;
+  height:52px;
+  display:grid;
+  place-items:center;
+  border-bottom:3px solid #ccd4e1;
+  color:var(--ink);
+  font-size:27px;
+  font-weight:1000;
+  text-transform:uppercase;
+}
+
+.built-letter.filled{
+  border-bottom-color:var(--blue);
+}
+
   .letter-bank{
     display:flex;
     flex-wrap:wrap;
@@ -1714,15 +1741,17 @@
     </div>
 
     <input
-      class="answer-input"
-      id="answerInput"
-      autocomplete="off"
-      autocapitalize="none"
-      spellcheck="false"
-      placeholder="Type the word"
-    >
+  class="answer-input"
+  id="answerInput"
+  autocomplete="off"
+  autocapitalize="none"
+  spellcheck="false"
+  placeholder="Type the word"
+>
 
-    <div class="letter-bank" id="letterBank"></div>
+<div class="built-word" id="builtWord"></div>
+
+<div class="letter-bank" id="letterBank"></div>
 
     <div class="actions" id="actions"></div>
 
@@ -2207,7 +2236,8 @@
     timer: document.getElementById("timer"),
     timerBar: document.getElementById("timerBar"),
     answerInput: document.getElementById("answerInput"),
-    letterBank: document.getElementById("letterBank"),
+builtWord: document.getElementById("builtWord"),
+letterBank: document.getElementById("letterBank"),
 actions: document.getElementById("actions"),
 hintPanel: document.getElementById("hintPanel"),
 feedback: document.getElementById("feedback"),
@@ -3294,8 +3324,12 @@ els.rewardMasterDisplay.textContent =
     els.answerInput.value = "";
     els.answerInput.disabled = stage === 4;
     els.answerInput.style.display = stage === 4 ? "none" : "";
-    els.letterBank.style.display = stage === 4 ? "flex" : "none";
-    els.letterBank.innerHTML = "";
+els.letterBank.style.display = stage === 4 ? "flex" : "none";
+
+els.builtWord.style.display = stage === 4 ? "flex" : "none";
+els.builtWord.innerHTML = "";
+
+els.letterBank.innerHTML = "";
 
     els.timer.classList.remove("visible");
     els.timerBar.style.transition = "none";
@@ -3428,63 +3462,116 @@ els.rewardMasterDisplay.textContent =
     previewRunning = false;
   }
 
-  function createLetterBank(wordText) {
-    const letters = wordText.replace(/\s/g,"").split("");
-    const distractors = buildDistractors(letters, Math.min(4, Math.max(2, Math.ceil(letters.length / 3))));
-    const bank = shuffle([...letters, ...distractors]);
+  function renderBuiltWord(wordText) {
+  const targetLetters = wordText.replace(/\s/g, "").split("");
+  const enteredLetters = els.answerInput.value.split("");
 
-    els.letterBank.innerHTML = "";
-    els.answerInput.value = "";
+  els.builtWord.innerHTML = "";
 
-    bank.forEach(letter => {
-      const btn = document.createElement("button");
-      btn.className = "letter-btn";
-      btn.textContent = letter.toUpperCase();
-      btn.dataset.letter = letter;
+  targetLetters.forEach((_, index) => {
+    const slot = document.createElement("span");
+    slot.className = "built-letter";
 
-      btn.addEventListener("click", () => {
-        els.answerInput.value += letter;
-        btn.classList.add("used");
+    if (enteredLetters[index]) {
+      slot.textContent = enteredLetters[index].toUpperCase();
+      slot.classList.add("filled");
+    } else {
+      slot.textContent = "";
+    }
 
-        const neededLength = wordText.replace(/\s/g,"").length;
-        if (els.answerInput.value.length >= neededLength) {
-          checkAnswer();
-        }
-      });
+    els.builtWord.appendChild(slot);
+  });
+}
 
-      els.letterBank.appendChild(btn);
+function createLetterBank(wordText) {
+  const letters = wordText.replace(/\s/g,"").split("");
+  const distractors = buildDistractors(
+    letters,
+    Math.min(4, Math.max(2, Math.ceil(letters.length / 3)))
+  );
+
+  const bank = shuffle([...letters, ...distractors]);
+
+  els.letterBank.innerHTML = "";
+  els.answerInput.value = "";
+
+  els.builtWord.style.display = "flex";
+  renderBuiltWord(wordText);
+
+  bank.forEach(letter => {
+    const btn = document.createElement("button");
+
+    btn.className = "letter-btn";
+    btn.textContent = letter.toUpperCase();
+    btn.dataset.letter = letter;
+
+    btn.addEventListener("click", () => {
+      els.answerInput.value += letter;
+
+      btn.classList.add("used");
+
+      renderBuiltWord(wordText);
+
+      const neededLength = wordText.replace(/\s/g,"").length;
+
+      if (els.answerInput.value.length >= neededLength) {
+        checkAnswer();
+      }
     });
 
-    els.actions.innerHTML = "";
+    els.letterBank.appendChild(btn);
+  });
 
-const undo = button("Undo", "secondary", undoLetter);
-const check = button("Check", "primary", checkAnswer);
-const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
-const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
-const hint = button("💡 Hint", "hint-btn", useHint);
-const skip = button("Choose next word", "secondary", nextWord);
+  els.actions.innerHTML = "";
 
-els.actions.append(
-  undo,
-  check,
-  hear,
-  sentence,
-  hint,
-  skip
-);
+  const undo = button("Undo", "secondary", undoLetter);
+  const check = button("Check", "primary", checkAnswer);
+  const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
+  const sentence = button(
+    "Hear in a sentence",
+    "sentence-btn",
+    speakCurrentSentence
+  );
+  const hint = button("💡 Hint", "hint-btn", useHint);
+  const skip = button("Choose next word", "secondary", nextWord);
+
+  els.actions.append(
+    undo,
+    check,
+    hear,
+    sentence,
+    hint,
+    skip
+  );
+}
+
+function undoLetter() {
+  const val = els.answerInput.value;
+
+  if (!val.length) return;
+
+  const removed = val.slice(-1);
+
+  els.answerInput.value = val.slice(0,-1);
+
+  const usedButtons = [
+    ...els.letterBank.querySelectorAll(".letter-btn.used")
+  ];
+
+  const matching = usedButtons
+    .reverse()
+    .find(button => button.dataset.letter === removed);
+
+  if (matching) {
+    matching.classList.remove("used");
   }
 
-  function undoLetter() {
-    const val = els.answerInput.value;
-    if (!val.length) return;
+  const word = currentWord();
 
-    const removed = val.slice(-1);
-    els.answerInput.value = val.slice(0,-1);
-
-    const usedButtons = [...els.letterBank.querySelectorAll(".letter-btn.used")];
-    const matching = usedButtons.reverse().find(b => b.dataset.letter === removed);
-    if (matching) matching.classList.remove("used");
+  if (word) {
+    renderBuiltWord(word.text);
   }
+}
 
   function buildDistractors(letters, count) {
     const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
