@@ -930,18 +930,129 @@
     color:#c73540;
   }
 
-  .feedback{
-    min-height:56px;
-    margin-top:18px;
-    font-size:20px;
-    font-weight:950;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+ .feedback{
+  min-height:82px;
+  margin-top:18px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.feedback-card{
+  width:min(520px,100%);
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:14px 16px;
+  border-radius:18px;
+  text-align:left;
+  animation:feedbackPop .28s ease;
+}
+
+.feedback-card.good{
+  background:#eaf9f1;
+  border:1px solid #ccebd9;
+  color:#137447;
+}
+
+.feedback-card.bad{
+  background:#fff0f1;
+  border:1px solid #f1d0d4;
+  color:#bd303b;
+}
+
+.feedback-icon{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  color:#fff;
+  font-size:24px;
+  font-weight:1000;
+}
+
+.feedback-card.good .feedback-icon{
+  background:var(--green);
+}
+
+.feedback-card.bad .feedback-icon{
+  background:var(--red);
+}
+
+.feedback-copy{
+  min-width:0;
+}
+
+.feedback-title{
+  display:block;
+  font-size:17px;
+  font-weight:1000;
+  line-height:1.15;
+}
+
+.feedback-message{
+  display:block;
+  margin-top:3px;
+  font-size:13px;
+  line-height:1.4;
+  font-weight:800;
+  opacity:.86;
+}
+
+@keyframes feedbackPop{
+  from{
+    opacity:0;
+    transform:translateY(7px) scale(.97);
   }
 
-  .feedback.good{color:var(--green)}
-  .feedback.bad{color:var(--red)}
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
+
+/* =========================================================
+   HINTS
+========================================================= */
+
+.hint-btn{
+  border:0;
+  border-radius:15px;
+  padding:13px 18px;
+  font-weight:950;
+  background:#fff5df;
+  color:#9a620b;
+}
+
+.hint-btn:hover{
+  background:#ffedc4;
+}
+
+.hint-btn:disabled{
+  opacity:.55;
+  cursor:default;
+}
+
+.hint-panel{
+  display:none;
+  width:min(520px,100%);
+  margin:16px auto 0;
+  padding:13px 15px;
+  border-radius:15px;
+  background:#fff8e8;
+  border:1px solid #f0dfb6;
+  color:#815611;
+  font-size:13px;
+  line-height:1.5;
+  font-weight:850;
+}
+
+.hint-panel.show{
+  display:block;
+}
 
   .letter-bank{
     display:flex;
@@ -1615,7 +1726,9 @@
 
     <div class="actions" id="actions"></div>
 
-    <div class="feedback" id="feedback"></div>
+<div class="hint-panel" id="hintPanel"></div>
+
+<div class="feedback" id="feedback"></div>
 
     <div class="stage-dots" id="stageDots"></div>
   </section>
@@ -2095,9 +2208,10 @@
     timerBar: document.getElementById("timerBar"),
     answerInput: document.getElementById("answerInput"),
     letterBank: document.getElementById("letterBank"),
-    actions: document.getElementById("actions"),
-    feedback: document.getElementById("feedback"),
-    stageDots: document.getElementById("stageDots"),
+actions: document.getElementById("actions"),
+hintPanel: document.getElementById("hintPanel"),
+feedback: document.getElementById("feedback"),
+stageDots: document.getElementById("stageDots"),
 
     parentBtn: document.getElementById("parentBtn"),
     parentModal: document.getElementById("parentModal"),
@@ -2152,7 +2266,8 @@
   let previewTimeout = null;
   let timerAnimation = null;
   let reviewMode = false;
-  let reviewCountsForSchedule = false;
+let reviewCountsForSchedule = false;
+let hintUsedThisAttempt = false;
 
   const cloudClient = window.supabase
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -2758,6 +2873,47 @@ function speakText(text) {
     const word = currentWord();
     if (word) speakText(sentenceFor(word));
   }
+  function clearHint() {
+  hintUsedThisAttempt = false;
+
+  if (!els.hintPanel) return;
+
+  els.hintPanel.textContent = "";
+  els.hintPanel.classList.remove("show");
+}
+
+function useHint() {
+  const word = currentWord();
+  if (!word || hintUsedThisAttempt) return;
+
+  hintUsedThisAttempt = true;
+
+  const letters = word.text
+    .replace(/[^a-zA-Z]/g,"")
+    .toLowerCase();
+
+  if (!letters.length) return;
+
+  const firstLetter = letters.charAt(0).toUpperCase();
+
+  let message =
+    `The word starts with ${firstLetter} and has ${letters.length} letters.`;
+
+  if (letters.length >= 7) {
+    const lastLetter = letters.charAt(letters.length - 1).toUpperCase();
+    message += ` It ends with ${lastLetter}.`;
+  }
+
+  message +=
+    " Spell it correctly now for practice, then complete this stage again without a hint.";
+
+  els.hintPanel.textContent = message;
+  els.hintPanel.classList.add("show");
+
+  document.querySelectorAll(".hint-btn").forEach(btn => {
+    btn.disabled = true;
+  });
+}
 
   function scheduleFirstReview(word) {
     word.masteredAt = new Date().toISOString();
@@ -2926,12 +3082,15 @@ function speakText(text) {
     els.progressTabBadge.textContent = accuracy + "%";
     els.masteredTabBadge.textContent = mastered;
 
-    const rewards = p.rewards || {};
-    const pendingRobux = Math.max(0, Number(rewards.pending || 0));
-    els.robuxBank.textContent = "R$ " + pendingRobux;
-    els.rewardsTabBadge.textContent = "R$ " + pendingRobux;
-    els.rewardStageDisplay.textContent = "R$ " + Math.max(0, Number(rewards.stageAmount ?? 1));
-    els.rewardMasterDisplay.textContent = "R$ " + Math.max(0, Number(rewards.masterBonus ?? 5));
+    const rewards = ensureRewards();
+
+renderRobuxTotals();
+
+els.rewardStageDisplay.textContent =
+  "R$ " + Math.max(0, Number(rewards.stageAmount ?? 1));
+
+els.rewardMasterDisplay.textContent =
+  "R$ " + Math.max(0, Number(rewards.masterBonus ?? 5));
 
     const streak = ensureStreak();
     const today = localDayKey();
@@ -3096,9 +3255,10 @@ function speakText(text) {
     });
   }
 
-  function renderGame() {
-    clearFeedback();
-
+ function renderGame() {
+  clearFeedback();
+  clearHint();
+   
     const p = profile();
     const unmastered = p.words.filter(w => !w.mastered);
 
@@ -3170,24 +3330,41 @@ function speakText(text) {
   }
 
   function renderCheckActions(stage) {
-    els.actions.innerHTML = "";
-    const check = button("Check", "primary", checkAnswer);
-    const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
-    const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
-    const skip = button("Choose next word", "secondary", nextWord);
-    els.actions.append(check, hear, sentence, skip);
+  els.actions.innerHTML = "";
+
+  const check = button("Check", "primary", checkAnswer);
+  const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
+  const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
+
+  els.actions.append(check, hear, sentence);
+
+  // Stage 1 already displays the full word,
+  // so a hint is only useful from Stage 2 onwards.
+  if (stage > 1) {
+    const hint = button("💡 Hint", "hint-btn", useHint);
+    els.actions.appendChild(hint);
   }
 
+  const skip = button("Choose next word", "secondary", nextWord);
+  els.actions.appendChild(skip);
+}
+
   function renderAudioStageActions() {
-    els.actions.innerHTML = "";
-    const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
-    const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
-    const check = button("Check", "primary", checkAnswer);
-    els.actions.append(hear, sentence, check);
-    if (!reviewMode) {
-      els.actions.appendChild(button("Choose next word", "secondary", nextWord));
-    }
+  els.actions.innerHTML = "";
+
+  const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
+  const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
+  const hint = button("💡 Hint", "hint-btn", useHint);
+  const check = button("Check", "primary", checkAnswer);
+
+  els.actions.append(hear, sentence, hint, check);
+
+  if (!reviewMode) {
+    els.actions.appendChild(
+      button("Choose next word", "secondary", nextWord)
+    );
   }
+}
 
   function button(text, className, handler) {
     const btn = document.createElement("button");
@@ -3276,12 +3453,22 @@ function speakText(text) {
     });
 
     els.actions.innerHTML = "";
-    const undo = button("Undo", "secondary", undoLetter);
-    const check = button("Check", "primary", checkAnswer);
-    const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
-    const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
-    const skip = button("Choose next word", "secondary", nextWord);
-    els.actions.append(undo, check, hear, sentence, skip);
+
+const undo = button("Undo", "secondary", undoLetter);
+const check = button("Check", "primary", checkAnswer);
+const hear = button("🔊 Hear word", "audio-btn", speakCurrentWord);
+const sentence = button("Hear in a sentence", "sentence-btn", speakCurrentSentence);
+const hint = button("💡 Hint", "hint-btn", useHint);
+const skip = button("Choose next word", "secondary", nextWord);
+
+els.actions.append(
+  undo,
+  check,
+  hear,
+  sentence,
+  hint,
+  skip
+);
   }
 
   function undoLetter() {
@@ -3441,24 +3628,74 @@ function speakText(text) {
     return p.rewards;
   }
 
-  function awardRobux(amount, reason, wordText) {
-    amount = Math.max(0, Math.floor(Number(amount) || 0));
-    if (!amount) return;
+  function renderRobuxTotals() {
+  const rewards = ensureRewards();
 
-    const rewards = ensureRewards();
-    rewards.pending += amount;
-    rewards.lifetime += amount;
+  rewards.pending = Math.max(
+    0,
+    Math.floor(Number(rewards.pending) || 0)
+  );
 
-    rewards.history.unshift({
-      amount,
-      reason,
-      word:wordText || "",
-      at:new Date().toISOString()
-    });
+  rewards.paid = Math.max(
+    0,
+    Math.floor(Number(rewards.paid) || 0)
+  );
 
-    rewards.history = rewards.history.slice(0,30);
-    showRewardPop(amount, reason);
+  rewards.lifetime = Math.max(
+    0,
+    Math.floor(Number(rewards.lifetime) || 0)
+  );
+
+  if (els.robuxBank) {
+    els.robuxBank.textContent = `R$ ${rewards.pending}`;
   }
+
+  if (els.rewardsTabBadge) {
+    els.rewardsTabBadge.textContent = `R$ ${rewards.pending}`;
+  }
+
+  if (els.rewardPending) {
+    els.rewardPending.textContent = rewards.pending;
+  }
+
+  if (els.rewardPaid) {
+    els.rewardPaid.textContent = rewards.paid;
+  }
+
+  if (els.rewardLifetime) {
+    els.rewardLifetime.textContent = rewards.lifetime;
+  }
+}
+
+  function awardRobux(amount, reason, wordText) {
+  amount = Math.max(
+    0,
+    Math.floor(Number(amount) || 0)
+  );
+
+  if (!amount) return;
+
+  const rewards = ensureRewards();
+
+  rewards.pending =
+    Math.max(0, Number(rewards.pending) || 0) + amount;
+
+  rewards.lifetime =
+    Math.max(0, Number(rewards.lifetime) || 0) + amount;
+
+  rewards.history.unshift({
+    amount,
+    reason,
+    word:wordText || "",
+    at:new Date().toISOString()
+  });
+
+  rewards.history = rewards.history.slice(0,30);
+
+  renderRobuxTotals();
+
+  showRewardPop(amount, reason);
+}
 
   function showRewardPop(amount, reason) {
     els.rewardPop.textContent = `+R$ ${amount} · ${reason}`;
@@ -3488,17 +3725,52 @@ function speakText(text) {
     const target = normalizeWord(word.text).replace(/\s+/g,"");
 
     if (!entered) {
-      showFeedback("Type or build the word first.", false);
+showFeedback(
+  "Type or build the word before checking it.",
+  false,
+  "Enter an answer"
+);
       return;
     }
 
     const stageAtAttempt = reviewMode ? 5 : Math.min(5, Math.max(1, word.stage || 1));
     const isReviewAttempt = Boolean(reviewMode && word.mastered);
 
-    word.attempts = (word.attempts || 0) + 1;
-    word.lastPractised = new Date().toISOString();
+   word.attempts = (word.attempts || 0) + 1;
+word.lastPractised = new Date().toISOString();
 
-    if (entered === target) {
+/*
+ * A correct answer after using a hint is useful practice,
+ * but it does NOT complete the stage.
+ */
+if (entered === target && hintUsedThisAttempt) {
+
+  logActivity("assisted", word, {
+    stage:stageAtAttempt,
+    review:isReviewAttempt
+  });
+
+  showFeedback(
+    `You spelled "${word.text}" correctly. Now do the same stage again without a hint to complete it.`,
+    true,
+    "Correct with a hint"
+  );
+
+  saveState();
+  renderParent();
+
+  setWordChangeLocked(true);
+  lockCurrentInputs();
+
+  setTimeout(() => {
+    hintUsedThisAttempt = false;
+    render();
+  }, 1700);
+
+  return;
+}
+
+if (entered === target) {
       word.correct = (word.correct || 0) + 1;
       profile().totals.correct = (profile().totals.correct || 0) + 1;
       logActivity("answer", word, {correct:true, stage:stageAtAttempt, review:isReviewAttempt});
@@ -3506,7 +3778,11 @@ function speakText(text) {
 
       if (isReviewAttempt) {
         if (reviewCountsForSchedule) completeScheduledReview(word);
-        showFeedback(`Correct — review passed! ★`, true);
+showFeedback(
+  `"${word.text}" passed its review.`,
+  true,
+  "Review passed!"
+);
 
         saveState();
         renderStats();
@@ -3534,10 +3810,18 @@ function speakText(text) {
         scheduleFirstReview(word);
         logActivity("mastered", word, {});
         awardMasterIfEligible(word);
-        showFeedback(`Correct — "${word.text}" is mastered! ★`, true);
+showFeedback(
+  `"${word.text}" is now mastered. Brilliant work!`,
+  true,
+  "Word mastered! ★"
+);
       } else {
         word.stage = Math.min(5, (word.stage || 1) + 1);
-        showFeedback(`Correct! "${word.text}" moves to Stage ${word.stage}.`, true);
+showFeedback(
+  `"${word.text}" moves to Stage ${word.stage}.`,
+  true,
+  "Correct!"
+);
       }
 
       saveState();
@@ -3568,36 +3852,62 @@ function speakText(text) {
       renderStats();
       renderParent();
 
-      showFeedback(`Not quite. The word is "${word.text}". Try it again.`, false);
+showFeedback(
+  `The correct spelling is "${word.text}". Have another go.`,
+  false,
+  "Try again"
+);
 
       els.wordDisplay.textContent = word.text;
       els.wordDisplay.classList.remove("hidden-word");
 
       if (!isReviewAttempt && word.stage === 4) {
-        setTimeout(() => {
-          els.answerInput.value = "";
-          createLetterBank(word.text);
-          els.wordDisplay.textContent = word.text;
-          els.wordDisplay.classList.add("hidden-word");
-          clearFeedback();
-          setWordChangeLocked(false);
-        }, 1800);
-      } else {
-        setTimeout(() => {
-          els.answerInput.value = "";
-          if (stageAtAttempt === 5) {
-            els.wordDisplay.textContent = "Listen & spell";
-            els.wordDisplay.classList.remove("hidden-word");
-            renderAudioStageActions();
-          } else if (word.stage > 1) {
-            els.wordDisplay.textContent = word.text;
-            els.wordDisplay.classList.add("hidden-word");
-          }
-          els.answerInput.focus();
-          clearFeedback();
-          setWordChangeLocked(isReviewAttempt);
-        }, 1800);
+
+  setTimeout(() => {
+    els.answerInput.value = "";
+
+    clearHint();
+
+    createLetterBank(word.text);
+
+    els.wordDisplay.textContent = word.text;
+    els.wordDisplay.classList.add("hidden-word");
+
+    clearFeedback();
+    setWordChangeLocked(false);
+  }, 1800);
+
+} else {
+
+  setTimeout(() => {
+    els.answerInput.value = "";
+
+    clearHint();
+
+    if (stageAtAttempt === 5) {
+
+      els.wordDisplay.textContent = "Listen & spell";
+      els.wordDisplay.classList.remove("hidden-word");
+
+      renderAudioStageActions();
+
+    } else {
+
+      if (word.stage > 1) {
+        els.wordDisplay.textContent = word.text;
+        els.wordDisplay.classList.add("hidden-word");
       }
+
+      renderCheckActions(stageAtAttempt);
+    }
+
+    els.answerInput.focus();
+
+    clearFeedback();
+    setWordChangeLocked(isReviewAttempt);
+
+  }, 1800);
+}
     }
   }
 
@@ -3607,15 +3917,39 @@ function speakText(text) {
     els.letterBank.querySelectorAll("button").forEach(b => b.disabled = true);
   }
 
-  function showFeedback(text, good) {
-    els.feedback.textContent = text;
-    els.feedback.className = "feedback " + (good ? "good" : "bad");
-  }
+  function showFeedback(text, good, title = "") {
+  els.feedback.innerHTML = "";
+  els.feedback.className = "feedback";
 
-  function clearFeedback() {
-    els.feedback.textContent = "";
-    els.feedback.className = "feedback";
-  }
+  const card = document.createElement("div");
+  card.className = `feedback-card ${good ? "good" : "bad"}`;
+
+  const icon = document.createElement("div");
+  icon.className = "feedback-icon";
+  icon.textContent = good ? "✓" : "×";
+
+  const copy = document.createElement("div");
+  copy.className = "feedback-copy";
+
+  const heading = document.createElement("strong");
+  heading.className = "feedback-title";
+  heading.textContent =
+    title || (good ? "Correct!" : "Try again");
+
+  const message = document.createElement("span");
+  message.className = "feedback-message";
+  message.textContent = text;
+
+  copy.append(heading, message);
+  card.append(icon, copy);
+
+  els.feedback.appendChild(card);
+}
+
+function clearFeedback() {
+  els.feedback.innerHTML = "";
+  els.feedback.className = "feedback";
+}
 
   function renderStageDots(stage, mastered) {
     els.stageDots.innerHTML = "";
