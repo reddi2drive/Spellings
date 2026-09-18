@@ -4161,19 +4161,36 @@ showFeedback(
 
       els.answerInput.focus();
 
-    } else {
+   } else if (stageAtAttempt === 2 || stageAtAttempt === 3) {
 
-      if (word.stage > 1) {
-        els.wordDisplay.textContent = word.text;
-        els.wordDisplay.classList.add("hidden-word");
-      }
+  // Give them another timed look before retrying.
+  els.answerInput.value = "";
+  els.answerInput.disabled = false;
 
-      renderCheckActions(stageAtAttempt);
+  els.wordDisplay.textContent = "Ready?";
+  els.wordDisplay.classList.remove("hidden-word");
 
-      setWordChangeLocked(isReviewAttempt);
+  setWordChangeLocked(true);
 
-      els.answerInput.focus();
-    }
+  // Stage 2 = another 5 seconds.
+  // Stage 3 = another 3 seconds.
+  startPreview(stageAtAttempt);
+
+} else {
+
+  // Stage 1: the word stays visible, so just let them retry.
+  els.answerInput.value = "";
+  els.answerInput.disabled = false;
+
+  els.wordDisplay.textContent = word.text;
+  els.wordDisplay.classList.remove("hidden-word");
+
+  renderCheckActions(stageAtAttempt);
+
+  setWordChangeLocked(false);
+
+  els.answerInput.focus();
+}
   }
 );
 
