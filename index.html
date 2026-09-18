@@ -366,25 +366,6 @@
     letter-spacing:-.25px;
   }
 
-  .mastery-progress-card{
-    margin-bottom:18px;
-    background:#fff;
-    border:1px solid rgba(18,35,63,.07);
-    border-radius:18px;
-    padding:15px 16px;
-    box-shadow:0 6px 20px rgba(26,39,66,.05);
-  }
-
-  .mastery-progress-top{
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    align-items:center;
-    margin-bottom:9px;
-    color:#5f6c82;
-    font-size:12px;
-    font-weight:900;
-  }
 
   .reward-overview-grid{
     display:grid;
@@ -705,22 +686,6 @@
     padding:9px 10px;
     font-weight:900;
     text-align:center;
-  }
-
-  .progress-track{
-    height:11px;
-    background:#e7ebf2;
-    border-radius:100px;
-    overflow:hidden;
-    margin-bottom:18px;
-  }
-
-  .progress-fill{
-    height:100%;
-    width:0;
-    border-radius:inherit;
-    background:linear-gradient(90deg,var(--blue),var(--purple));
-    transition:width .3s ease;
   }
 
   .game-card{
@@ -1681,15 +1646,6 @@
     <div class="stat"><strong id="statAccuracy">0%</strong><span>Accuracy</span></div>
   </div>
 
-    <div class="mastery-progress-card">
-      <div class="mastery-progress-top">
-        <span>Overall mastery</span>
-        <span id="masteryProgressText">0 / 0 mastered</span>
-      </div>
-  <div class="progress-track">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
-    </div>
 
     <div class="dashboard-card">
       <h3 class="dashboard-card-title">This week's summary</h3>
@@ -2102,7 +2058,6 @@
     progressTabBadge: document.getElementById("progressTabBadge"),
     masteredTabBadge: document.getElementById("masteredTabBadge"),
     rewardsTabBadge: document.getElementById("rewardsTabBadge"),
-    masteryProgressText: document.getElementById("masteryProgressText"),
     rewardStageDisplay: document.getElementById("rewardStageDisplay"),
     rewardMasterDisplay: document.getElementById("rewardMasterDisplay"),
     rewardNextDisplay: document.getElementById("rewardNextDisplay"),
@@ -2110,7 +2065,6 @@
     statMastered: document.getElementById("statMastered"),
     statCorrect: document.getElementById("statCorrect"),
     statAccuracy: document.getElementById("statAccuracy"),
-    progressFill: document.getElementById("progressFill"),
     robuxBank: document.getElementById("robuxBank"),
     rewardPop: document.getElementById("rewardPop"),
     streakTitle: document.getElementById("streakTitle"),
@@ -2895,10 +2849,6 @@
     els.statAccuracy.textContent = accuracy + "%";
     els.progressTabBadge.textContent = accuracy + "%";
     els.masteredTabBadge.textContent = mastered;
-    els.masteryProgressText.textContent = `${mastered} / ${total} mastered`;
-
-    const pct = total ? Math.round(mastered / total * 100) : 0;
-    els.progressFill.style.width = pct + "%";
 
     const rewards = p.rewards || {};
     const pendingRobux = Math.max(0, Number(rewards.pending || 0));
