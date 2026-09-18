@@ -147,6 +147,113 @@
     box-shadow:0 0 0 4px rgba(79,124,255,.10);
   }
 
+  .sync-chip{
+    flex:0 0 auto;
+    border:1px solid rgba(18,35,63,.08);
+    border-radius:999px;
+    padding:10px 13px;
+    background:#fff;
+    color:#536076;
+    font-size:11px;
+    font-weight:950;
+    white-space:nowrap;
+    box-shadow:0 4px 12px rgba(23,32,51,.05);
+  }
+
+  .sync-chip[data-state="synced"]{
+    background:#eaf8f0;
+    color:#168652;
+    border-color:#d2ebdc;
+  }
+
+  .sync-chip[data-state="saving"],
+  .sync-chip[data-state="syncing"]{
+    background:#eef3ff;
+    color:#385bcb;
+    border-color:#d8e2ff;
+  }
+
+  .sync-chip[data-state="offline"]{
+    background:#fff5e8;
+    color:#a25d12;
+    border-color:#f4dfc6;
+  }
+
+  .sync-chip[data-state="error"]{
+    background:#fff0f1;
+    color:#c73540;
+    border-color:#f1d4d7;
+  }
+
+  .cloud-login-panel{
+    width:min(480px,100%);
+  }
+
+  .cloud-login-intro{
+    margin:-4px 0 18px;
+    color:var(--muted);
+    line-height:1.55;
+    font-weight:700;
+  }
+
+  .cloud-login-fields{
+    display:grid;
+    gap:10px;
+  }
+
+  .cloud-login-fields input{
+    width:100%;
+    border:2px solid #dce2eb;
+    border-radius:14px;
+    padding:13px 14px;
+    outline:none;
+    font-size:16px;
+  }
+
+  .cloud-login-fields input:focus{
+    border-color:var(--blue);
+    box-shadow:0 0 0 4px rgba(79,124,255,.10);
+  }
+
+  .cloud-login-message{
+    min-height:20px;
+    margin:11px 0 0;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:800;
+    line-height:1.45;
+  }
+
+  .cloud-login-message.error{
+    color:var(--red);
+  }
+
+  .cloud-parent-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:13px 14px;
+    background:#fafbfe;
+  }
+
+  .cloud-parent-card strong{
+    display:block;
+  }
+
+  .cloud-parent-card small{
+    display:block;
+    margin-top:3px;
+    color:var(--muted);
+    font-weight:750;
+  }
+
+  .cloud-parent-actions{
+    flex:0 0 auto;
+  }
+
   .app-nav{
     display:grid;
     grid-template-columns:repeat(4,1fr);
@@ -1447,6 +1554,11 @@
     .profile-label{font-size:11px}
     .profile-avatar{width:46px;height:46px;flex-basis:46px}
     .avatar-choice-row{grid-template-columns:1fr}
+    .profile-bar{flex-wrap:wrap}
+    .sync-chip{margin-left:58px}
+    .cloud-parent-card{align-items:flex-start;flex-direction:column}
+    .cloud-parent-actions{width:100%}
+    .cloud-parent-actions button{width:100%}
     .mastered-words-section{border-radius:20px;padding:16px}
     .form-row{flex-direction:column}
     .name-settings{grid-template-columns:1fr}
@@ -1473,6 +1585,7 @@
     </div>
     <span class="profile-label">Learner</span>
     <select class="profile-select" id="profileSelect" aria-label="Choose learner"></select>
+    <button class="sync-chip" id="syncStatusBtn" type="button" data-state="signed-out">☁ Sign in to sync</button>
   </div>
 
   <nav class="app-nav" id="appNav" role="tablist" aria-label="Spelling Steps sections">
@@ -1681,6 +1794,32 @@
 
 <div class="reward-pop" id="rewardPop">+R$ 1</div>
 
+<div class="modal" id="cloudModal" aria-hidden="true">
+  <div class="modal-panel cloud-login-panel">
+    <div class="modal-head">
+      <h2>Cloud sync</h2>
+      <button class="close-btn" id="closeCloudModal" type="button">×</button>
+    </div>
+
+    <p class="cloud-login-intro">
+      Sign in with the Spelling Steps family account. You only need to do this once on each device.
+      Progress will then stay in sync between homes.
+    </p>
+
+    <div class="cloud-login-fields">
+      <input id="cloudEmailInput" type="email" autocomplete="username" placeholder="Family account email">
+      <input id="cloudPasswordInput" type="password" autocomplete="current-password" placeholder="Password">
+    </div>
+
+    <div class="actions" style="justify-content:flex-start">
+      <button class="primary" id="cloudSignInBtn" type="button">Sign in & sync</button>
+      <button class="secondary" id="cloudContinueOfflineBtn" type="button">Continue offline</button>
+    </div>
+
+    <div class="cloud-login-message" id="cloudLoginMessage"></div>
+  </div>
+</div>
+
 <div class="modal" id="parentModal" aria-hidden="true">
   <div class="modal-panel">
     <div class="modal-head">
@@ -1844,6 +1983,20 @@
     </div>
     <input id="importFileInput" type="file" accept="application/json,.json" hidden>
 
+    <div class="section-title">Cloud sync</div>
+    <div class="cloud-parent-card">
+      <div>
+        <strong id="cloudParentStatus">Not signed in</strong>
+        <small id="cloudParentEmail">Progress is currently saved on this device only.</small>
+      </div>
+      <div class="cloud-parent-actions">
+        <button class="secondary" id="cloudParentActionBtn" type="button">Sign in</button>
+      </div>
+    </div>
+    <p class="foot-note" style="margin-top:9px">
+      Cloud sync keeps spellings, stages, mastered words, streaks and Robux available across devices. This device still keeps a local offline copy.
+    </p>
+
     <div class="section-title">Progress controls</div>
     <div class="actions" style="justify-content:flex-start">
       <button class="secondary" id="resetProgressBtn">Reset progress only</button>
@@ -1851,14 +2004,21 @@
     </div>
 
     <p class="foot-note">
-      Progress is saved automatically on this device using browser localStorage. Use Export progress backup before clearing browser/site data or moving to another device.
+      Progress is saved automatically on this device and, when signed in, synchronised with Supabase. Use Export progress backup before clearing browser/site data.
     </p>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (() => {
   const STORAGE_KEY = "spellingSteps_v1";
+  const SUPABASE_URL = "https://ywvcaarepsoggzriavy.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ZT4fcRZyYOYPJGqUKFeOKw_H_0gcn2A";
+  const CLOUD_USER_KEY = "spellingSteps_cloud_user_v1";
+  const CLOUD_PENDING_KEY = "spellingSteps_cloud_pending_v1";
+  const CLOUD_LAST_REMOTE_KEY = "spellingSteps_cloud_last_remote_v1";
+  const CLOUD_PROMPTED_KEY = "spellingSteps_cloud_prompted_v1";
 
   const AVATARS = {
     popstar: {
@@ -1923,6 +2083,17 @@
   const els = {
     profileSelect: document.getElementById("profileSelect"),
     profileAvatar: document.getElementById("profileAvatar"),
+    syncStatusBtn: document.getElementById("syncStatusBtn"),
+    cloudModal: document.getElementById("cloudModal"),
+    closeCloudModal: document.getElementById("closeCloudModal"),
+    cloudEmailInput: document.getElementById("cloudEmailInput"),
+    cloudPasswordInput: document.getElementById("cloudPasswordInput"),
+    cloudSignInBtn: document.getElementById("cloudSignInBtn"),
+    cloudContinueOfflineBtn: document.getElementById("cloudContinueOfflineBtn"),
+    cloudLoginMessage: document.getElementById("cloudLoginMessage"),
+    cloudParentStatus: document.getElementById("cloudParentStatus"),
+    cloudParentEmail: document.getElementById("cloudParentEmail"),
+    cloudParentActionBtn: document.getElementById("cloudParentActionBtn"),
     avatarPreviewChild1: document.getElementById("avatarPreviewChild1"),
     avatarPreviewChild2: document.getElementById("avatarPreviewChild2"),
     avatarNameChild1: document.getElementById("avatarNameChild1"),
@@ -2026,6 +2197,20 @@
   let timerAnimation = null;
   let reviewMode = false;
   let reviewCountsForSchedule = false;
+
+  const cloudClient = window.supabase
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth:{
+          persistSession:true,
+          autoRefreshToken:true,
+          detectSessionInUrl:false
+        }
+      })
+    : null;
+
+  let cloudSession = null;
+  let cloudSaveTimer = null;
+  let cloudBusy = false;
 
   function freshWord(text) {
     return {
@@ -2164,9 +2349,290 @@
     }
   }
 
-  function saveState() {
+  function saveState(syncCloud = true) {
     state.currentProfileId = currentProfileId;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+    if (syncCloud) {
+      localStorage.setItem(CLOUD_PENDING_KEY, "1");
+      scheduleCloudSave();
+    }
+  }
+
+  function cloudPayload() {
+    const payload = JSON.parse(JSON.stringify(state));
+    // Which learner is selected is a device preference, not shared family data.
+    delete payload.currentProfileId;
+    return payload;
+  }
+
+  function setCloudStatus(mode, text, detail = "") {
+    if (els.syncStatusBtn) {
+      els.syncStatusBtn.dataset.state = mode;
+      els.syncStatusBtn.textContent = text;
+    }
+
+    if (els.cloudParentStatus) {
+      els.cloudParentStatus.textContent =
+        mode === "synced" ? "Cloud sync is on" :
+        mode === "saving" || mode === "syncing" ? "Synchronising…" :
+        mode === "offline" ? "Offline — local copy active" :
+        mode === "error" ? "Cloud sync needs attention" :
+        "Not signed in";
+    }
+
+    if (els.cloudParentEmail) {
+      els.cloudParentEmail.textContent = detail ||
+        (cloudSession?.user?.email
+          ? cloudSession.user.email
+          : "Progress is currently saved on this device only.");
+    }
+
+    if (els.cloudParentActionBtn) {
+      els.cloudParentActionBtn.textContent = cloudSession ? "Sign out this device" : "Sign in";
+    }
+  }
+
+  function openCloudModal() {
+    if (cloudSession) return;
+    els.cloudLoginMessage.textContent = "";
+    els.cloudLoginMessage.className = "cloud-login-message";
+    els.cloudModal.classList.add("open");
+    els.cloudModal.setAttribute("aria-hidden","false");
+    setTimeout(() => els.cloudEmailInput.focus(), 100);
+  }
+
+  function closeCloudModal() {
+    els.cloudModal.classList.remove("open");
+    els.cloudModal.setAttribute("aria-hidden","true");
+  }
+
+  function scheduleCloudSave() {
+    if (!cloudSession || !cloudClient || !navigator.onLine) {
+      if (cloudSession && !navigator.onLine) {
+        setCloudStatus("offline", "☁ Offline", "Changes are saved on this device and will sync when internet returns.");
+      }
+      return;
+    }
+
+    if (cloudSaveTimer) clearTimeout(cloudSaveTimer);
+    setCloudStatus("saving", "☁ Saving…", cloudSession.user.email || "");
+    cloudSaveTimer = setTimeout(() => uploadCloudState(), 550);
+  }
+
+  async function uploadCloudState() {
+    if (!cloudSession || !cloudClient || !navigator.onLine || cloudBusy) return;
+
+    cloudBusy = true;
+    if (cloudSaveTimer) {
+      clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = null;
+    }
+
+    try {
+      setCloudStatus("saving", "☁ Saving…", cloudSession.user.email || "");
+
+      const updatedAt = new Date().toISOString();
+      const { error } = await cloudClient
+        .from("spelling_app_state")
+        .upsert({
+          user_id: cloudSession.user.id,
+          data: cloudPayload(),
+          updated_at: updatedAt
+        }, { onConflict:"user_id" });
+
+      if (error) throw error;
+
+      localStorage.setItem(CLOUD_USER_KEY, cloudSession.user.id);
+      localStorage.setItem(CLOUD_PENDING_KEY, "0");
+      localStorage.setItem(CLOUD_LAST_REMOTE_KEY, updatedAt);
+      setCloudStatus("synced", "☁ Synced", cloudSession.user.email || "");
+    } catch (err) {
+      console.error("Cloud save failed:", err);
+      setCloudStatus(
+        navigator.onLine ? "error" : "offline",
+        navigator.onLine ? "☁ Sync error" : "☁ Offline",
+        navigator.onLine
+          ? "Your progress is still saved locally. Tap the sync status to retry."
+          : "Changes are saved on this device and will sync when internet returns."
+      );
+    } finally {
+      cloudBusy = false;
+    }
+  }
+
+  function applyCloudState(remoteData) {
+    if (!remoteData?.profiles?.child1 || !remoteData?.profiles?.child2) {
+      throw new Error("Cloud data is not a valid Spelling Steps state.");
+    }
+
+    const localLearner = currentProfileId;
+    const merged = {
+      ...remoteData,
+      currentProfileId: state.profiles?.[localLearner] ? localLearner : "child1"
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+    state = loadState();
+    currentProfileId = state.profiles[currentProfileId] ? currentProfileId : "child1";
+    currentWordId = null;
+    reviewMode = false;
+    reviewCountsForSchedule = false;
+    render();
+  }
+
+  async function reconcileCloudState() {
+    if (!cloudSession || !cloudClient || !navigator.onLine) return;
+
+    setCloudStatus("syncing", "☁ Syncing…", cloudSession.user.email || "");
+
+    const { data: row, error } = await cloudClient
+      .from("spelling_app_state")
+      .select("data,updated_at")
+      .maybeSingle();
+
+    if (error) throw error;
+
+    const previousCloudUser = localStorage.getItem(CLOUD_USER_KEY);
+    const hasPendingLocal = localStorage.getItem(CLOUD_PENDING_KEY) === "1";
+    const lastRemoteSeen = localStorage.getItem(CLOUD_LAST_REMOTE_KEY);
+
+    if (!row) {
+      // First ever sync: the existing device data becomes the cloud starting point.
+      await uploadCloudState();
+      return;
+    }
+
+    if (hasPendingLocal && previousCloudUser === cloudSession.user.id) {
+      const cloudChangedElsewhere =
+        Boolean(lastRemoteSeen) &&
+        Boolean(row.updated_at) &&
+        row.updated_at !== lastRemoteSeen;
+
+      if (cloudChangedElsewhere) {
+        const keepThisDevice = confirm(
+          "Spelling Steps found changes on this device and newer changes in the cloud.\n\n" +
+          "Press OK to keep THIS DEVICE'S progress and upload it.\n" +
+          "Press Cancel to use the CLOUD copy instead."
+        );
+
+        if (keepThisDevice) {
+          await uploadCloudState();
+          return;
+        }
+      } else {
+        await uploadCloudState();
+        return;
+      }
+    }
+
+    applyCloudState(row.data);
+    localStorage.setItem(CLOUD_USER_KEY, cloudSession.user.id);
+    localStorage.setItem(CLOUD_PENDING_KEY, "0");
+    localStorage.setItem(CLOUD_LAST_REMOTE_KEY, row.updated_at || "");
+    setCloudStatus("synced", "☁ Synced", cloudSession.user.email || "");
+  }
+
+  async function signInCloud() {
+    if (!cloudClient) {
+      els.cloudLoginMessage.textContent = "Cloud sync could not load. Check your internet connection and reload.";
+      els.cloudLoginMessage.className = "cloud-login-message error";
+      return;
+    }
+
+    const email = els.cloudEmailInput.value.trim();
+    const password = els.cloudPasswordInput.value;
+
+    if (!email || !password) {
+      els.cloudLoginMessage.textContent = "Enter the family account email and password.";
+      els.cloudLoginMessage.className = "cloud-login-message error";
+      return;
+    }
+
+    els.cloudSignInBtn.disabled = true;
+    els.cloudLoginMessage.textContent = "Signing in…";
+    els.cloudLoginMessage.className = "cloud-login-message";
+
+    try {
+      const { data, error } = await cloudClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+
+      cloudSession = data.session;
+      els.cloudPasswordInput.value = "";
+      closeCloudModal();
+
+      await reconcileCloudState();
+      renderParent();
+    } catch (err) {
+      console.error("Cloud sign in failed:", err);
+      els.cloudLoginMessage.textContent =
+        err?.message || "Sign in failed. Check the email and password.";
+      els.cloudLoginMessage.className = "cloud-login-message error";
+    } finally {
+      els.cloudSignInBtn.disabled = false;
+    }
+  }
+
+  async function signOutCloud() {
+    if (!cloudClient || !cloudSession) {
+      openCloudModal();
+      return;
+    }
+
+    if (!confirm("Sign out of cloud sync on this device? The local copy will remain here.")) return;
+
+    try {
+      if (localStorage.getItem(CLOUD_PENDING_KEY) === "1" && navigator.onLine) {
+        await uploadCloudState();
+      }
+      await cloudClient.auth.signOut();
+    } catch (err) {
+      console.error("Cloud sign out failed:", err);
+    }
+
+    cloudSession = null;
+    setCloudStatus("signed-out", "☁ Sign in to sync");
+    renderParent();
+  }
+
+  async function initCloud() {
+    if (!cloudClient) {
+      setCloudStatus("error", "☁ Sync unavailable", "Cloud library could not load. The app is still working locally.");
+      return;
+    }
+
+    try {
+      const { data, error } = await cloudClient.auth.getSession();
+      if (error) throw error;
+
+      cloudSession = data.session || null;
+
+      cloudClient.auth.onAuthStateChange((_event, session) => {
+        cloudSession = session || null;
+        if (!cloudSession) {
+          setCloudStatus("signed-out", "☁ Sign in to sync");
+        }
+      });
+
+      if (cloudSession) {
+        await reconcileCloudState();
+      } else {
+        setCloudStatus("signed-out", "☁ Sign in to sync");
+
+        // Show the setup prompt once on each new browser/device.
+        if (!localStorage.getItem(CLOUD_PROMPTED_KEY)) {
+          localStorage.setItem(CLOUD_PROMPTED_KEY, "1");
+          setTimeout(openCloudModal, 450);
+        }
+      }
+    } catch (err) {
+      console.error("Cloud initialisation failed:", err);
+      setCloudStatus(
+        navigator.onLine ? "error" : "offline",
+        navigator.onLine ? "☁ Sync error" : "☁ Offline",
+        "The app is still saving locally on this device."
+      );
+    }
   }
 
   function profile() {
@@ -3194,6 +3660,19 @@
   function renderParent() {
     const p = profile();
 
+    if (cloudSession) {
+      const pending = localStorage.getItem(CLOUD_PENDING_KEY) === "1";
+      if (!navigator.onLine) {
+        setCloudStatus("offline", "☁ Offline", "Changes are saved on this device and will sync later.");
+      } else if (pending) {
+        setCloudStatus("saving", "☁ Saving…", cloudSession.user.email || "");
+      } else {
+        setCloudStatus("synced", "☁ Synced", cloudSession.user.email || "");
+      }
+    } else {
+      setCloudStatus("signed-out", "☁ Sign in to sync");
+    }
+
     els.parentProfileSelect.innerHTML = "";
     Object.entries(state.profiles).forEach(([id, learner]) => {
       const option = document.createElement("option");
@@ -3489,6 +3968,65 @@
   }
 
   // Event bindings
+  els.syncStatusBtn.addEventListener("click", async () => {
+    if (!cloudSession) {
+      openCloudModal();
+      return;
+    }
+
+    if (!navigator.onLine) {
+      setCloudStatus("offline", "☁ Offline", "Changes are saved on this device and will sync when internet returns.");
+      return;
+    }
+
+    try {
+      await reconcileCloudState();
+    } catch (err) {
+      console.error("Manual sync failed:", err);
+      setCloudStatus("error", "☁ Sync error", "Tap again to retry. Your local progress is safe.");
+    }
+  });
+
+  els.closeCloudModal.addEventListener("click", closeCloudModal);
+  els.cloudContinueOfflineBtn.addEventListener("click", closeCloudModal);
+  els.cloudSignInBtn.addEventListener("click", signInCloud);
+  els.cloudPasswordInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") signInCloud();
+  });
+  els.cloudEmailInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") els.cloudPasswordInput.focus();
+  });
+
+  els.cloudModal.addEventListener("click", e => {
+    if (e.target === els.cloudModal) closeCloudModal();
+  });
+
+  els.cloudParentActionBtn.addEventListener("click", () => {
+    if (cloudSession) signOutCloud();
+    else openCloudModal();
+  });
+
+  window.addEventListener("online", async () => {
+    if (!cloudSession) return;
+    try {
+      await reconcileCloudState();
+    } catch (err) {
+      console.error("Reconnect sync failed:", err);
+    }
+  });
+
+  window.addEventListener("offline", () => {
+    if (cloudSession) {
+      setCloudStatus("offline", "☁ Offline", "Changes are saved on this device and will sync when internet returns.");
+    }
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && cloudSession && navigator.onLine) {
+      uploadCloudState();
+    }
+  });
+
   document.querySelectorAll(".avatar-choice").forEach(btn => {
     btn.addEventListener("click", () => {
       const profileId = btn.dataset.profile;
@@ -3647,10 +4185,16 @@
   });
 
   document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && els.parentModal.classList.contains("open")) closeParent();
+    if (e.key !== "Escape") return;
+    if (els.cloudModal.classList.contains("open")) {
+      closeCloudModal();
+      return;
+    }
+    if (els.parentModal.classList.contains("open")) closeParent();
   });
 
   render();
+  initCloud();
 })();
 </script>
 </body>
