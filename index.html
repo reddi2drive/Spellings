@@ -131,6 +131,7 @@
     white-space:nowrap;
   }
 
+
   .profile-select{
     flex:1;
     min-width:0;
@@ -1074,7 +1075,7 @@
   color:var(--ink);
   font-size:27px;
   font-weight:1000;
-  text-transform:uppercase;
+  text-transform:none;
 }
 
 .built-letter.filled{
@@ -2399,7 +2400,8 @@ stageDots: document.getElementById("stageDots"),
   let reviewMode = false;
 let reviewCountsForSchedule = false;
 let hintUsedThisAttempt = false;
-  let resultModalAction = null;
+let hintCountThisAttempt = 0;
+let resultModalAction = null;
 
   const cloudClient = window.supabase
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -3007,6 +3009,7 @@ function speakText(text) {
   }
   function clearHint() {
   hintUsedThisAttempt = false;
+  hintCountThisAttempt = 0;
 
   if (!els.hintPanel) return;
 
@@ -3018,12 +3021,34 @@ function useHint() {
   const word = currentWord();
   if (!word) return;
 
-  hintUsedThisAttempt = true;
+  const stage = reviewMode
+    ? 5
+    : Math.min(5, Math.max(1, word.stage || 1));
 
-  const target = normalizeWord(word.text).replace(/\s+/g, "");
-  const entered = normalizeWord(els.answerInput.value).replace(/\s+/g, "");
+  // Stage 2 = unlimited hints.
+  // Stages 3, 4 and 5 = maximum 3 hints per attempt.
+  const unlimitedHints = stage === 2;
+  const maxHints = 3;
 
-  // Find how many letters from the beginning are correct.
+  if (!unlimitedHints && hintCountThisAttempt >= maxHints) {
+    els.hintPanel.innerHTML =
+      `💡 You've used all <strong>${maxHints}</strong> hints for this attempt.`;
+
+    els.hintPanel.classList.add("show");
+
+    document.querySelectorAll(".hint-btn").forEach(btn => {
+      btn.disabled = true;
+    });
+
+    return;
+  }
+
+  const target =
+    normalizeWord(word.text).replace(/\s+/g, "");
+
+  const entered =
+    normalizeWord(els.answerInput.value).replace(/\s+/g, "");
+
   let correctPrefixLength = 0;
 
   while (
@@ -3039,18 +3064,40 @@ function useHint() {
   if (!nextLetter) {
     els.hintPanel.textContent =
       "You've already entered all the letters. Press Check.";
+
     els.hintPanel.classList.add("show");
     return;
   }
 
-  els.hintPanel.innerHTML =
-    `💡 Next letter: <strong style="font-size:22px">${nextLetter.toUpperCase()}</strong>`;
+  hintUsedThisAttempt = true;
+  hintCountThisAttempt++;
+
+  if (unlimitedHints) {
+
+    els.hintPanel.innerHTML =
+      `💡 Next letter: <strong style="font-size:22px">${nextLetter.toLowerCase()}</strong>`;
+
+  } else {
+
+    const remaining =
+      Math.max(0, maxHints - hintCountThisAttempt);
+
+    els.hintPanel.innerHTML =
+      `💡 Next letter: <strong style="font-size:22px">${nextLetter.toLowerCase()}</strong>` +
+      `<br><span style="font-size:11px">${remaining} hint${remaining === 1 ? "" : "s"} remaining</span>`;
+
+    if (remaining === 0) {
+      document.querySelectorAll(".hint-btn").forEach(btn => {
+        btn.disabled = true;
+      });
+    }
+  }
 
   els.hintPanel.classList.add("show");
 }
 
 
-  function scheduleFirstReview(word) {
+function scheduleFirstReview(word) {
     word.masteredAt = new Date().toISOString();
     word.reviewIndex = 0;
     word.reviewComplete = false;
@@ -3575,7 +3622,7 @@ els.letterBank.innerHTML = "";
     slot.className = "built-letter";
 
     if (enteredLetters[index]) {
-      slot.textContent = enteredLetters[index].toUpperCase();
+slot.textContent = enteredLetters[index].toLowerCase();
       slot.classList.add("filled");
     } else {
       slot.textContent = "";
@@ -3604,7 +3651,7 @@ function createLetterBank(wordText) {
     const btn = document.createElement("button");
 
     btn.className = "letter-btn";
-    btn.textContent = letter.toUpperCase();
+btn.textContent = letter.toLowerCase();
     btn.dataset.letter = letter;
 
     btn.addEventListener("click", () => {
