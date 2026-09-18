@@ -2884,25 +2884,38 @@ function speakText(text) {
 
 function useHint() {
   const word = currentWord();
-  if (!word || hintUsedThisAttempt) return;
+  if (!word) return;
 
   hintUsedThisAttempt = true;
 
-  const letters = word.text
-    .replace(/[^a-zA-Z]/g,"")
-    .toLowerCase();
+  const target = normalizeWord(word.text).replace(/\s+/g, "");
+  const entered = normalizeWord(els.answerInput.value).replace(/\s+/g, "");
 
-  if (!letters.length) return;
+  // Work out how many letters at the start are currently correct.
+  let correctPrefixLength = 0;
 
-  const firstLetter = letters.charAt(0).toUpperCase();
-
-  let message =
-    `The word starts with ${firstLetter} and has ${letters.length} letters.`;
-
-  if (letters.length >= 7) {
-    const lastLetter = letters.charAt(letters.length - 1).toUpperCase();
-    message += ` It ends with ${lastLetter}.`;
+  while (
+    correctPrefixLength < entered.length &&
+    correctPrefixLength < target.length &&
+    entered[correctPrefixLength] === target[correctPrefixLength]
+  ) {
+    correctPrefixLength++;
   }
+
+  const nextLetter = target.charAt(correctPrefixLength);
+
+  if (!nextLetter) {
+    els.hintPanel.textContent =
+      "You've already entered all the letters. Press Check.";
+    els.hintPanel.classList.add("show");
+    return;
+  }
+
+  els.hintPanel.innerHTML =
+    `💡 Next letter: <strong style="font-size:22px">${nextLetter.toUpperCase()}</strong>`;
+
+  els.hintPanel.classList.add("show");
+}
 
   message +=
     " Spell it correctly now for practice, then complete this stage again without a hint.";
@@ -2910,10 +2923,6 @@ function useHint() {
   els.hintPanel.textContent = message;
   els.hintPanel.classList.add("show");
 
-  document.querySelectorAll(".hint-btn").forEach(btn => {
-    btn.disabled = true;
-  });
-}
 
   function scheduleFirstReview(word) {
     word.masteredAt = new Date().toISOString();
