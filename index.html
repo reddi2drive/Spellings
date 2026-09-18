@@ -1385,6 +1385,75 @@
     color:var(--muted);
   }
 
+  /* =========================================================
+   RESULT MODAL
+========================================================= */
+
+.modal.result-modal{
+  z-index:120;
+  background:rgba(10,16,29,.68);
+  backdrop-filter:blur(5px);
+}
+
+.result-modal-panel{
+  width:min(430px,100%);
+  text-align:center;
+  padding:34px 28px 28px;
+  border-radius:28px;
+  animation:resultModalPop .25s ease;
+}
+
+.result-modal-icon{
+  width:76px;
+  height:76px;
+  margin:0 auto 18px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--green);
+  color:#fff;
+  font-size:40px;
+  font-weight:1000;
+  box-shadow:0 10px 25px rgba(32,178,107,.22);
+}
+
+.result-modal-icon.bad{
+  background:var(--red);
+  box-shadow:0 10px 25px rgba(227,72,80,.22);
+}
+
+.result-modal-panel h2{
+  margin:0;
+  font-size:30px;
+  letter-spacing:-.7px;
+}
+
+.result-modal-panel p{
+  margin:12px auto 22px;
+  max-width:340px;
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.5;
+  font-weight:750;
+}
+
+.result-modal-btn{
+  min-width:180px;
+  font-size:16px;
+}
+
+@keyframes resultModalPop{
+  from{
+    opacity:0;
+    transform:translateY(12px) scale(.95);
+  }
+
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
   /* modal */
   .modal{
     position:fixed;
@@ -1892,6 +1961,31 @@
 
 <div class="reward-pop" id="rewardPop">+R$ 1</div>
 
+  <div class="modal result-modal" id="resultModal" aria-hidden="true">
+  <div
+    class="modal-panel result-modal-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="resultModalTitle"
+  >
+
+    <div class="result-modal-icon" id="resultModalIcon">✓</div>
+
+    <h2 id="resultModalTitle">Stage complete!</h2>
+
+    <p id="resultModalMessage"></p>
+
+    <button
+      class="primary result-modal-btn"
+      id="resultModalBtn"
+      type="button"
+    >
+      Continue
+    </button>
+
+  </div>
+</div>
+
 <div class="modal" id="cloudModal" aria-hidden="true">
   <div class="modal-panel cloud-login-panel">
     <div class="modal-head">
@@ -2210,7 +2304,14 @@
     statAccuracy: document.getElementById("statAccuracy"),
     robuxBank: document.getElementById("robuxBank"),
     rewardPop: document.getElementById("rewardPop"),
-    streakTitle: document.getElementById("streakTitle"),
+
+resultModal: document.getElementById("resultModal"),
+resultModalIcon: document.getElementById("resultModalIcon"),
+resultModalTitle: document.getElementById("resultModalTitle"),
+resultModalMessage: document.getElementById("resultModalMessage"),
+resultModalBtn: document.getElementById("resultModalBtn"),
+
+streakTitle: document.getElementById("streakTitle"),
     streakNext: document.getElementById("streakNext"),
     streakCount: document.getElementById("streakCount"),
     dailyProgressText: document.getElementById("dailyProgressText"),
@@ -2298,6 +2399,7 @@ stageDots: document.getElementById("stageDots"),
   let reviewMode = false;
 let reviewCountsForSchedule = false;
 let hintUsedThisAttempt = false;
+  let resultModalAction = null;
 
   const cloudClient = window.supabase
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -3326,7 +3428,7 @@ els.rewardMasterDisplay.textContent =
     els.answerInput.style.display = stage === 4 ? "none" : "";
 els.letterBank.style.display = stage === 4 ? "flex" : "none";
 
-els.builtWord.style.display = stage === 4 ? "flex" : "none";
+els.builtWord.style.display = "none";
 els.builtWord.innerHTML = "";
 
 els.letterBank.innerHTML = "";
@@ -3840,24 +3942,24 @@ if (entered === target && hintUsedThisAttempt) {
     review:isReviewAttempt
   });
 
-  showFeedback(
-    `You spelled "${word.text}" correctly. Now do the same stage again without a hint to complete it.`,
-    true,
-    "Correct with a hint"
-  );
-
   saveState();
-  renderParent();
+renderParent();
 
-  setWordChangeLocked(true);
-  lockCurrentInputs();
+setWordChangeLocked(true);
+lockCurrentInputs();
 
-  setTimeout(() => {
+showFeedback(
+  `You spelled "${word.text}" correctly, but because you used a hint you'll need to complete this stage again without help.`,
+  true,
+  "Good practice!",
+  "Try stage again",
+  () => {
     hintUsedThisAttempt = false;
     render();
-  }, 1700);
+  }
+);
 
-  return;
+return;
 }
 
 if (entered === target) {
@@ -3868,71 +3970,107 @@ if (entered === target) {
 
       if (isReviewAttempt) {
         if (reviewCountsForSchedule) completeScheduledReview(word);
+saveState();
+renderStats();
+renderParent();
+renderReviewDue();
+renderMasteredWords();
+
+setWordChangeLocked(true);
+lockCurrentInputs();
+
 showFeedback(
   `"${word.text}" passed its review.`,
   true,
-  "Review passed!"
+  "Review passed!",
+  "Continue",
+  () => {
+    reviewMode = false;
+    reviewCountsForSchedule = false;
+
+    const remaining =
+      profile().words.filter(w => !w.mastered);
+
+    currentWordId =
+      remaining.length
+        ? remaining[0].id
+        : null;
+
+    render();
+  }
 );
 
-        saveState();
-        renderStats();
-        renderParent();
-        renderReviewDue();
-        renderMasteredWords();
-        setWordChangeLocked(true);
-        lockCurrentInputs();
-
-        setTimeout(() => {
-          reviewMode = false;
-          reviewCountsForSchedule = false;
-          const remaining = profile().words.filter(w => !w.mastered);
-          currentWordId = remaining.length ? remaining[0].id : null;
-          render();
-        }, 1200);
-        return;
+return;
       }
 
       const completedStage = Math.min(5, Math.max(1, word.stage || 1));
       awardStageIfEligible(word, completedStage);
 
-      if (word.stage >= 5) {
-        word.mastered = true;
-        scheduleFirstReview(word);
-        logActivity("mastered", word, {});
-        awardMasterIfEligible(word);
+      let resultTitle = "";
+let resultMessage = "";
+let resultButton = "";
+
+if (word.stage >= 5) {
+
+  word.mastered = true;
+
+  scheduleFirstReview(word);
+  logActivity("mastered", word, {});
+  awardMasterIfEligible(word);
+
+  resultTitle = "Word mastered! ★";
+  resultMessage =
+    `Brilliant! You have mastered "${word.text}".`;
+
+  resultButton = "Next word";
+
+} else {
+
+  word.stage =
+    Math.min(5, (word.stage || 1) + 1);
+
+  resultTitle = "Stage complete! ✓";
+  resultMessage =
+    `"${word.text}" is ready for Stage ${word.stage}.`;
+
+  resultButton = "Next stage";
+}
+
+saveState();
+renderStats();
+renderParent();
+renderReviewDue();
+renderMasteredWords();
+renderStageDots(word.stage, word.mastered);
+
+setWordChangeLocked(true);
+lockCurrentInputs();
+
 showFeedback(
-  `"${word.text}" is now mastered. Brilliant work!`,
+  resultMessage,
   true,
-  "Word mastered! ★"
+  resultTitle,
+  resultButton,
+  () => {
+
+    if (word.mastered) {
+
+      const remaining =
+        profile().words.filter(w => !w.mastered);
+
+      currentWordId =
+        remaining.length
+          ? remaining[0].id
+          : null;
+
+    } else {
+
+      currentWordId = word.id;
+    }
+
+    render();
+  }
 );
-      } else {
-        word.stage = Math.min(5, (word.stage || 1) + 1);
-showFeedback(
-  `"${word.text}" moves to Stage ${word.stage}.`,
-  true,
-  "Correct!"
-);
-      }
-
-      saveState();
-      renderStats();
-      renderParent();
-      renderReviewDue();
-      renderMasteredWords();
-      renderStageDots(word.stage, word.mastered);
-
-      setWordChangeLocked(true);
-      lockCurrentInputs();
-
-      setTimeout(() => {
-        if (word.mastered) {
-          const remaining = profile().words.filter(w => !w.mastered);
-          currentWordId = remaining.length ? remaining[0].id : null;
-        } else {
-          currentWordId = word.id;
-        }
-        render();
-      }, 1200);
 
     } else {
       word.incorrect = (word.incorrect || 0) + 1;
@@ -3942,44 +4080,39 @@ showFeedback(
       renderStats();
       renderParent();
 
+els.wordDisplay.textContent = word.text;
+els.wordDisplay.classList.remove("hidden-word");
+
 showFeedback(
   `The correct spelling is "${word.text}". Have another go.`,
   false,
-  "Try again"
-);
+  "Incorrect",
+  "Try again",
+  () => {
+
+    els.answerInput.value = "";
+
+    clearHint();
+
+    if (!isReviewAttempt && word.stage === 4) {
+
+      createLetterBank(word.text);
 
       els.wordDisplay.textContent = word.text;
-      els.wordDisplay.classList.remove("hidden-word");
+      els.wordDisplay.classList.add("hidden-word");
 
-      if (!isReviewAttempt && word.stage === 4) {
+      setWordChangeLocked(false);
 
-  setTimeout(() => {
-    els.answerInput.value = "";
-
-    clearHint();
-
-    createLetterBank(word.text);
-
-    els.wordDisplay.textContent = word.text;
-    els.wordDisplay.classList.add("hidden-word");
-
-    clearFeedback();
-    setWordChangeLocked(false);
-  }, 1800);
-
-} else {
-
-  setTimeout(() => {
-    els.answerInput.value = "";
-
-    clearHint();
-
-    if (stageAtAttempt === 5) {
+    } else if (stageAtAttempt === 5) {
 
       els.wordDisplay.textContent = "Listen & spell";
       els.wordDisplay.classList.remove("hidden-word");
 
       renderAudioStageActions();
+
+      setWordChangeLocked(isReviewAttempt);
+
+      els.answerInput.focus();
 
     } else {
 
@@ -3989,52 +4122,74 @@ showFeedback(
       }
 
       renderCheckActions(stageAtAttempt);
+
+      setWordChangeLocked(isReviewAttempt);
+
+      els.answerInput.focus();
     }
+  }
+);
 
-    els.answerInput.focus();
-
-    clearFeedback();
-    setWordChangeLocked(isReviewAttempt);
-
-  }, 1800);
-}
     }
   }
 
-  function lockCurrentInputs() {
+function lockCurrentInputs() {
     els.answerInput.disabled = true;
     els.actions.querySelectorAll("button").forEach(b => b.disabled = true);
     els.letterBank.querySelectorAll("button").forEach(b => b.disabled = true);
   }
 
-  function showFeedback(text, good, title = "") {
-  els.feedback.innerHTML = "";
-  els.feedback.className = "feedback";
+ function showFeedback(
+  text,
+  good,
+  title = "",
+  buttonText = "OK",
+  onAcknowledge = null
+) {
+  resultModalAction =
+    typeof onAcknowledge === "function"
+      ? onAcknowledge
+      : null;
 
-  const card = document.createElement("div");
-  card.className = `feedback-card ${good ? "good" : "bad"}`;
+  els.resultModalIcon.textContent = good ? "✓" : "×";
+  els.resultModalIcon.classList.toggle("bad", !good);
 
-  const icon = document.createElement("div");
-  icon.className = "feedback-icon";
-  icon.textContent = good ? "✓" : "×";
+  els.resultModalTitle.textContent =
+    title || (good ? "Correct!" : "Incorrect");
 
-  const copy = document.createElement("div");
-  copy.className = "feedback-copy";
+  els.resultModalMessage.textContent = text;
+  els.resultModalBtn.textContent = buttonText;
 
-  const heading = document.createElement("strong");
-  heading.className = "feedback-title";
-  heading.textContent =
-    title || (good ? "Correct!" : "Try again");
+  els.resultModalBtn.className =
+    good
+      ? "primary result-modal-btn"
+      : "danger-btn result-modal-btn";
 
-  const message = document.createElement("span");
-  message.className = "feedback-message";
-  message.textContent = text;
+  els.resultModal.classList.add("open");
+  els.resultModal.setAttribute("aria-hidden","false");
 
-  copy.append(heading, message);
-  card.append(icon, copy);
-
-  els.feedback.appendChild(card);
+  setTimeout(() => {
+    els.resultModalBtn.focus();
+  }, 50);
 }
+
+function closeResultModal() {
+  const action = resultModalAction;
+
+  resultModalAction = null;
+
+  els.resultModal.classList.remove("open");
+  els.resultModal.setAttribute("aria-hidden","true");
+
+  if (action) {
+    action();
+  }
+}
+
+  els.resultModalBtn.addEventListener(
+  "click",
+  closeResultModal
+);
 
 function clearFeedback() {
   els.feedback.innerHTML = "";
