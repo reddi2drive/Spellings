@@ -1767,10 +1767,10 @@
       <input id="cloudPasswordInput" type="password" autocomplete="current-password" placeholder="Password">
     </div>
 
-    <div class="actions" style="justify-content:flex-start">
-      <button class="primary" id="cloudSignInBtn" type="button">Sign in & sync</button>
-      <button class="secondary" id="cloudContinueOfflineBtn" type="button">Continue offline</button>
-    </div>
+ <div class="actions" style="justify-content:flex-start">
+  <button class="primary" id="cloudSignInBtn" type="button">Sign in & sync</button>
+  <button class="secondary" id="cloudContinueOfflineBtn" type="button">Continue offline</button>
+</div>
 
     <div class="cloud-login-message" id="cloudLoginMessage"></div>
   </div>
@@ -1879,10 +1879,11 @@
       <input id="masterRewardInput" type="number" min="0" max="500" step="1">
     </div>
 
-    <div class="actions" style="justify-content:flex-start">
-      <button class="secondary" id="saveRewardsBtn">Save rewards</button>
-      <button class="success-btn" id="markPaidBtn">Mark Robux as paid</button>
-    </div>
+  <div class="actions" style="justify-content:flex-start">
+  <button class="secondary" id="saveRewardsBtn">Save rewards</button>
+  <button class="success-btn" id="markPaidBtn">Mark Robux as paid</button>
+  <button class="danger-btn" id="resetRobuxBtn">Reset Robux balance</button>
+</div>
 
     <p class="foot-note" style="margin-top:10px">
       This tracks rewards only — it does not connect to Roblox or transfer Robux automatically.
@@ -2125,6 +2126,7 @@
     masterRewardInput: document.getElementById("masterRewardInput"),
     saveRewardsBtn: document.getElementById("saveRewardsBtn"),
     markPaidBtn: document.getElementById("markPaidBtn"),
+    resetRobuxBtn: document.getElementById("resetRobuxBtn"),
     rewardHistory: document.getElementById("rewardHistory"),
     dailyTargetInput: document.getElementById("dailyTargetInput"),
     streak3Input: document.getElementById("streak3Input"),
@@ -4107,6 +4109,30 @@
     saveState();
     render();
   });
+  
+  els.resetRobuxBtn.addEventListener("click", () => {
+  const rewards = ensureRewards();
+  const amount = Math.max(0, Number(rewards.pending || 0));
+
+  if (!amount) {
+    alert(`${profile().name}'s Robux balance is already R$ 0.`);
+    return;
+  }
+
+  if (!confirm(
+    `Reset ${profile().name}'s current Robux balance from R$ ${amount} to R$ 0?\n\n` +
+    `This will not change their lifetime earned or previously paid Robux.`
+  )) {
+    return;
+  }
+
+  rewards.pending = 0;
+
+  saveState();
+  render();
+
+  alert(`${profile().name}'s Robux balance has been reset to R$ 0.`);
+});
 
   els.saveStreakBtn.addEventListener("click", () => {
     const streak = ensureStreak();
