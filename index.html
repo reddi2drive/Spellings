@@ -2663,17 +2663,91 @@
     return (word?.sentence || "").trim() || `I am practising the word ${word.text} today.`;
   }
 
-  function speakText(text) {
-    if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
-      alert("Speech is not available in this browser.");
-      return;
+  let spellingVoice = null;
+
+function loadSpellingVoice() {
+  if (!("speechSynthesis" in window)) return;
+
+  const voices = window.speechSynthesis.getVoices();
+
+  if (!voices.length) return;
+
+  const britishVoices = voices.filter(
+    voice => String(voice.lang || "").toLowerCase().startsWith("en-gb")
+  );
+
+  // Prefer more natural British voices where the browser exposes them.
+  const preferredNames = [
+    "Siri",
+    "Serena",
+    "Daniel",
+    "Stephanie",
+    "Kate",
+    "Oliver"
+  ];
+
+  spellingVoice = null;
+
+  for (const name of preferredNames) {
+    const match = britishVoices.find(
+      voice => voice.name.toLowerCase().includes(name.toLowerCase())
+    );
+
+    if (match) {
+      spellingVoice = match;
+      break;
     }
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-GB";
-    utterance.rate = 0.82;
-    window.speechSynthesis.speak(utterance);
   }
+
+  // If none of our preferred voices are available,
+  // use the first British English voice.
+  if (!spellingVoice) {
+    spellingVoice =
+      britishVoices[0] ||
+      voices.find(voice =>
+        String(voice.lang || "").toLowerCase().startsWith("en")
+      ) ||
+      voices[0];
+  }
+
+  console.log(
+    "Spelling voice:",
+    spellingVoice?.name,
+    spellingVoice?.lang
+  );
+}
+
+function speakText(text) {
+  if (
+    !("speechSynthesis" in window) ||
+    typeof SpeechSynthesisUtterance === "undefined"
+  ) {
+    alert("Speech is not available in this browser.");
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  // Safari sometimes loads the voices after the page itself has loaded.
+  if (!spellingVoice) {
+    loadSpellingVoice();
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  utterance.lang = "en-GB";
+
+  if (spellingVoice) {
+    utterance.voice = spellingVoice;
+  }
+
+  // Clear but still natural for spelling practice.
+  utterance.rate = 0.86;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+
+  window.speechSynthesis.speak(utterance);
+}
 
   function speakCurrentWord() {
     const word = currentWord();
@@ -4168,6 +4242,15 @@
     }
     if (els.parentModal.classList.contains("open")) closeParent();
   });
+
+  loadSpellingVoice();
+
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.addEventListener(
+    "voiceschanged",
+    loadSpellingVoice
+  );
+}
 
   render();
   initCloud();
