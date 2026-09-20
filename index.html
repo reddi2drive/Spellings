@@ -255,6 +255,147 @@
     flex:0 0 auto;
   }
 
+  /* =========================================================
+   SPELLING / PHONICS MODE SWITCH
+========================================================= */
+
+.mode-switch-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:18px;
+  padding:14px 16px;
+  border-radius:20px;
+  background:#fff;
+  border:1px solid rgba(18,35,63,.07);
+  box-shadow:0 6px 20px rgba(26,39,66,.06);
+}
+
+.mode-switch-copy{
+  min-width:0;
+}
+
+.mode-switch-copy strong{
+  display:block;
+  font-size:17px;
+  font-weight:1000;
+}
+
+.mode-switch-copy span{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:750;
+}
+
+.mode-toggle{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  flex:0 0 auto;
+  cursor:pointer;
+  user-select:none;
+}
+
+.mode-toggle input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.mode-toggle-label{
+  font-size:12px;
+  font-weight:950;
+  color:#8490a3;
+  transition:.2s ease;
+}
+
+.mode-toggle-track{
+  position:relative;
+  width:58px;
+  height:32px;
+  border-radius:999px;
+  background:#dce2eb;
+  transition:.22s ease;
+  box-shadow:inset 0 1px 3px rgba(23,32,51,.12);
+}
+
+.mode-toggle-thumb{
+  position:absolute;
+  top:4px;
+  left:4px;
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 3px 8px rgba(23,32,51,.20);
+  transition:.22s ease;
+}
+
+.mode-toggle input:checked + .mode-toggle-track{
+  background:var(--purple);
+}
+
+.mode-toggle input:checked + .mode-toggle-track .mode-toggle-thumb{
+  transform:translateX(26px);
+}
+
+.mode-toggle:has(input:not(:checked)) .spelling-label{
+  color:var(--blue);
+}
+
+.mode-toggle:has(input:checked) .phonics-label{
+  color:var(--purple);
+}
+
+/* PHONICS PLACEHOLDER */
+
+.phonics-mode-card{
+  display:none;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(129,89,232,.12),transparent 35%),
+    #fff;
+}
+
+.phonics-mode-card.show{
+  display:flex;
+}
+
+.phonics-mode-icon{
+  font-size:60px;
+  margin-bottom:12px;
+}
+
+.phonics-mode-card h2{
+  margin:0 0 8px;
+  font-size:clamp(28px,6vw,42px);
+}
+
+.phonics-mode-card p{
+  max-width:560px;
+  margin:0 auto;
+  color:var(--muted);
+  font-size:16px;
+  line-height:1.55;
+  font-weight:750;
+}
+
+@media (max-width:650px){
+
+  .mode-switch-card{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .mode-toggle{
+    width:100%;
+    justify-content:center;
+    padding-top:4px;
+  }
+}
+
   .app-nav{
     display:grid;
     grid-template-columns:repeat(4,1fr);
@@ -1871,10 +2012,44 @@
     </div>
     <span class="profile-label">Learner</span>
     <select class="profile-select" id="profileSelect" aria-label="Choose learner"></select>
-    <button class="sync-chip" id="syncStatusBtn" type="button" data-state="signed-out">☁ Sign in to sync</button>
+  <button class="sync-chip" id="syncStatusBtn" type="button" data-state="signed-out">☁ Sign in to sync</button>
   </div>
 
-  <nav class="app-nav" id="appNav" role="tablist" aria-label="Spelling Steps sections">
+  <!-- SPELLING / PHONICS MODE SWITCH -->
+  <div class="mode-switch-card">
+
+    <div class="mode-switch-copy">
+      <strong id="modeTitle">Spelling</strong>
+      <span id="modeDescription">
+        Practise spelling words through five stages.
+      </span>
+    </div>
+
+    <label class="mode-toggle">
+
+      <span class="mode-toggle-label spelling-label">
+        Spelling
+      </span>
+
+      <input
+        type="checkbox"
+        id="learningModeToggle"
+        aria-label="Switch between spelling and phonics"
+      >
+
+      <span class="mode-toggle-track">
+        <span class="mode-toggle-thumb"></span>
+      </span>
+
+      <span class="mode-toggle-label phonics-label">
+        Phonics
+      </span>
+
+    </label>
+
+  </div>
+
+ <nav class="app-nav" id="appNav" role="tablist" aria-label="Spelling Steps sections">
     <button class="app-tab active" type="button" role="tab" aria-selected="true" data-tab="practice">
       Practice
     </button>
@@ -1892,10 +2067,30 @@
   <section class="tab-panel active" id="tab-practice" data-panel="practice">
     <div class="panel-heading">
       <div>
-        <h2>Practice</h2>
-        <p>Choose one word and work through each stage until it is mastered.</p>
+        <h2 id="practiceHeading">Practice</h2>
+<p id="practiceDescription">
+  Choose one word and work through each stage until it is mastered.
+</p>
       </div>
     </div>
+
+    <section class="game-card phonics-mode-card" id="phonicsPracticeCard">
+
+  <div class="phonics-mode-icon">🔤</div>
+
+  <div class="stage-pill">
+    Phonics Mode
+  </div>
+
+  <h2>Let's practise sounds</h2>
+
+  <p>
+    Phonics activities will appear here. Sounds, blending,
+    segmenting and phoneme recognition will use the same
+    learner, rewards, streaks and progress system.
+  </p>
+
+</section>
 
   <section class="game-card" id="gameCard">
 
@@ -1946,8 +2141,8 @@
   </section>
 
   <section class="game-card mastered-card" id="masteredCard">
-    <div class="mastered-icon">🏆</div>
-    <h2>All words mastered!</h2>
+   <div class="mastered-icon" id="masteredIcon">🏆</div>
+<h2 id="masteredTitle">All words mastered!</h2>
     <p id="masteredText">Brilliant work.</p>
     <div class="actions">
       <button class="primary" id="reviewBtn">Review mastered words</button>
@@ -2362,6 +2557,12 @@
     cloudParentStatus: document.getElementById("cloudParentStatus"),
     cloudParentEmail: document.getElementById("cloudParentEmail"),
     cloudParentActionBtn: document.getElementById("cloudParentActionBtn"),
+    learningModeToggle: document.getElementById("learningModeToggle"),
+modeTitle: document.getElementById("modeTitle"),
+modeDescription: document.getElementById("modeDescription"),
+practiceHeading: document.getElementById("practiceHeading"),
+practiceDescription: document.getElementById("practiceDescription"),
+phonicsPracticeCard: document.getElementById("phonicsPracticeCard"),
    
     appNav: document.getElementById("appNav"),
     progressTabBadge: document.getElementById("progressTabBadge"),
@@ -2513,9 +2714,20 @@ let resultModalAction = null;
   avatar = "popstar",
   includeDefaultWords = false
 ) {
-  return {
+ return {
     name,
     avatar,
+
+    learningMode:"spelling",
+
+    phonics:{
+      sounds:[],
+      totals:{
+        correct:0,
+        incorrect:0
+      },
+      activityLog:[]
+    },
 
     words: includeDefaultWords
       ? DEFAULT_WORDS.map(freshWord)
@@ -2593,9 +2805,54 @@ let resultModalAction = null;
         String(p.name || "Learner").trim().slice(0,20) ||
         "Learner";
 
-      p.avatar = AVATARS[p.avatar]
+     p.avatar = AVATARS[p.avatar]
         ? p.avatar
         : "popstar";
+
+
+      /* =========================
+         LEARNING MODE
+      ========================= */
+
+      p.learningMode =
+        p.learningMode === "phonics"
+          ? "phonics"
+          : "spelling";
+
+
+      /* =========================
+         PHONICS DATA
+      ========================= */
+
+      p.phonics =
+        p.phonics &&
+        typeof p.phonics === "object"
+          ? p.phonics
+          : {
+              sounds:[],
+              totals:{
+                correct:0,
+                incorrect:0
+              },
+              activityLog:[]
+            };
+
+      p.phonics.sounds =
+        Array.isArray(p.phonics.sounds)
+          ? p.phonics.sounds
+          : [];
+
+      p.phonics.totals =
+        p.phonics.totals || {
+          correct:0,
+          incorrect:0
+        };
+
+      p.phonics.activityLog =
+        Array.isArray(p.phonics.activityLog)
+          ? p.phonics.activityLog
+          : [];
+
 
       p.words = Array.isArray(p.words)
         ? p.words
@@ -2782,11 +3039,15 @@ let resultModalAction = null;
   }
 
   function cloudPayload() {
-    const payload = JSON.parse(JSON.stringify(state));
-    // Which learner is selected is a device preference, not shared family data.
-    delete payload.currentProfileId;
-    return payload;
-  }
+  const payload =
+    JSON.parse(JSON.stringify(state));
+
+  // Device-only settings
+  delete payload.currentProfileId;
+  delete payload.parentPin;
+
+  return payload;
+}
 
   function setCloudStatus(mode, text, detail = "") {
     if (els.syncStatusBtn) {
@@ -2895,11 +3156,18 @@ let resultModalAction = null;
    const localLearner =
   currentProfileId;
 
+const localParentPin =
+  state.parentPin || null;
+
 const firstRemoteLearner =
   Object.keys(remoteData.profiles)[0];
 
 const merged = {
   ...remoteData,
+
+  // Keep device-only settings on this device.
+  parentPin: localParentPin,
+
   currentProfileId:
     remoteData.profiles[localLearner]
       ? localLearner
@@ -2924,9 +3192,10 @@ currentProfileId =
     setCloudStatus("syncing", "☁ Syncing…", cloudSession.user.email || "");
 
     const { data: row, error } = await cloudClient
-      .from("spelling_app_state")
-      .select("data,updated_at")
-      .maybeSingle();
+  .from("spelling_app_state")
+  .select("data,updated_at")
+  .eq("user_id", cloudSession.user.id)
+  .maybeSingle();
 
     if (error) throw error;
 
@@ -3080,6 +3349,97 @@ currentProfileId =
     const key = profileData?.avatar;
     return AVATARS[key] || AVATARS.popstar;
   }
+
+  function currentLearningMode() {
+
+  return profile().learningMode === "phonics"
+    ? "phonics"
+    : "spelling";
+}
+
+
+function setLearningMode(mode) {
+
+  const nextMode =
+    mode === "phonics"
+      ? "phonics"
+      : "spelling";
+
+  clearPreview();
+
+  profile().learningMode =
+    nextMode;
+
+  currentWordId = null;
+
+  reviewMode = false;
+  reviewCountsForSchedule = false;
+
+  saveState();
+
+  render();
+}
+
+
+function renderLearningMode() {
+
+  const phonics =
+    currentLearningMode() === "phonics";
+
+
+  /* TOGGLE */
+
+  els.learningModeToggle.checked =
+    phonics;
+
+
+  /* TOP MODE LABEL */
+
+  els.modeTitle.textContent =
+    phonics
+      ? "Phonics"
+      : "Spelling";
+
+  els.modeDescription.textContent =
+    phonics
+      ? "Practise sounds, blending, segmenting and phoneme recognition."
+      : "Practise spelling words through five stages.";
+
+
+  /* PRACTICE HEADING */
+
+  els.practiceHeading.textContent =
+    phonics
+      ? "Phonics Practice"
+      : "Practice";
+
+  els.practiceDescription.textContent =
+    phonics
+      ? "Build confidence recognising sounds, blending and segmenting words."
+      : "Choose one word and work through each stage until it is mastered.";
+
+
+  /* PHONICS CARD */
+
+  els.phonicsPracticeCard.classList.toggle(
+    "show",
+    phonics
+  );
+
+
+  /* SPELLING CARDS */
+
+  if (phonics) {
+
+    els.gameCard.style.display =
+      "none";
+
+    els.masteredCard.classList.remove(
+      "show"
+    );
+
+  }
+}
 
   function normalizeWord(word) {
     return String(word || "")
@@ -3585,7 +3945,15 @@ function setLearnerAvatar(profileId, avatarKey) {
     renderParent();
     renderReviewDue();
     renderMasteredWords();
+
+    /*
+     * Render spelling first.
+     * renderLearningMode() then decides whether
+     * spelling or phonics should be visible.
+     */
     renderGame();
+    renderLearningMode();
+
     setActiveTab(activeTab, false);
   }
 
@@ -3808,10 +4176,20 @@ els.rewardMasterDisplay.textContent =
       els.gameCard.style.display = "none";
       els.masteredCard.classList.add("show");
 
-      if (!p.words.length) {
-        els.masteredText.textContent = "There are no spelling words yet. Add some in the Parent area.";
-        els.reviewBtn.style.display = "none";
-      } else {
+     if (!p.words.length) {
+
+  els.masteredIcon.textContent = "✏️";
+  els.masteredTitle.textContent = "Ready to get started?";
+
+  els.masteredText.textContent =
+    `${p.name} doesn't have any spelling words yet. Add some in the Parent area.`;
+
+  els.reviewBtn.style.display = "none";
+
+} else {
+
+  els.masteredIcon.textContent = "🏆";
+  els.masteredTitle.textContent = "All words mastered!";
         els.masteredText.textContent = `${p.name} has mastered ${p.words.length} spelling${p.words.length === 1 ? "" : "s"}.`;
         els.reviewBtn.style.display = "";
       }
@@ -5045,13 +5423,19 @@ renderLearnerSettings();
         small.textContent = `${word.incorrect || 0} incorrect attempts · Stage ${word.stage || 1}`;
         info.append(strong,small);
         const practise = button("Practise", "secondary", () => {
-          closeParent();
-          setActiveTab("practice");
-          reviewMode = false;
-          reviewCountsForSchedule = false;
-          currentWordId = word.id;
-          render();
-        });
+
+  profile().learningMode = "spelling";
+
+  closeParent();
+  setActiveTab("practice");
+
+  reviewMode = false;
+  reviewCountsForSchedule = false;
+  currentWordId = word.id;
+
+  saveState();
+  render();
+});
         row.append(info,practise);
         els.problemWordsList.appendChild(row);
       });
@@ -5163,6 +5547,15 @@ renderLearnerSettings();
     }));
     profile().totals = {correct:0, incorrect:0};
     profile().activityLog = [];
+
+    profile().phonics = {
+  sounds:[],
+  totals:{
+    correct:0,
+    incorrect:0
+  },
+  activityLog:[]
+};
 
     currentWordId = null;
     reviewMode = false;
@@ -5316,6 +5709,19 @@ renderLearnerSettings();
       switchProfile(els.profileSelect.value);
     }
   });
+
+  els.learningModeToggle.addEventListener(
+  "change",
+  () => {
+
+    setLearningMode(
+      els.learningModeToggle.checked
+        ? "phonics"
+        : "spelling"
+    );
+
+  }
+);
 
   els.parentProfileSelect.addEventListener("change", () => {
     if (els.parentProfileSelect.value) {
