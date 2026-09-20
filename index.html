@@ -382,6 +382,186 @@
   font-weight:750;
 }
 
+  .phonics-stage-pill{
+  background:#f3efff;
+  color:#6742c5;
+}
+
+.phonics-prompt{
+  width:min(620px,100%);
+  min-height:92px;
+  margin:5px auto 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+  font-size:clamp(34px,8vw,62px);
+  line-height:1.15;
+  font-weight:1000;
+  letter-spacing:1px;
+}
+
+.phonics-sub-prompt{
+  min-height:24px;
+  max-width:560px;
+  margin:0 auto 18px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.5;
+  font-weight:800;
+}
+
+.phonics-choice-grid{
+  width:min(600px,100%);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+}
+
+.phonics-choice-btn{
+  min-height:70px;
+  border:2px solid #dce2eb;
+  border-radius:17px;
+  background:#fff;
+  color:var(--ink);
+  padding:13px;
+  font-size:clamp(20px,4vw,28px);
+  font-weight:1000;
+  box-shadow:0 5px 14px rgba(23,32,51,.05);
+  transition:.16s ease;
+}
+
+.phonics-choice-btn:hover{
+  border-color:var(--purple);
+  background:#faf8ff;
+  transform:translateY(-1px);
+}
+
+.phonics-choice-btn:disabled{
+  opacity:.55;
+  cursor:default;
+  transform:none;
+}
+
+.phonics-chunk-line{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:9px;
+}
+
+.phonics-chunk{
+  min-width:58px;
+  min-height:58px;
+  display:grid;
+  place-items:center;
+  padding:8px 13px;
+  border-radius:15px;
+  background:#f3efff;
+  border:2px solid #ded4fb;
+  color:#6742c5;
+  font-size:28px;
+  font-weight:1000;
+}
+
+.phonics-chunk.missing{
+  background:#fff5df;
+  border-color:#efd495;
+  color:#9a620b;
+}
+
+.phonics-dot-separator{
+  color:#a5abba;
+  font-size:25px;
+  font-weight:1000;
+}
+
+.phonics-built-word{
+  display:none;
+  width:min(600px,100%);
+  min-height:72px;
+  margin:4px auto 12px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:9px;
+}
+
+.phonics-built-word.show{
+  display:flex;
+}
+
+.phonics-built-slot{
+  min-width:58px;
+  min-height:58px;
+  display:grid;
+  place-items:center;
+  padding:8px 13px;
+  border-radius:15px;
+  border:2px dashed #cfd7e4;
+  background:#fafbfe;
+  color:var(--ink);
+  font-size:27px;
+  font-weight:1000;
+}
+
+.phonics-built-slot.filled{
+  border-style:solid;
+  border-color:var(--purple);
+  background:#f5f1ff;
+}
+
+.phonics-chunk-bank{
+  display:none;
+  width:min(620px,100%);
+  margin:6px auto 0;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.phonics-chunk-bank.show{
+  display:flex;
+}
+
+.phonics-chunk-btn{
+  min-width:58px;
+  min-height:54px;
+  border:2px solid #dce2eb;
+  border-radius:14px;
+  background:#fff;
+  color:var(--ink);
+  padding:8px 13px;
+  font-size:22px;
+  font-weight:1000;
+}
+
+.phonics-chunk-btn.used{
+  opacity:.24;
+  pointer-events:none;
+}
+
+@media (max-width:650px){
+
+  .phonics-choice-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .phonics-choice-btn{
+    min-height:64px;
+  }
+
+  .phonics-chunk,
+  .phonics-built-slot{
+    min-width:52px;
+    min-height:54px;
+    font-size:24px;
+  }
+}
+
 @media (max-width:650px){
 
   .mode-switch-card{
@@ -2076,19 +2256,91 @@
 
     <section class="game-card phonics-mode-card" id="phonicsPracticeCard">
 
-  <div class="phonics-mode-icon">🔤</div>
+  <div class="word-picker-wrap">
+    <span class="word-picker-label">Practice sound</span>
 
-  <div class="stage-pill">
-    Phonics Mode
+    <button
+      class="word-change-btn"
+      id="changePhonicsSoundBtn"
+      type="button"
+    >
+      Change sound
+    </button>
   </div>
 
-  <h2>Let's practise sounds</h2>
+  <div class="word-focus-note" id="phonicsFocusNote">
+    Sound selected — work through all five stages.
+  </div>
 
-  <p>
-    Phonics activities will appear here. Sounds, blending,
-    segmenting and phoneme recognition will use the same
-    learner, rewards, streaks and progress system.
-  </p>
+  <div
+    class="word-chooser"
+    id="phonicsSoundChooser"
+    aria-hidden="true"
+  >
+    <p class="word-chooser-title">
+      Choose a sound to practise
+    </p>
+
+    <div
+      class="word-choice-grid"
+      id="phonicsSoundChoiceGrid"
+    ></div>
+
+    <button
+      class="word-chooser-close"
+      id="closePhonicsSoundChooser"
+      type="button"
+    >
+      Close
+    </button>
+  </div>
+
+  <div
+    class="stage-pill phonics-stage-pill"
+    id="phonicsStagePill"
+  >
+    Stage 1 · Hear the sound
+  </div>
+
+  <p
+    class="stage-help"
+    id="phonicsStageHelp"
+  ></p>
+
+  <div
+    class="phonics-prompt"
+    id="phonicsPrompt"
+  ></div>
+
+  <div
+    class="phonics-sub-prompt"
+    id="phonicsSubPrompt"
+  ></div>
+
+  <div
+    class="phonics-choice-grid"
+    id="phonicsChoiceGrid"
+  ></div>
+
+  <div
+    class="phonics-built-word"
+    id="phonicsBuiltWord"
+  ></div>
+
+  <div
+    class="phonics-chunk-bank"
+    id="phonicsChunkBank"
+  ></div>
+
+  <div
+    class="actions"
+    id="phonicsActions"
+  ></div>
+
+  <div
+    class="stage-dots"
+    id="phonicsStageDots"
+  ></div>
 
 </section>
 
@@ -2543,6 +2795,160 @@
     }
   };
 
+  const PHONICS_STAGES = {
+  1:{
+    title:"Stage 1 · Hear the sound",
+    help:"Listen to the clue, then choose the grapheme that represents the sound."
+  },
+  2:{
+    title:"Stage 2 · Find the sound",
+    help:"Find the grapheme from the choices."
+  },
+  3:{
+    title:"Stage 3 · Spot it in a word",
+    help:"Listen to the word and choose the missing sound chunk."
+  },
+  4:{
+    title:"Stage 4 · Blend the word",
+    help:"Blend the sound chunks together and choose the word they make."
+  },
+  5:{
+    title:"Stage 5 · Segment & spell",
+    help:"Listen to the word, then build it using the correct sound chunks."
+  }
+};
+
+const PHONICS_LIBRARY = [
+  {
+    id:"s",
+    grapheme:"s",
+    cueWord:"sun",
+    cuePosition:"first",
+    practiceWord:"sat",
+    chunks:["s","a","t"]
+  },
+  {
+    id:"a",
+    grapheme:"a",
+    cueWord:"apple",
+    cuePosition:"first",
+    practiceWord:"cat",
+    chunks:["c","a","t"]
+  },
+  {
+    id:"t",
+    grapheme:"t",
+    cueWord:"tap",
+    cuePosition:"first",
+    practiceWord:"tap",
+    chunks:["t","a","p"]
+  },
+  {
+    id:"p",
+    grapheme:"p",
+    cueWord:"pan",
+    cuePosition:"first",
+    practiceWord:"pat",
+    chunks:["p","a","t"]
+  },
+  {
+    id:"i",
+    grapheme:"i",
+    cueWord:"insect",
+    cuePosition:"first",
+    practiceWord:"sit",
+    chunks:["s","i","t"]
+  },
+  {
+    id:"n",
+    grapheme:"n",
+    cueWord:"net",
+    cuePosition:"first",
+    practiceWord:"nap",
+    chunks:["n","a","p"]
+  },
+  {
+    id:"m",
+    grapheme:"m",
+    cueWord:"map",
+    cuePosition:"first",
+    practiceWord:"map",
+    chunks:["m","a","p"]
+  },
+  {
+    id:"d",
+    grapheme:"d",
+    cueWord:"dog",
+    cuePosition:"first",
+    practiceWord:"dip",
+    chunks:["d","i","p"]
+  },
+  {
+    id:"sh",
+    grapheme:"sh",
+    cueWord:"ship",
+    cuePosition:"first",
+    practiceWord:"ship",
+    chunks:["sh","i","p"]
+  },
+  {
+    id:"ch",
+    grapheme:"ch",
+    cueWord:"chip",
+    cuePosition:"first",
+    practiceWord:"chip",
+    chunks:["ch","i","p"]
+  },
+  {
+    id:"th",
+    grapheme:"th",
+    cueWord:"thin",
+    cuePosition:"first",
+    practiceWord:"thin",
+    chunks:["th","i","n"]
+  },
+  {
+    id:"ng",
+    grapheme:"ng",
+    cueWord:"ring",
+    cuePosition:"last",
+    practiceWord:"ring",
+    chunks:["r","i","ng"]
+  },
+  {
+    id:"ai",
+    grapheme:"ai",
+    cueWord:"rain",
+    cuePosition:"middle",
+    practiceWord:"rain",
+    chunks:["r","ai","n"]
+  },
+  {
+    id:"ee",
+    grapheme:"ee",
+    cueWord:"seed",
+    cuePosition:"middle",
+    practiceWord:"seed",
+    chunks:["s","ee","d"]
+  },
+  {
+    id:"igh",
+    grapheme:"igh",
+    cueWord:"night",
+    cuePosition:"middle",
+    practiceWord:"night",
+    chunks:["n","igh","t"]
+  },
+  {
+    id:"oa",
+    grapheme:"oa",
+    cueWord:"goat",
+    cuePosition:"middle",
+    practiceWord:"goat",
+    chunks:["g","oa","t"]
+  }
+];
+
   const els = {
     profileSelect: document.getElementById("profileSelect"),
     profileAvatar: document.getElementById("profileAvatar"),
@@ -2563,6 +2969,21 @@ modeDescription: document.getElementById("modeDescription"),
 practiceHeading: document.getElementById("practiceHeading"),
 practiceDescription: document.getElementById("practiceDescription"),
 phonicsPracticeCard: document.getElementById("phonicsPracticeCard"),
+
+changePhonicsSoundBtn: document.getElementById("changePhonicsSoundBtn"),
+phonicsFocusNote: document.getElementById("phonicsFocusNote"),
+phonicsSoundChooser: document.getElementById("phonicsSoundChooser"),
+phonicsSoundChoiceGrid: document.getElementById("phonicsSoundChoiceGrid"),
+closePhonicsSoundChooser: document.getElementById("closePhonicsSoundChooser"),
+phonicsStagePill: document.getElementById("phonicsStagePill"),
+phonicsStageHelp: document.getElementById("phonicsStageHelp"),
+phonicsPrompt: document.getElementById("phonicsPrompt"),
+phonicsSubPrompt: document.getElementById("phonicsSubPrompt"),
+phonicsChoiceGrid: document.getElementById("phonicsChoiceGrid"),
+phonicsBuiltWord: document.getElementById("phonicsBuiltWord"),
+phonicsChunkBank: document.getElementById("phonicsChunkBank"),
+phonicsActions: document.getElementById("phonicsActions"),
+phonicsStageDots: document.getElementById("phonicsStageDots"),
    
     appNav: document.getElementById("appNav"),
     progressTabBadge: document.getElementById("progressTabBadge"),
@@ -2584,6 +3005,7 @@ resultModalTitle: document.getElementById("resultModalTitle"),
 resultModalMessage: document.getElementById("resultModalMessage"),
 resultModalBtn: document.getElementById("resultModalBtn"),
 
+  
 streakTitle: document.getElementById("streakTitle"),
     streakNext: document.getElementById("streakNext"),
     streakCount: document.getElementById("streakCount"),
@@ -2600,9 +3022,7 @@ streakTitle: document.getElementById("streakTitle"),
 masteredIcon: document.getElementById("masteredIcon"),
 masteredTitle: document.getElementById("masteredTitle"),
 masteredText: document.getElementById("masteredText"),
-    masteredCard: document.getElementById("masteredCard"),
-    masteredText: document.getElementById("masteredText"),
-    masteredWordsCount: document.getElementById("masteredWordsCount"),
+masteredWordsCount: document.getElementById("masteredWordsCount"),
     masteredWordsGrid: document.getElementById("masteredWordsGrid"),
     reviewDueSection: document.getElementById("reviewDueSection"),
     reviewDueCount: document.getElementById("reviewDueCount"),
@@ -2669,7 +3089,9 @@ let currentProfileId =
   state.currentProfileId ||
   Object.keys(state.profiles)[0];
   let activeTab = localStorage.getItem("spellingSteps_activeTab_v1") || "practice";
-  let currentWordId = null;
+let currentWordId = null;
+let currentSoundId = null;
+let phonicsBuiltChunks = [];
   let previewRunning = false;
   let previewTimeout = null;
   let timerAnimation = null;
@@ -2713,6 +3135,117 @@ let resultModalAction = null;
     };
   }
 
+  function freshPhonicsSound(definition) {
+  return {
+    id:definition.id,
+    grapheme:definition.grapheme,
+    cueWord:definition.cueWord,
+    cuePosition:definition.cuePosition,
+    practiceWord:definition.practiceWord,
+    chunks:[...definition.chunks],
+
+    stage:1,
+    mastered:false,
+
+    correct:0,
+    incorrect:0,
+    attempts:0,
+
+    lastPractised:null,
+
+    rewardedStages:[],
+    masterRewarded:false,
+
+    masteredAt:null
+  };
+}
+
+function mergePhonicsSounds(existingSounds = []) {
+
+  const existingById =
+    new Map(
+      (Array.isArray(existingSounds)
+        ? existingSounds
+        : []
+      ).map(sound => [
+        sound.id,
+        sound
+      ])
+    );
+
+  return PHONICS_LIBRARY.map(definition => {
+
+    const old =
+      existingById.get(definition.id);
+
+    if (!old) {
+      return freshPhonicsSound(definition);
+    }
+
+    return {
+      ...freshPhonicsSound(definition),
+      ...old,
+
+      id:definition.id,
+      grapheme:definition.grapheme,
+      cueWord:definition.cueWord,
+      cuePosition:definition.cuePosition,
+      practiceWord:definition.practiceWord,
+      chunks:[...definition.chunks],
+
+      stage:
+        Math.min(
+          5,
+          Math.max(
+            1,
+            Number(old.stage || 1)
+          )
+        ),
+
+      mastered:Boolean(old.mastered),
+
+      rewardedStages:
+        Array.isArray(old.rewardedStages)
+          ? old.rewardedStages
+          : [],
+
+      masterRewarded:
+        Boolean(old.masterRewarded)
+    };
+  });
+}
+
+function ensurePhonicsData(
+  learner = profile()
+) {
+
+  learner.phonics =
+    learner.phonics &&
+    typeof learner.phonics === "object"
+      ? learner.phonics
+      : {};
+
+  learner.phonics.sounds =
+    mergePhonicsSounds(
+      learner.phonics.sounds
+    );
+
+  learner.phonics.totals =
+    learner.phonics.totals || {
+      correct:0,
+      incorrect:0
+    };
+
+  learner.phonics.activityLog =
+    Array.isArray(
+      learner.phonics.activityLog
+    )
+      ? learner.phonics.activityLog
+      : [];
+
+  return learner.phonics;
+}
+
   function defaultProfile(
   name,
   avatar = "popstar",
@@ -2725,13 +3258,15 @@ let resultModalAction = null;
     learningMode:"spelling",
 
     phonics:{
-      sounds:[],
-      totals:{
-        correct:0,
-        incorrect:0
-      },
-      activityLog:[]
-    },
+  sounds:PHONICS_LIBRARY.map(
+    freshPhonicsSound
+  ),
+  totals:{
+    correct:0,
+    incorrect:0
+  },
+  activityLog:[]
+},
 
     words: includeDefaultWords
       ? DEFAULT_WORDS.map(freshWord)
@@ -2856,6 +3391,11 @@ let resultModalAction = null;
         Array.isArray(p.phonics.activityLog)
           ? p.phonics.activityLog
           : [];
+
+      p.phonics.sounds =
+  mergePhonicsSounds(
+    p.phonics.sounds
+  );
 
 
       p.words = Array.isArray(p.words)
@@ -3184,10 +3724,14 @@ currentProfileId =
   state.profiles[currentProfileId]
     ? currentProfileId
     : Object.keys(state.profiles)[0];
-    currentWordId = null;
-    reviewMode = false;
-    reviewCountsForSchedule = false;
-    render();
+   currentWordId = null;
+currentSoundId = null;
+phonicsBuiltChunks = [];
+
+reviewMode = false;
+reviewCountsForSchedule = false;
+
+render();
   }
 
   async function reconcileCloudState() {
@@ -3375,8 +3919,10 @@ function setLearningMode(mode) {
     nextMode;
 
   currentWordId = null;
+currentSoundId = null;
+phonicsBuiltChunks = [];
 
-  reviewMode = false;
+reviewMode = false;
   reviewCountsForSchedule = false;
 
   saveState();
@@ -3435,14 +3981,21 @@ function renderLearningMode() {
 
   if (phonics) {
 
-    els.gameCard.style.display =
-      "none";
+  els.gameCard.style.display =
+    "none";
 
-    els.masteredCard.classList.remove(
-      "show"
-    );
+  els.masteredCard.classList.remove(
+    "show"
+  );
 
-  }
+  renderPhonicsGame();
+
+} else {
+
+  els.phonicsPracticeCard
+    .classList.remove("show");
+
+}
 }
 
   function normalizeWord(word) {
@@ -3603,6 +4156,1158 @@ function speakText(text) {
     const word = currentWord();
     if (word) speakText(sentenceFor(word));
   }
+
+  /* =========================================================
+   PHONICS GAME
+========================================================= */
+
+function phonicsData() {
+  return ensurePhonicsData(
+    profile()
+  );
+}
+
+function currentPhonicsSound() {
+
+  const data =
+    phonicsData();
+
+  const available =
+    data.sounds.filter(
+      sound => !sound.mastered
+    );
+
+  if (!available.length) {
+    return null;
+  }
+
+  let sound =
+    available.find(
+      item =>
+        item.id === currentSoundId
+    );
+
+  if (!sound) {
+    sound = available[0];
+    currentSoundId = sound.id;
+  }
+
+  return sound;
+}
+
+function choosePhonicsSound(id) {
+
+  const sound =
+    phonicsData().sounds.find(
+      item =>
+        item.id === id &&
+        !item.mastered
+    );
+
+  if (!sound) return;
+
+  currentSoundId = sound.id;
+  phonicsBuiltChunks = [];
+
+  closePhonicsSoundChooser();
+
+  render();
+}
+
+function nextPhonicsSound() {
+
+  const available =
+    phonicsData().sounds.filter(
+      sound => !sound.mastered
+    );
+
+  if (!available.length) {
+    currentSoundId = null;
+    render();
+    return;
+  }
+
+  const index =
+    available.findIndex(
+      sound =>
+        sound.id === currentSoundId
+    );
+
+  const next =
+    available[
+      index >= 0
+        ? (index + 1) %
+          available.length
+        : 0
+    ];
+
+  currentSoundId = next.id;
+  phonicsBuiltChunks = [];
+
+  render();
+}
+
+function openPhonicsSoundChooser() {
+
+  els.phonicsSoundChooser
+    .classList.add("open");
+
+  els.phonicsSoundChooser
+    .setAttribute(
+      "aria-hidden",
+      "false"
+    );
+}
+
+function closePhonicsSoundChooser() {
+
+  els.phonicsSoundChooser
+    .classList.remove("open");
+
+  els.phonicsSoundChooser
+    .setAttribute(
+      "aria-hidden",
+      "true"
+    );
+}
+
+function renderPhonicsPicker() {
+
+  const available =
+    phonicsData().sounds.filter(
+      sound => !sound.mastered
+    );
+
+  els.phonicsSoundChoiceGrid
+    .innerHTML = "";
+
+  if (!available.length) {
+
+    els.changePhonicsSoundBtn.disabled =
+      true;
+
+    return;
+  }
+
+  els.changePhonicsSoundBtn.disabled =
+    false;
+
+  available.forEach(sound => {
+
+    const btn =
+      document.createElement(
+        "button"
+      );
+
+    btn.type = "button";
+    btn.className =
+      "word-choice-btn";
+
+    const label =
+      document.createElement("span");
+
+    label.textContent =
+      sound.grapheme;
+
+    const status =
+      document.createElement("small");
+
+    status.textContent =
+      `Stage ${sound.stage || 1}`;
+
+    btn.append(
+      label,
+      status
+    );
+
+    btn.addEventListener(
+      "click",
+      () => {
+        choosePhonicsSound(
+          sound.id
+        );
+      }
+    );
+
+    els.phonicsSoundChoiceGrid
+      .appendChild(btn);
+  });
+}
+
+function phonicsChoiceValues(
+  target,
+  sourceValues,
+  count = 4
+) {
+
+  const unique =
+    [...new Set(
+      sourceValues.filter(Boolean)
+    )]
+      .filter(
+        value =>
+          value !== target
+      );
+
+  return shuffle([
+    target,
+    ...shuffle(unique)
+      .slice(
+        0,
+        Math.max(
+          0,
+          count - 1
+        )
+      )
+  ]);
+}
+
+function renderPhonicsChoiceButtons(
+  values,
+  correctValue,
+  sound,
+  stage
+) {
+
+  els.phonicsChoiceGrid.innerHTML =
+    "";
+
+  values.forEach(value => {
+
+    const btn =
+      document.createElement(
+        "button"
+      );
+
+    btn.type = "button";
+
+    btn.className =
+      "phonics-choice-btn";
+
+    btn.textContent = value;
+
+    btn.addEventListener(
+      "click",
+      () => {
+
+        els.phonicsChoiceGrid
+          .querySelectorAll("button")
+          .forEach(button => {
+            button.disabled = true;
+          });
+
+        submitPhonicsAnswer(
+          value === correctValue,
+          sound,
+          stage,
+          value
+        );
+      }
+    );
+
+    els.phonicsChoiceGrid
+      .appendChild(btn);
+  });
+}
+
+function renderPhonicsStageDots(
+  stage,
+  mastered
+) {
+
+  els.phonicsStageDots.innerHTML =
+    "";
+
+  for (
+    let i = 1;
+    i <= 5;
+    i++
+  ) {
+
+    const dot =
+      document.createElement(
+        "span"
+      );
+
+    dot.className =
+      "stage-dot";
+
+    if (
+      mastered ||
+      i < stage
+    ) {
+      dot.classList.add("done");
+
+    } else if (
+      i === stage
+    ) {
+      dot.classList.add(
+        "current"
+      );
+    }
+
+    els.phonicsStageDots
+      .appendChild(dot);
+  }
+}
+
+function phonicsCueSentence(sound) {
+
+  if (
+    sound.cuePosition === "last"
+  ) {
+    return `Listen to the last sound in ${sound.cueWord}. ${sound.cueWord}.`;
+  }
+
+  if (
+    sound.cuePosition === "middle"
+  ) {
+    return `Listen to the middle sound in ${sound.cueWord}. ${sound.cueWord}.`;
+  }
+
+  return `Listen to the first sound in ${sound.cueWord}. ${sound.cueWord}.`;
+}
+
+function speakPhonicsClue(sound) {
+
+  if (!sound) return;
+
+  speakText(
+    phonicsCueSentence(sound)
+  );
+}
+
+function speakPhonicsWord(sound) {
+
+  if (!sound) return;
+
+  speakText(
+    sound.practiceWord
+  );
+}
+
+function phonicsChunkMarkup(
+  sound,
+  hideTarget = false
+) {
+
+  const targetIndex =
+    sound.chunks.findIndex(
+      chunk =>
+        chunk === sound.grapheme
+    );
+
+  return `
+    <div class="phonics-chunk-line">
+      ${sound.chunks.map(
+        (chunk,index) => {
+
+          const missing =
+            hideTarget &&
+            index === targetIndex;
+
+          return `
+            <span
+              class="phonics-chunk${missing ? " missing" : ""}"
+            >
+              ${missing ? "?" : chunk}
+            </span>
+
+            ${
+              index <
+              sound.chunks.length - 1
+                ? `<span class="phonics-dot-separator">·</span>`
+                : ""
+            }
+          `;
+        }
+      ).join("")}
+    </div>
+  `;
+}
+
+function renderPhonicsGame() {
+
+  const data =
+    phonicsData();
+
+  const unmastered =
+    data.sounds.filter(
+      sound =>
+        !sound.mastered
+    );
+
+  renderPhonicsPicker();
+
+  els.phonicsChoiceGrid.innerHTML =
+    "";
+
+  els.phonicsBuiltWord.innerHTML =
+    "";
+
+  els.phonicsBuiltWord
+    .classList.remove("show");
+
+  els.phonicsChunkBank.innerHTML =
+    "";
+
+  els.phonicsChunkBank
+    .classList.remove("show");
+
+  els.phonicsActions.innerHTML =
+    "";
+
+  if (!unmastered.length) {
+
+    els.phonicsStagePill.textContent =
+      "All sounds mastered";
+
+    els.phonicsStageHelp.textContent =
+      "Brilliant work — every phonics sound in this set has been completed.";
+
+    els.phonicsPrompt.textContent =
+      "🏆";
+
+    els.phonicsSubPrompt.textContent =
+      `${profile().name} has completed the phonics set.`;
+
+    els.phonicsFocusNote.textContent =
+      "All available sounds are mastered.";
+
+    renderPhonicsStageDots(
+      5,
+      true
+    );
+
+    return;
+  }
+
+  const sound =
+    currentPhonicsSound();
+
+  if (!sound) return;
+
+  const stage =
+    Math.min(
+      5,
+      Math.max(
+        1,
+        Number(sound.stage || 1)
+      )
+    );
+
+  els.phonicsStagePill.textContent =
+    PHONICS_STAGES[stage].title;
+
+  els.phonicsStageHelp.textContent =
+    PHONICS_STAGES[stage].help;
+
+  els.phonicsFocusNote.textContent =
+    `Practising "${sound.grapheme}" · Stage ${stage}`;
+
+  renderPhonicsStageDots(
+    stage,
+    sound.mastered
+  );
+
+  if (stage === 1) {
+
+    els.phonicsPrompt.textContent =
+      "🔊 Listen carefully";
+
+    els.phonicsSubPrompt.textContent =
+      `Which grapheme matches the ${sound.cuePosition} sound in "${sound.cueWord}"?`;
+
+    const choices =
+      phonicsChoiceValues(
+        sound.grapheme,
+        data.sounds.map(
+          item =>
+            item.grapheme
+        )
+      );
+
+    renderPhonicsChoiceButtons(
+      choices,
+      sound.grapheme,
+      sound,
+      stage
+    );
+
+    els.phonicsActions.append(
+      button(
+        "🔊 Hear clue",
+        "audio-btn",
+        () =>
+          speakPhonicsClue(
+            sound
+          )
+      ),
+      button(
+        "Choose another sound",
+        "secondary",
+        nextPhonicsSound
+      )
+    );
+
+    return;
+  }
+
+  if (stage === 2) {
+
+    els.phonicsPrompt.textContent =
+      sound.grapheme;
+
+    els.phonicsSubPrompt.textContent =
+      `Find "${sound.grapheme}" below.`;
+
+    const choices =
+      phonicsChoiceValues(
+        sound.grapheme,
+        data.sounds.map(
+          item =>
+            item.grapheme
+        )
+      );
+
+    renderPhonicsChoiceButtons(
+      choices,
+      sound.grapheme,
+      sound,
+      stage
+    );
+
+    els.phonicsActions.append(
+      button(
+        "Choose another sound",
+        "secondary",
+        nextPhonicsSound
+      )
+    );
+
+    return;
+  }
+
+  if (stage === 3) {
+
+    els.phonicsPrompt.innerHTML =
+      phonicsChunkMarkup(
+        sound,
+        true
+      );
+
+    els.phonicsSubPrompt.textContent =
+      `Listen to "${sound.practiceWord}". Which sound chunk is missing?`;
+
+    const choices =
+      phonicsChoiceValues(
+        sound.grapheme,
+        data.sounds.map(
+          item =>
+            item.grapheme
+        )
+      );
+
+    renderPhonicsChoiceButtons(
+      choices,
+      sound.grapheme,
+      sound,
+      stage
+    );
+
+    els.phonicsActions.append(
+      button(
+        "🔊 Hear word",
+        "audio-btn",
+        () =>
+          speakPhonicsWord(
+            sound
+          )
+      ),
+      button(
+        "Choose another sound",
+        "secondary",
+        nextPhonicsSound
+      )
+    );
+
+    return;
+  }
+
+  if (stage === 4) {
+
+    els.phonicsPrompt.innerHTML =
+      phonicsChunkMarkup(
+        sound,
+        false
+      );
+
+    els.phonicsSubPrompt.textContent =
+      "Blend the sounds together. Which word do they make?";
+
+    const wordChoices =
+      phonicsChoiceValues(
+        sound.practiceWord,
+        data.sounds.map(
+          item =>
+            item.practiceWord
+        )
+      );
+
+    renderPhonicsChoiceButtons(
+      wordChoices,
+      sound.practiceWord,
+      sound,
+      stage
+    );
+
+    els.phonicsActions.append(
+      button(
+        "Choose another sound",
+        "secondary",
+        nextPhonicsSound
+      )
+    );
+
+    return;
+  }
+
+  renderPhonicsBuildStage(
+    sound
+  );
+}
+
+function renderPhonicsBuildStage(
+  sound
+) {
+
+  phonicsBuiltChunks = [];
+
+  els.phonicsPrompt.textContent =
+    "🔊 Listen & build";
+
+  els.phonicsSubPrompt.textContent =
+    "Hear the word, then build it using the sound chunks.";
+
+  els.phonicsBuiltWord
+    .classList.add("show");
+
+  els.phonicsChunkBank
+    .classList.add("show");
+
+  renderPhonicsBuiltWord(
+    sound
+  );
+
+  const allChunks =
+    PHONICS_LIBRARY
+      .flatMap(
+        item =>
+          item.chunks
+      );
+
+  const targetChunks =
+    [...sound.chunks];
+
+  const distractors =
+    shuffle(
+      [...new Set(allChunks)]
+        .filter(
+          chunk =>
+            !targetChunks.includes(
+              chunk
+            )
+        )
+    )
+      .slice(0,3);
+
+  const bank =
+    shuffle([
+      ...targetChunks,
+      ...distractors
+    ]);
+
+  els.phonicsChunkBank.innerHTML =
+    "";
+
+  bank.forEach(
+    (chunk,index) => {
+
+      const btn =
+        document.createElement(
+          "button"
+        );
+
+      btn.type = "button";
+
+      btn.className =
+        "phonics-chunk-btn";
+
+      btn.textContent =
+        chunk;
+
+      btn.dataset.index =
+        String(index);
+
+      btn.addEventListener(
+        "click",
+        () => {
+
+          if (
+            phonicsBuiltChunks.length >=
+            sound.chunks.length
+          ) {
+            return;
+          }
+
+          phonicsBuiltChunks.push({
+            chunk,
+            buttonIndex:index
+          });
+
+          btn.classList.add(
+            "used"
+          );
+
+          renderPhonicsBuiltWord(
+            sound
+          );
+        }
+      );
+
+      els.phonicsChunkBank
+        .appendChild(btn);
+    }
+  );
+
+  els.phonicsActions.innerHTML =
+    "";
+
+  els.phonicsActions.append(
+    button(
+      "🔊 Hear word",
+      "audio-btn",
+      () =>
+        speakPhonicsWord(
+          sound
+        )
+    ),
+
+    button(
+      "Undo",
+      "secondary",
+      undoPhonicsChunk
+    ),
+
+    button(
+      "Check",
+      "primary",
+      checkPhonicsBuild
+    ),
+
+    button(
+      "Choose another sound",
+      "secondary",
+      nextPhonicsSound
+    )
+  );
+}
+
+function renderPhonicsBuiltWord(
+  sound
+) {
+
+  els.phonicsBuiltWord.innerHTML =
+    "";
+
+  sound.chunks.forEach(
+    (_,index) => {
+
+      const slot =
+        document.createElement(
+          "span"
+        );
+
+      slot.className =
+        "phonics-built-slot";
+
+      const built =
+        phonicsBuiltChunks[index];
+
+      if (built) {
+
+        slot.textContent =
+          built.chunk;
+
+        slot.classList.add(
+          "filled"
+        );
+
+      } else {
+
+        slot.textContent =
+          "";
+      }
+
+      els.phonicsBuiltWord
+        .appendChild(slot);
+    }
+  );
+}
+
+function undoPhonicsChunk() {
+
+  const removed =
+    phonicsBuiltChunks.pop();
+
+  if (!removed) return;
+
+  const button =
+    els.phonicsChunkBank
+      .querySelector(
+        `[data-index="${removed.buttonIndex}"]`
+      );
+
+  if (button) {
+    button.classList.remove(
+      "used"
+    );
+  }
+
+  const sound =
+    currentPhonicsSound();
+
+  if (sound) {
+    renderPhonicsBuiltWord(
+      sound
+    );
+  }
+}
+
+function checkPhonicsBuild() {
+
+  const sound =
+    currentPhonicsSound();
+
+  if (!sound) return;
+
+  if (
+    phonicsBuiltChunks.length !==
+    sound.chunks.length
+  ) {
+
+    showFeedback(
+      "Build the whole word before checking it.",
+      false,
+      "Keep going"
+    );
+
+    return;
+  }
+
+  const entered =
+    phonicsBuiltChunks.map(
+      item =>
+        item.chunk
+    );
+
+  const correct =
+    entered.every(
+      (chunk,index) =>
+        chunk ===
+        sound.chunks[index]
+    );
+
+  submitPhonicsAnswer(
+    correct,
+    sound,
+    5,
+    entered.join(" · ")
+  );
+}
+
+function logPhonicsActivity(
+  type,
+  sound,
+  data = {}
+) {
+
+  const phonics =
+    phonicsData();
+
+  phonics.activityLog.push({
+    at:new Date().toISOString(),
+    type,
+    soundId:sound?.id || null,
+    grapheme:
+      sound?.grapheme || "",
+    ...data
+  });
+
+  phonics.activityLog =
+    phonics.activityLog.slice(
+      -1000
+    );
+}
+
+function recordCorrectPhonicsForStreak(
+  sound
+) {
+
+  const streak =
+    ensureStreak();
+
+  const today =
+    localDayKey();
+
+  if (
+    streak.lastCompletedDay ===
+    today
+  ) {
+    return;
+  }
+
+  const key =
+    `phonics:${sound.id}`;
+
+  if (
+    !streak.todayWords.includes(
+      key
+    )
+  ) {
+    streak.todayWords.push(
+      key
+    );
+  }
+
+  if (
+    streak.todayWords.length >=
+    streak.dailyTarget
+  ) {
+    completeStreakDay();
+  }
+}
+
+function awardPhonicsStageIfEligible(
+  sound,
+  stage
+) {
+
+  sound.rewardedStages =
+    Array.isArray(
+      sound.rewardedStages
+    )
+      ? sound.rewardedStages
+      : [];
+
+  if (
+    sound.rewardedStages.includes(
+      stage
+    )
+  ) {
+    return;
+  }
+
+  sound.rewardedStages.push(
+    stage
+  );
+
+  awardRobux(
+    ensureRewards().stageAmount,
+    `Phonics Stage ${stage}`,
+    sound.grapheme
+  );
+}
+
+function awardPhonicsMasterIfEligible(
+  sound
+) {
+
+  if (
+    sound.masterRewarded
+  ) {
+    return;
+  }
+
+  sound.masterRewarded =
+    true;
+
+  awardRobux(
+    ensureRewards().masterBonus,
+    "Sound mastered",
+    sound.grapheme
+  );
+}
+
+function submitPhonicsAnswer(
+  correct,
+  sound,
+  stage,
+  selectedValue = ""
+) {
+
+  sound.attempts =
+    Number(
+      sound.attempts || 0
+    ) + 1;
+
+  sound.lastPractised =
+    new Date().toISOString();
+
+  const totals =
+    phonicsData().totals;
+
+  if (!correct) {
+
+    sound.incorrect =
+      Number(
+        sound.incorrect || 0
+      ) + 1;
+
+    totals.incorrect =
+      Number(
+        totals.incorrect || 0
+      ) + 1;
+
+    logPhonicsActivity(
+      "answer",
+      sound,
+      {
+        correct:false,
+        stage,
+        selected:selectedValue
+      }
+    );
+
+    saveState();
+
+    showFeedback(
+      "Not quite. Have another go.",
+      false,
+      "Try again",
+      "Try again",
+      () => {
+        phonicsBuiltChunks = [];
+        render();
+      }
+    );
+
+    return;
+  }
+
+  sound.correct =
+    Number(
+      sound.correct || 0
+    ) + 1;
+
+  totals.correct =
+    Number(
+      totals.correct || 0
+    ) + 1;
+
+  logPhonicsActivity(
+    "answer",
+    sound,
+    {
+      correct:true,
+      stage
+    }
+  );
+
+  recordCorrectPhonicsForStreak(
+    sound
+  );
+
+  awardPhonicsStageIfEligible(
+    sound,
+    stage
+  );
+
+  let title;
+  let message;
+  let buttonText;
+
+  if (stage >= 5) {
+
+    sound.mastered =
+      true;
+
+    sound.masteredAt =
+      new Date().toISOString();
+
+    logPhonicsActivity(
+      "mastered",
+      sound
+    );
+
+    awardPhonicsMasterIfEligible(
+      sound
+    );
+
+    title =
+      "Sound mastered! ★";
+
+    message =
+      `Brilliant! "${sound.grapheme}" is mastered.`;
+
+    buttonText =
+      "Next sound";
+
+  } else {
+
+    sound.stage =
+      Math.min(
+        5,
+        stage + 1
+      );
+
+    title =
+      "Stage complete! ✓";
+
+    message =
+      `"${sound.grapheme}" is ready for Stage ${sound.stage}.`;
+
+    buttonText =
+      "Next stage";
+  }
+
+  saveState();
+
+  showFeedback(
+    message,
+    true,
+    title,
+    buttonText,
+    () => {
+
+      phonicsBuiltChunks = [];
+
+      if (sound.mastered) {
+
+        const remaining =
+          phonicsData()
+            .sounds
+            .filter(
+              item =>
+                !item.mastered
+            );
+
+        currentSoundId =
+          remaining.length
+            ? remaining[0].id
+            : null;
+
+      } else {
+
+        currentSoundId =
+          sound.id;
+      }
+
+      render();
+    }
+  );
+}
+  
   function clearHint() {
   hintUsedThisAttempt = false;
   hintCountThisAttempt = 0;
@@ -3718,17 +5423,38 @@ function scheduleFirstReview(word) {
     return Boolean(word.mastered && !word.reviewComplete && word.reviewDue && word.reviewDue <= localDayKey());
   }
 
-  function startReview(wordId, countsForSchedule = true) {
-    clearPreview();
-    setActiveTab("practice");
-    const word = profile().words.find(w => w.id === wordId && w.mastered);
-    if (!word) return;
-    reviewMode = true;
-    reviewCountsForSchedule = Boolean(countsForSchedule);
-    currentWordId = word.id;
-    render();
-    setTimeout(() => speakCurrentWord(), 150);
-  }
+ function startReview(wordId, countsForSchedule = true) {
+  clearPreview();
+
+  const word =
+    profile().words.find(
+      w => w.id === wordId && w.mastered
+    );
+
+  if (!word) return;
+
+  // Spelling reviews always open in Spelling mode.
+  profile().learningMode = "spelling";
+
+  currentSoundId = null;
+  phonicsBuiltChunks = [];
+
+  reviewMode = true;
+  reviewCountsForSchedule =
+    Boolean(countsForSchedule);
+
+  currentWordId = word.id;
+
+  setActiveTab("practice");
+
+  saveState();
+  render();
+
+  setTimeout(
+    () => speakCurrentWord(),
+    150
+  );
+}
 
   function currentWord() {
     const p = profile();
@@ -3828,10 +5554,12 @@ function addLearner(name) {
   currentProfileId =
     profileId;
 
-  currentWordId = null;
-  reviewMode = false;
-  reviewCountsForSchedule = false;
+ currentWordId = null;
+currentSoundId = null;
+phonicsBuiltChunks = [];
 
+reviewMode = false;
+reviewCountsForSchedule = false;
   saveState();
 
   els.newLearnerName.value = "";
@@ -3867,10 +5595,12 @@ function removeLearner(profileId) {
       Object.keys(state.profiles)[0];
   }
 
-  currentWordId = null;
-  reviewMode = false;
-  reviewCountsForSchedule = false;
+ currentWordId = null;
+currentSoundId = null;
+phonicsBuiltChunks = [];
 
+reviewMode = false;
+reviewCountsForSchedule = false;
   saveState();
   render();
 }
@@ -3914,14 +5644,21 @@ function setLearnerAvatar(profileId, avatarKey) {
   
   function switchProfile(id) {
   if (!state.profiles[id]) return;
+
   clearPreview();
+
   currentProfileId = id;
-    currentWordId = null;
-    reviewMode = false;
-    reviewCountsForSchedule = false;
-    saveState();
-    render();
-  }
+
+  currentWordId = null;
+  currentSoundId = null;
+  phonicsBuiltChunks = [];
+
+  reviewMode = false;
+  reviewCountsForSchedule = false;
+
+  saveState();
+  render();
+}
 
   function setActiveTab(tabName, save = true) {
     const valid = ["practice","progress","mastered","rewards"];
@@ -5532,28 +7269,132 @@ renderLearnerSettings();
   }
 
   function resetProgressOnly() {
-    if (!confirm(`Reset all progress for ${profile().name}? The words will stay.`)) return;
 
-    profile().words = profile().words.map(w => ({
-      ...w,
+  if (
+    !confirm(
+      `Reset all learning progress for ${profile().name}?\n\n` +
+      `Their spelling words and phonics sounds will stay, but stages, mastery and scores will be reset.`
+    )
+  ) {
+    return;
+  }
+
+  const p = profile();
+
+  /* =========================
+     SPELLING
+  ========================= */
+
+  p.words = p.words.map(word => ({
+    ...word,
+
+    stage:1,
+    mastered:false,
+
+    correct:0,
+    incorrect:0,
+    attempts:0,
+
+    lastPractised:null,
+
+    /*
+     * Keep reward history so resetting progress
+     * cannot be used to earn the same Robux again.
+     */
+    rewardedStages:
+      Array.isArray(word.rewardedStages)
+        ? word.rewardedStages
+        : [],
+
+    masterRewarded:
+      Boolean(word.masterRewarded),
+
+    masteredAt:null,
+    reviewDue:null,
+    reviewIndex:0,
+    reviewComplete:false
+  }));
+
+  p.totals = {
+    correct:0,
+    incorrect:0
+  };
+
+  p.activityLog = [];
+
+
+  /* =========================
+     PHONICS
+  ========================= */
+
+  const phonics =
+    ensurePhonicsData(p);
+
+  phonics.sounds =
+    phonics.sounds.map(sound => ({
+      ...sound,
+
       stage:1,
       mastered:false,
+
       correct:0,
       incorrect:0,
       attempts:0,
-      lastPractised:null,
-      rewardedStages:Array.isArray(w.rewardedStages) ? w.rewardedStages : [],
-      masterRewarded:Boolean(w.masterRewarded),
-      masteredAt:null,
-      reviewDue:null,
-      reviewIndex:0,
-      reviewComplete:false
-    }));
-    profile().totals = {correct:0, incorrect:0};
-    profile().activityLog = [];
 
-    profile().phonics = {
-  sounds:[],
+      lastPractised:null,
+
+      /*
+       * As with spelling, keep already-earned
+       * reward flags.
+       */
+      rewardedStages:
+        Array.isArray(sound.rewardedStages)
+          ? sound.rewardedStages
+          : [],
+
+      masterRewarded:
+        Boolean(sound.masterRewarded),
+
+      masteredAt:null
+    }));
+
+  phonics.totals = {
+    correct:0,
+    incorrect:0
+  };
+
+  phonics.activityLog = [];
+
+
+  /* =========================
+     CURRENT ACTIVITY
+  ========================= */
+
+  currentWordId = null;
+  currentSoundId = null;
+
+  phonicsBuiltChunks = [];
+
+  reviewMode = false;
+  reviewCountsForSchedule = false;
+
+  clearPreview();
+
+  saveState();
+  render();
+}
+
+  function resetEverything() {
+    if (!confirm(`Remove all words and progress for ${profile().name}?`)) return;
+
+    profile().words = [];
+    profile().totals = {correct:0, incorrect:0};
+   profile().activityLog = [];
+
+profile().phonics = {
+  sounds:PHONICS_LIBRARY.map(
+    freshPhonicsSound
+  ),
   totals:{
     correct:0,
     incorrect:0
@@ -5561,19 +7402,9 @@ renderLearnerSettings();
   activityLog:[]
 };
 
-    currentWordId = null;
-    reviewMode = false;
-    saveState();
-    render();
-  }
+profile().learningMode = "spelling";
 
-  function resetEverything() {
-    if (!confirm(`Remove all words and progress for ${profile().name}?`)) return;
-
-    profile().words = [];
-    profile().totals = {correct:0, incorrect:0};
-    profile().activityLog = [];
-    profile().rewards = {
+profile().rewards = {
       pending:0,
       paid:0,
       lifetime:0,
@@ -5591,10 +7422,17 @@ renderLearnerSettings();
       dailyTarget:3,
       milestones:{"3":5,"5":10,"7":20,"14":40}
     };
-    currentWordId = null;
-    reviewMode = false;
-    saveState();
-    render();
+   currentWordId = null;
+currentSoundId = null;
+phonicsBuiltChunks = [];
+
+reviewMode = false;
+reviewCountsForSchedule = false;
+
+clearPreview();
+
+saveState();
+render();
   }
 
   function exportProgress() {
@@ -5631,10 +7469,14 @@ renderLearnerSettings();
   state.profiles[state.currentProfileId]
     ? state.currentProfileId
     : Object.keys(state.profiles)[0];
-        currentWordId = null;
-        reviewMode = false;
-        reviewCountsForSchedule = false;
-        saveState();
+       currentWordId = null;
+currentSoundId = null;
+phonicsBuiltChunks = [];
+
+reviewMode = false;
+reviewCountsForSchedule = false;
+
+saveState();
         closeParent();
         render();
         alert("Backup restored.");
@@ -5736,15 +7578,35 @@ renderLearnerSettings();
   els.changeWordBtn.addEventListener("click", openWordChooser);
   els.closeWordChooser.addEventListener("click", closeWordChooser);
 
+  els.changePhonicsSoundBtn.addEventListener(
+  "click",
+  openPhonicsSoundChooser
+);
+
+els.closePhonicsSoundChooser.addEventListener(
+  "click",
+  closePhonicsSoundChooser
+);
+
   document.addEventListener("click", e => {
-    if (
-      els.wordChooser.classList.contains("open") &&
-      !els.wordChooser.contains(e.target) &&
-      e.target !== els.changeWordBtn
-    ) {
-      closeWordChooser();
-    }
-  });
+
+  if (
+    els.wordChooser.classList.contains("open") &&
+    !els.wordChooser.contains(e.target) &&
+    e.target !== els.changeWordBtn
+  ) {
+    closeWordChooser();
+  }
+
+  if (
+    els.phonicsSoundChooser.classList.contains("open") &&
+    !els.phonicsSoundChooser.contains(e.target) &&
+    e.target !== els.changePhonicsSoundBtn
+  ) {
+    closePhonicsSoundChooser();
+  }
+
+});
 
   document.querySelectorAll(".app-tab").forEach(btn => {
     btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
