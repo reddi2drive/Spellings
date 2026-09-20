@@ -1691,6 +1691,119 @@
     margin-top:2px;
   }
 
+  .learner-settings-list{
+  display:grid;
+  gap:12px;
+  margin-top:12px;
+}
+
+.learner-settings-card{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:15px;
+  background:#fafbfe;
+}
+
+.learner-settings-head{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.learner-settings-avatar{
+  width:52px;
+  height:52px;
+  flex:0 0 52px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #fff;
+  background:#e9eef7;
+  box-shadow:0 4px 12px rgba(23,32,51,.10);
+}
+
+.learner-settings-name-wrap{
+  flex:1;
+  min-width:0;
+}
+
+.learner-settings-name{
+  width:100%;
+  border:2px solid #dce2eb;
+  border-radius:12px;
+  padding:10px 12px;
+  background:#fff;
+  color:var(--ink);
+  font-weight:900;
+  outline:none;
+}
+
+.learner-settings-name:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 4px rgba(79,124,255,.10);
+}
+
+.learner-current-badge{
+  display:inline-block;
+  margin-top:5px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#eef3ff;
+  color:#385bcb;
+  font-size:10px;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
+.learner-card-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.learner-remove-btn{
+  border:0;
+  border-radius:11px;
+  padding:9px 11px;
+  background:#fff0f1;
+  color:#c73540;
+  font-size:12px;
+  font-weight:950;
+}
+
+.learner-remove-btn:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+.learner-avatar-label{
+  margin-bottom:8px;
+  color:#59657a;
+  font-size:11px;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+@media (max-width:650px){
+  .learner-settings-head{
+    align-items:flex-start;
+  }
+
+  .learner-card-actions{
+    align-self:center;
+  }
+
+  .learner-add-row{
+    flex-direction:column;
+  }
+
+  .learner-add-row button{
+    width:100%;
+  }
+}
+
   .name-settings{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -2025,64 +2138,25 @@
       <select id="parentProfileSelect" aria-label="Choose learner to manage"></select>
     </div>
 
-    <div class="section-title">Child names</div>
-    <div class="name-settings">
-      <input id="profileName1" maxlength="20" placeholder="Child 1">
-      <input id="profileName2" maxlength="20" placeholder="Child 2">
-    </div>
-    <button class="secondary" id="saveNamesBtn">Save names</button>
+    <div class="section-title">Learners</div>
 
-    <div class="section-title">Avatars</div>
-    <div class="avatar-settings">
+<div class="form-row learner-add-row">
+  <input
+    id="newLearnerName"
+    maxlength="20"
+    placeholder="New learner name"
+    autocomplete="off"
+  >
+  <button class="primary" id="addLearnerBtn" type="button">
+    Add learner
+  </button>
+</div>
 
-      <div class="avatar-child-card">
-        <div class="avatar-child-head">
-          <img class="avatar-child-preview" id="avatarPreviewChild1" alt="">
-          <div>
-            <strong id="avatarNameChild1">Child 1</strong>
-            <small>Choose an avatar</small>
-          </div>
-        </div>
+<div class="learner-settings-list" id="learnerSettingsList"></div>
 
-        <div class="avatar-choice-row">
-          <button class="avatar-choice" type="button" data-profile="child1" data-avatar="popstar">
-            <img src="assets/avatars/popstar.webp" alt="">
-            <span>Pop Star<small>Fedora & red stage jacket</small></span>
-          </button>
-
-          <button class="avatar-choice" type="button" data-profile="child1" data-avatar="speedster">
-            <img src="assets/avatars/speedster.webp" alt="">
-            <span>Blue Speedster<small>Fast game-style hero</small></span>
-          </button>
-        </div>
-      </div>
-
-      <div class="avatar-child-card">
-        <div class="avatar-child-head">
-          <img class="avatar-child-preview" id="avatarPreviewChild2" alt="">
-          <div>
-            <strong id="avatarNameChild2">Child 2</strong>
-            <small>Choose an avatar</small>
-          </div>
-        </div>
-
-        <div class="avatar-choice-row">
-          <button class="avatar-choice" type="button" data-profile="child2" data-avatar="popstar">
-            <img src="assets/avatars/popstar.webp" alt="">
-            <span>Pop Star<small>Fedora & red stage jacket</small></span>
-          </button>
-
-          <button class="avatar-choice" type="button" data-profile="child2" data-avatar="speedster">
-            <img src="assets/avatars/speedster.webp" alt="">
-            <span>Blue Speedster<small>Fast game-style hero</small></span>
-          </button>
-        </div>
-      </div>
-
-    </div>
-    <p class="foot-note" style="margin-top:10px">
-      Each learner keeps their own avatar along with their spelling progress, Robux and streaks.
-    </p>
+<p class="foot-note" style="margin-top:10px">
+  Each learner keeps their own spellings, progress, avatar, Robux and streaks.
+</p>
 
     <div class="section-title">Add spellings</div>
     <div class="form-row">
@@ -2288,10 +2362,7 @@
     cloudParentStatus: document.getElementById("cloudParentStatus"),
     cloudParentEmail: document.getElementById("cloudParentEmail"),
     cloudParentActionBtn: document.getElementById("cloudParentActionBtn"),
-    avatarPreviewChild1: document.getElementById("avatarPreviewChild1"),
-    avatarPreviewChild2: document.getElementById("avatarPreviewChild2"),
-    avatarNameChild1: document.getElementById("avatarNameChild1"),
-    avatarNameChild2: document.getElementById("avatarNameChild2"),
+   
     appNav: document.getElementById("appNav"),
     progressTabBadge: document.getElementById("progressTabBadge"),
     masteredTabBadge: document.getElementById("masteredTabBadge"),
@@ -2331,7 +2402,6 @@ streakTitle: document.getElementById("streakTitle"),
     reviewDueSection: document.getElementById("reviewDueSection"),
     reviewDueCount: document.getElementById("reviewDueCount"),
     reviewDueList: document.getElementById("reviewDueList"),
-
     stagePill: document.getElementById("stagePill"),
     stageHelp: document.getElementById("stageHelp"),
     wordDisplay: document.getElementById("wordDisplay"),
@@ -2344,14 +2414,13 @@ actions: document.getElementById("actions"),
 hintPanel: document.getElementById("hintPanel"),
 feedback: document.getElementById("feedback"),
 stageDots: document.getElementById("stageDots"),
-
     parentBtn: document.getElementById("parentBtn"),
     parentModal: document.getElementById("parentModal"),
     parentProfileSelect: document.getElementById("parentProfileSelect"),
     closeModal: document.getElementById("closeModal"),
-    profileName1: document.getElementById("profileName1"),
-    profileName2: document.getElementById("profileName2"),
-    saveNamesBtn: document.getElementById("saveNamesBtn"),
+newLearnerName: document.getElementById("newLearnerName"),
+addLearnerBtn: document.getElementById("addLearnerBtn"),
+learnerSettingsList: document.getElementById("learnerSettingsList"),
     newWordInput: document.getElementById("newWordInput"),
     addWordBtn: document.getElementById("addWordBtn"),
     bulkWordsInput: document.getElementById("bulkWordsInput"),
@@ -2391,7 +2460,9 @@ stageDots: document.getElementById("stageDots"),
   };
 
   let state = loadState();
-  let currentProfileId = state.currentProfileId || "child1";
+let currentProfileId =
+  state.currentProfileId ||
+  Object.keys(state.profiles)[0];
   let activeTab = localStorage.getItem("spellingSteps_activeTab_v1") || "practice";
   let currentWordId = null;
   let previewRunning = false;
@@ -2437,22 +2508,196 @@ let resultModalAction = null;
     };
   }
 
-  function defaultProfile(name, avatar = "popstar") {
-    return {
-      name,
-      avatar,
-      words: DEFAULT_WORDS.map(freshWord),
-      totals: { correct:0, incorrect:0 },
-      activityLog: [],
-      rewards: {
+  function defaultProfile(
+  name,
+  avatar = "popstar",
+  includeDefaultWords = false
+) {
+  return {
+    name,
+    avatar,
+
+    words: includeDefaultWords
+      ? DEFAULT_WORDS.map(freshWord)
+      : [],
+
+    totals:{
+      correct:0,
+      incorrect:0
+    },
+
+    activityLog:[],
+
+    rewards:{
+      pending:0,
+      paid:0,
+      lifetime:0,
+      stageAmount:1,
+      masterBonus:5,
+      history:[]
+    },
+
+    streak:{
+      current:0,
+      best:0,
+      lastCompletedDay:null,
+      todayKey:null,
+      todayWords:[],
+      rewardedMilestones:[],
+      dailyTarget:3,
+      milestones:{
+        "3":5,
+        "5":10,
+        "7":20,
+        "14":40
+      }
+    }
+  };
+}
+
+  function getDefaultState() {
+  const firstId = makeLearnerId();
+
+  return {
+    parentPin:null,
+    currentProfileId:firstId,
+    profiles:{
+      [firstId]: defaultProfile("Child 1", "popstar")
+    }
+  };
+}
+
+  function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if (!raw) {
+      return getDefaultState();
+    }
+
+    const parsed = JSON.parse(raw);
+
+    if (
+      !parsed.profiles ||
+      typeof parsed.profiles !== "object" ||
+      !Object.keys(parsed.profiles).length
+    ) {
+      return getDefaultState();
+    }
+
+    parsed.parentPin = parsed.parentPin || null;
+
+    Object.entries(parsed.profiles).forEach(([profileId, p]) => {
+
+      p.name =
+        String(p.name || "Learner").trim().slice(0,20) ||
+        "Learner";
+
+      p.avatar = AVATARS[p.avatar]
+        ? p.avatar
+        : "popstar";
+
+      p.words = Array.isArray(p.words)
+        ? p.words
+        : [];
+
+      p.totals = p.totals || {
+        correct:0,
+        incorrect:0
+      };
+
+      p.rewards = p.rewards || {
         pending:0,
         paid:0,
         lifetime:0,
         stageAmount:1,
         masterBonus:5,
         history:[]
-      },
-      streak: {
+      };
+
+      p.rewards.pending =
+        Number(p.rewards.pending || 0);
+
+      p.rewards.paid =
+        Number(p.rewards.paid || 0);
+
+      p.rewards.lifetime =
+        Number(p.rewards.lifetime || 0);
+
+      p.rewards.stageAmount =
+        Number.isFinite(Number(p.rewards.stageAmount))
+          ? Number(p.rewards.stageAmount)
+          : 1;
+
+      p.rewards.masterBonus =
+        Number.isFinite(Number(p.rewards.masterBonus))
+          ? Number(p.rewards.masterBonus)
+          : 5;
+
+      p.rewards.history =
+        Array.isArray(p.rewards.history)
+          ? p.rewards.history
+          : [];
+
+      p.activityLog =
+        Array.isArray(p.activityLog)
+          ? p.activityLog
+          : [];
+
+      p.words.forEach(w => {
+
+        w.rewardedStages =
+          Array.isArray(w.rewardedStages)
+            ? w.rewardedStages
+            : [];
+
+        w.masterRewarded =
+          Boolean(w.masterRewarded);
+
+        w.sentence =
+          typeof w.sentence === "string"
+            ? w.sentence
+            : (
+                DEFAULT_SENTENCES[
+                  normalizeWord(w.text)
+                ] || ""
+              );
+
+        w.masteredAt =
+          w.masteredAt ||
+          (
+            w.mastered
+              ? (
+                  w.lastPractised ||
+                  new Date().toISOString()
+                )
+              : null
+          );
+
+        w.reviewIndex =
+          Number.isFinite(Number(w.reviewIndex))
+            ? Number(w.reviewIndex)
+            : 0;
+
+        w.reviewComplete =
+          Boolean(w.reviewComplete);
+
+        if (
+          w.mastered &&
+          !w.reviewComplete &&
+          !w.reviewDue
+        ) {
+          w.reviewDue =
+            addDaysKey(localDayKey(), 3);
+        }
+
+        if (!w.mastered) {
+          w.reviewDue = null;
+          w.reviewComplete = false;
+        }
+      });
+
+      p.streak = p.streak || {
         current:0,
         best:0,
         lastCompletedDay:null,
@@ -2460,99 +2705,71 @@ let resultModalAction = null;
         todayWords:[],
         rewardedMilestones:[],
         dailyTarget:3,
-        milestones:{"3":5,"5":10,"7":20,"14":40}
-      }
-    };
-  }
+        milestones:{
+          "3":5,
+          "5":10,
+          "7":20,
+          "14":40
+        }
+      };
 
-  function getDefaultState() {
-    return {
-      parentPin:null,
-      currentProfileId:"child1",
-      profiles:{
-        child1: defaultProfile("Child 1", "popstar"),
-        child2: defaultProfile("Child 2", "speedster")
-      }
-    };
-  }
+      p.streak.current =
+        Number(p.streak.current || 0);
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return getDefaultState();
-      const parsed = JSON.parse(raw);
+      p.streak.best =
+        Number(p.streak.best || 0);
 
-      if (!parsed.profiles?.child1 || !parsed.profiles?.child2) {
-        return getDefaultState();
-      }
+      p.streak.lastCompletedDay =
+        p.streak.lastCompletedDay || null;
 
-      parsed.parentPin = parsed.parentPin || null;
+      p.streak.todayKey =
+        p.streak.todayKey || null;
 
-      Object.entries(parsed.profiles).forEach(([profileId,p]) => {
-        p.avatar = AVATARS[p.avatar]
-          ? p.avatar
-          : (profileId === "child2" ? "speedster" : "popstar");
+      p.streak.todayWords =
+        Array.isArray(p.streak.todayWords)
+          ? p.streak.todayWords
+          : [];
 
-        p.totals = p.totals || {correct:0, incorrect:0};
-        p.rewards = p.rewards || {
-          pending:0,
-          paid:0,
-          lifetime:0,
-          stageAmount:1,
-          masterBonus:5,
-          history:[]
-        };
+      p.streak.rewardedMilestones =
+        Array.isArray(p.streak.rewardedMilestones)
+          ? p.streak.rewardedMilestones
+          : [];
 
-        p.rewards.pending = Number(p.rewards.pending || 0);
-        p.rewards.paid = Number(p.rewards.paid || 0);
-        p.rewards.lifetime = Number(p.rewards.lifetime || 0);
-        p.rewards.stageAmount = Number.isFinite(Number(p.rewards.stageAmount)) ? Number(p.rewards.stageAmount) : 1;
-        p.rewards.masterBonus = Number.isFinite(Number(p.rewards.masterBonus)) ? Number(p.rewards.masterBonus) : 5;
-        p.rewards.history = Array.isArray(p.rewards.history) ? p.rewards.history : [];
+      p.streak.dailyTarget =
+        Math.max(
+          1,
+          Number(p.streak.dailyTarget || 3)
+        );
 
-        p.activityLog = Array.isArray(p.activityLog) ? p.activityLog : [];
+      p.streak.milestones =
+        Object.assign(
+          {
+            "3":5,
+            "5":10,
+            "7":20,
+            "14":40
+          },
+          p.streak.milestones || {}
+        );
+    });
 
-        (p.words || []).forEach(w => {
-          w.rewardedStages = Array.isArray(w.rewardedStages) ? w.rewardedStages : [];
-          w.masterRewarded = Boolean(w.masterRewarded);
-          w.sentence = typeof w.sentence === "string" ? w.sentence : (DEFAULT_SENTENCES[normalizeWord(w.text)] || "");
-          w.masteredAt = w.masteredAt || (w.mastered ? (w.lastPractised || new Date().toISOString()) : null);
-          w.reviewIndex = Number.isFinite(Number(w.reviewIndex)) ? Number(w.reviewIndex) : 0;
-          w.reviewComplete = Boolean(w.reviewComplete);
-          if (w.mastered && !w.reviewComplete && !w.reviewDue) {
-            w.reviewDue = addDaysKey(localDayKey(), 3);
-          }
-          if (!w.mastered) {
-            w.reviewDue = null;
-            w.reviewComplete = false;
-          }
-        });
+    const profileIds =
+      Object.keys(parsed.profiles);
 
-        p.streak = p.streak || {
-          current:0,
-          best:0,
-          lastCompletedDay:null,
-          todayKey:null,
-          todayWords:[],
-          rewardedMilestones:[],
-          dailyTarget:3,
-          milestones:{"3":5,"5":10,"7":20,"14":40}
-        };
-        p.streak.current = Number(p.streak.current || 0);
-        p.streak.best = Number(p.streak.best || 0);
-        p.streak.lastCompletedDay = p.streak.lastCompletedDay || null;
-        p.streak.todayKey = p.streak.todayKey || null;
-        p.streak.todayWords = Array.isArray(p.streak.todayWords) ? p.streak.todayWords : [];
-        p.streak.rewardedMilestones = Array.isArray(p.streak.rewardedMilestones) ? p.streak.rewardedMilestones : [];
-        p.streak.dailyTarget = Math.max(1, Number(p.streak.dailyTarget || 3));
-        p.streak.milestones = Object.assign({"3":5,"5":10,"7":20,"14":40}, p.streak.milestones || {});
-      });
-
-      return parsed;
-    } catch {
-      return getDefaultState();
+    if (
+      !parsed.currentProfileId ||
+      !parsed.profiles[parsed.currentProfileId]
+    ) {
+      parsed.currentProfileId =
+        profileIds[0];
     }
+
+    return parsed;
+
+  } catch {
+    return getDefaultState();
   }
+}
 
   function saveState(syncCloud = true) {
     state.currentProfileId = currentProfileId;
@@ -2667,19 +2884,34 @@ let resultModalAction = null;
   }
 
   function applyCloudState(remoteData) {
-    if (!remoteData?.profiles?.child1 || !remoteData?.profiles?.child2) {
-      throw new Error("Cloud data is not a valid Spelling Steps state.");
-    }
+   if (
+  !remoteData?.profiles ||
+  typeof remoteData.profiles !== "object" ||
+  !Object.keys(remoteData.profiles).length
+) {
+  throw new Error("Cloud data is not a valid Spelling Steps state.");
+}
 
-    const localLearner = currentProfileId;
-    const merged = {
-      ...remoteData,
-      currentProfileId: state.profiles?.[localLearner] ? localLearner : "child1"
-    };
+   const localLearner =
+  currentProfileId;
+
+const firstRemoteLearner =
+  Object.keys(remoteData.profiles)[0];
+
+const merged = {
+  ...remoteData,
+  currentProfileId:
+    remoteData.profiles[localLearner]
+      ? localLearner
+      : firstRemoteLearner
+};
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
     state = loadState();
-    currentProfileId = state.profiles[currentProfileId] ? currentProfileId : "child1";
+currentProfileId =
+  state.profiles[currentProfileId]
+    ? currentProfileId
+    : Object.keys(state.profiles)[0];
     currentWordId = null;
     reviewMode = false;
     reviewCountsForSchedule = false;
@@ -3189,9 +3421,137 @@ function scheduleFirstReview(word) {
     render();
   }
 
+  function makeLearnerId() {
+  return "learner_" +
+    Date.now().toString(36) +
+    "_" +
+    Math.random().toString(36).slice(2,8);
+}
+
+function addLearner(name) {
+  const cleanName =
+    String(name || "").trim().slice(0,20);
+
+  if (!cleanName) {
+    alert("Enter the learner's name.");
+    return;
+  }
+
+  const profileId = makeLearnerId();
+
+  const avatarKeys =
+    Object.keys(AVATARS);
+
+  const existingCount =
+    Object.keys(state.profiles).length;
+
+  const avatar =
+    avatarKeys[
+      existingCount % avatarKeys.length
+    ] || "popstar";
+
+  const newProfile =
+    defaultProfile(cleanName, avatar);
+
+  /*
+   * New learners begin with an empty spelling list
+   * rather than automatically receiving the demo words.
+   */
+
+  state.profiles[profileId] =
+    newProfile;
+
+  currentProfileId =
+    profileId;
+
+  currentWordId = null;
+  reviewMode = false;
+  reviewCountsForSchedule = false;
+
+  saveState();
+
+  els.newLearnerName.value = "";
+
+  render();
+}
+
+function removeLearner(profileId) {
+  const profileIds =
+    Object.keys(state.profiles);
+
+  if (profileIds.length <= 1) {
+    alert("Spelling Steps needs at least one learner.");
+    return;
+  }
+
+  const learner =
+    state.profiles[profileId];
+
+  if (!learner) return;
+
+  const okay = confirm(
+    `Remove ${learner.name}?\n\n` +
+    `This will permanently remove their spellings, progress, Robux and streak information.`
+  );
+
+  if (!okay) return;
+
+  delete state.profiles[profileId];
+
+  if (currentProfileId === profileId) {
+    currentProfileId =
+      Object.keys(state.profiles)[0];
+  }
+
+  currentWordId = null;
+  reviewMode = false;
+  reviewCountsForSchedule = false;
+
+  saveState();
+  render();
+}
+
+function renameLearner(profileId, name) {
+  const learner =
+    state.profiles[profileId];
+
+  if (!learner) return;
+
+  const clean =
+    String(name || "").trim().slice(0,20);
+
+  if (!clean) {
+    render();
+    return;
+  }
+
+  learner.name = clean;
+
+  saveState();
+  render();
+}
+
+function setLearnerAvatar(profileId, avatarKey) {
+  const learner =
+    state.profiles[profileId];
+
+  if (
+    !learner ||
+    !AVATARS[avatarKey]
+  ) {
+    return;
+  }
+
+  learner.avatar = avatarKey;
+
+  saveState();
+  render();
+}
+  
   function switchProfile(id) {
-    clearPreview();
-    currentProfileId = id;
+  if (!state.profiles[id]) return;
+  clearPreview();
+  currentProfileId = id;
     currentWordId = null;
     reviewMode = false;
     reviewCountsForSchedule = false;
@@ -4326,6 +4686,274 @@ function clearFeedback() {
     els.parentModal.setAttribute("aria-hidden","true");
   }
 
+  function renderLearnerSettings() {
+  if (!els.learnerSettingsList) return;
+
+  els.learnerSettingsList.innerHTML = "";
+
+  const profileEntries =
+    Object.entries(state.profiles);
+
+  profileEntries.forEach(([profileId, learner]) => {
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "learner-settings-card";
+
+
+    /* =========================
+       TOP ROW
+    ========================= */
+
+    const head =
+      document.createElement("div");
+
+    head.className =
+      "learner-settings-head";
+
+
+    const preview =
+      document.createElement("img");
+
+    preview.className =
+      "learner-settings-avatar";
+
+    preview.src =
+      avatarFor(learner).src;
+
+    preview.alt =
+      `${learner.name} avatar`;
+
+
+    const nameWrap =
+      document.createElement("div");
+
+    nameWrap.className =
+      "learner-settings-name-wrap";
+
+
+    const nameInput =
+      document.createElement("input");
+
+    nameInput.type = "text";
+    nameInput.maxLength = 20;
+    nameInput.className =
+      "learner-settings-name";
+
+    nameInput.value =
+      learner.name;
+
+    nameInput.setAttribute(
+      "aria-label",
+      `Name for ${learner.name}`
+    );
+
+    nameInput.addEventListener(
+      "keydown",
+      e => {
+
+        if (e.key === "Enter") {
+          nameInput.blur();
+        }
+      }
+    );
+
+    nameInput.addEventListener(
+      "change",
+      () => {
+        renameLearner(
+          profileId,
+          nameInput.value
+        );
+      }
+    );
+
+
+    nameWrap.appendChild(nameInput);
+
+
+    if (profileId === currentProfileId) {
+
+      const current =
+        document.createElement("span");
+
+      current.className =
+        "learner-current-badge";
+
+      current.textContent =
+        "Current learner";
+
+      nameWrap.appendChild(current);
+    }
+
+
+    const actionWrap =
+      document.createElement("div");
+
+    actionWrap.className =
+      "learner-card-actions";
+
+
+    if (profileId !== currentProfileId) {
+
+      const switchBtn =
+        document.createElement("button");
+
+      switchBtn.type = "button";
+      switchBtn.className =
+        "secondary";
+
+      switchBtn.textContent =
+        "Use";
+
+      switchBtn.addEventListener(
+        "click",
+        () => {
+          switchProfile(profileId);
+        }
+      );
+
+      actionWrap.appendChild(switchBtn);
+    }
+
+
+    const removeBtn =
+      document.createElement("button");
+
+    removeBtn.type = "button";
+    removeBtn.className =
+      "learner-remove-btn";
+
+    removeBtn.textContent =
+      "Remove";
+
+    removeBtn.disabled =
+      profileEntries.length <= 1;
+
+    removeBtn.addEventListener(
+      "click",
+      () => {
+        removeLearner(profileId);
+      }
+    );
+
+    actionWrap.appendChild(removeBtn);
+
+
+    head.append(
+      preview,
+      nameWrap,
+      actionWrap
+    );
+
+
+    /* =========================
+       AVATARS
+    ========================= */
+
+    const avatarLabel =
+      document.createElement("div");
+
+    avatarLabel.className =
+      "learner-avatar-label";
+
+    avatarLabel.textContent =
+      "Choose avatar";
+
+
+    const avatarRow =
+      document.createElement("div");
+
+    avatarRow.className =
+      "avatar-choice-row";
+
+
+    Object.entries(AVATARS)
+      .forEach(([avatarKey, avatar]) => {
+
+        const btn =
+          document.createElement("button");
+
+        btn.type = "button";
+
+        btn.className =
+          "avatar-choice";
+
+        if (
+          learner.avatar === avatarKey
+        ) {
+          btn.classList.add("selected");
+        }
+
+        btn.setAttribute(
+          "aria-pressed",
+          learner.avatar === avatarKey
+            ? "true"
+            : "false"
+        );
+
+
+        const img =
+          document.createElement("img");
+
+        img.src =
+          avatar.src;
+
+        img.alt = "";
+
+
+        const text =
+          document.createElement("span");
+
+        text.textContent =
+          avatar.label;
+
+
+        const small =
+          document.createElement("small");
+
+        small.textContent =
+          avatarKey === "popstar"
+            ? "Fedora & red stage jacket"
+            : "Fast game-style hero";
+
+
+        text.appendChild(small);
+
+        btn.append(
+          img,
+          text
+        );
+
+
+        btn.addEventListener(
+          "click",
+          () => {
+            setLearnerAvatar(
+              profileId,
+              avatarKey
+            );
+          }
+        );
+
+
+        avatarRow.appendChild(btn);
+      });
+
+
+    card.append(
+      head,
+      avatarLabel,
+      avatarRow
+    );
+
+    els.learnerSettingsList
+      .appendChild(card);
+  });
+}
+
   function renderParent() {
     const p = profile();
 
@@ -4351,29 +4979,9 @@ function clearFeedback() {
     });
     els.parentProfileSelect.value = currentProfileId;
 
-    els.profileName1.value = state.profiles.child1.name;
-    els.profileName2.value = state.profiles.child2.name;
     els.parentProfileName.textContent = p.name;
 
-    els.avatarNameChild1.textContent = state.profiles.child1.name;
-    els.avatarNameChild2.textContent = state.profiles.child2.name;
-
-    const child1Avatar = avatarFor(state.profiles.child1);
-    const child2Avatar = avatarFor(state.profiles.child2);
-
-    els.avatarPreviewChild1.src = child1Avatar.src;
-    els.avatarPreviewChild1.alt = `${state.profiles.child1.name} avatar`;
-
-    els.avatarPreviewChild2.src = child2Avatar.src;
-    els.avatarPreviewChild2.alt = `${state.profiles.child2.name} avatar`;
-
-    document.querySelectorAll(".avatar-choice").forEach(btn => {
-      const profileId = btn.dataset.profile;
-      const avatarKey = btn.dataset.avatar;
-      const selected = state.profiles[profileId]?.avatar === avatarKey;
-      btn.classList.toggle("selected", selected);
-      btn.setAttribute("aria-pressed", selected ? "true" : "false");
-    });
+renderLearnerSettings();
 
     const week = weeklySummary();
     els.weekWords.textContent = week.words;
@@ -4611,15 +5219,21 @@ function clearFeedback() {
     reader.onload = () => {
       try {
         const imported = JSON.parse(String(reader.result || ""));
-        if (!imported?.profiles?.child1 || !imported?.profiles?.child2) {
-          throw new Error("Invalid backup");
-        }
+       if (
+  !imported?.profiles ||
+  typeof imported.profiles !== "object" ||
+  !Object.keys(imported.profiles).length
+) {
+  throw new Error("Invalid backup");
+}
         if (!confirm("Replace the current spelling data with this backup?")) return;
         state = imported;
         state.parentPin = state.parentPin || null;
-        currentProfileId = state.currentProfileId && state.profiles[state.currentProfileId]
-          ? state.currentProfileId
-          : "child1";
+       currentProfileId =
+  state.currentProfileId &&
+  state.profiles[state.currentProfileId]
+    ? state.currentProfileId
+    : Object.keys(state.profiles)[0];
         currentWordId = null;
         reviewMode = false;
         reviewCountsForSchedule = false;
@@ -4696,18 +5310,6 @@ function clearFeedback() {
     }
   });
 
-  document.querySelectorAll(".avatar-choice").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const profileId = btn.dataset.profile;
-      const avatarKey = btn.dataset.avatar;
-
-      if (!state.profiles[profileId] || !AVATARS[avatarKey]) return;
-
-      state.profiles[profileId].avatar = avatarKey;
-      saveState();
-      render();
-    });
-  });
 
   els.profileSelect.addEventListener("change", () => {
     if (els.profileSelect.value) {
@@ -4751,15 +5353,16 @@ function clearFeedback() {
     if (e.target === els.parentModal) closeParent();
   });
 
-  els.saveNamesBtn.addEventListener("click", () => {
-    const n1 = els.profileName1.value.trim();
-    const n2 = els.profileName2.value.trim();
-    if (n1) state.profiles.child1.name = n1;
-    if (n2) state.profiles.child2.name = n2;
-    saveState();
-    render();
-  });
+  els.addLearnerBtn.addEventListener("click", () => {
+  addLearner(els.newLearnerName.value);
+});
 
+els.newLearnerName.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    els.addLearnerBtn.click();
+  }
+});
+  
   els.addWordBtn.addEventListener("click", () => {
     const added = addWord(els.newWordInput.value);
     if (added) els.newWordInput.value = "";
