@@ -2771,19 +2771,6 @@
     "again"
   ];
 
-  const DEFAULT_SENTENCES = {
-    because:"I wore my coat because it was raining.",
-    friend:"My friend came to play after school.",
-    people:"Lots of people visited the park today.",
-    school:"We walked to school in the morning.",
-    different:"The two pictures look different from each other.",
-    beautiful:"The garden looked beautiful in the sunshine.",
-    thought:"I thought I had left my book at home.",
-    through:"We walked through the gate into the field.",
-    where:"Do you know where I put my shoes?",
-    again:"Please read the sentence again."
-  };
-
   const STAGES = {
     1: {
       title: "Stage 1 · Copy it",
@@ -3139,7 +3126,6 @@ let resultModalAction = null;
       lastPractised: null,
       rewardedStages: [],
       masterRewarded: false,
-      sentence: DEFAULT_SENTENCES[normalizeWord(text)] || "",
       masteredAt: null,
       reviewDue: null,
       reviewIndex: 0,
@@ -3467,14 +3453,6 @@ function ensurePhonicsData(
         w.masterRewarded =
           Boolean(w.masterRewarded);
 
-        w.sentence =
-          typeof w.sentence === "string"
-            ? w.sentence
-            : (
-                DEFAULT_SENTENCES[
-                  normalizeWord(w.text)
-                ] || ""
-              );
 
         w.masteredAt =
           w.masteredAt ||
@@ -4081,10 +4059,6 @@ function renderLearningMode() {
     };
   }
 
-  function sentenceFor(word) {
-    return (word?.sentence || "").trim() || `I am practising the word ${word.text} today.`;
-  }
-
   let spellingVoice = null;
 
 function loadSpellingVoice() {
@@ -4185,6 +4159,14 @@ function wordAudioPath(wordText) {
   return `audio/words/${fileName}.mp3`;
 }
 
+  function sentenceAudioPath(wordText) {
+  const fileName = normalizeWord(wordText)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return `audio/sentences/${fileName}.mp3`;
+}
+
 function speakCurrentWord() {
   const word = currentWord();
 
@@ -4248,9 +4230,56 @@ function speakCurrentWord() {
 function speakCurrentSentence() {
   const word = currentWord();
 
-  if (word) {
-    speakText(sentenceFor(word));
+  if (!word) return;
+
+  // Stop browser speech
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
   }
+
+  // Stop any audio already playing
+  if (currentWordAudio) {
+    currentWordAudio.pause();
+    currentWordAudio.currentTime = 0;
+    currentWordAudio = null;
+  }
+
+  const audio = new Audio(
+    sentenceAudioPath(word.text)
+  );
+
+  currentWordAudio = audio;
+
+  let unavailableShown = false;
+
+  const sentenceUnavailable = () => {
+    if (unavailableShown) return;
+
+    unavailableShown = true;
+    currentWordAudio = null;
+
+    alert(
+      `A sentence recording hasn't been added for "${word.text}" yet.`
+    );
+  };
+
+  audio.addEventListener(
+    "error",
+    sentenceUnavailable,
+    { once:true }
+  );
+
+  audio.addEventListener(
+    "ended",
+    () => {
+      if (currentWordAudio === audio) {
+        currentWordAudio = null;
+      }
+    },
+    { once:true }
+  );
+
+  audio.play().catch(sentenceUnavailable);
 }
 
   /* =========================================================
@@ -7311,33 +7340,17 @@ renderLearnerSettings();
         info.append(strong, small);
 
         const actions = document.createElement("div");
-        actions.className = "word-row-actions";
+actions.className = "word-row-actions";
 
-        const sentenceBtn = document.createElement("button");
-        sentenceBtn.className = "sentence-edit-btn";
-        sentenceBtn.textContent = word.sentence ? "Edit sentence" : "Add sentence";
-        sentenceBtn.addEventListener("click", () => editSentence(word.id));
+const del = document.createElement("button");
+del.className = "tiny-btn";
+del.textContent = "Remove";
+del.addEventListener("click", () => removeWord(word.id));
 
-        const del = document.createElement("button");
-        del.className = "tiny-btn";
-        del.textContent = "Remove";
-        del.addEventListener("click", () => removeWord(word.id));
-
-        actions.append(sentenceBtn,del);
-        row.append(info, actions);
+actions.appendChild(del);
+row.append(info, actions);
         els.parentWordList.appendChild(row);
       });
-  }
-
-  function editSentence(wordId) {
-    const word = profile().words.find(w => w.id === wordId);
-    if (!word) return;
-    const current = word.sentence || sentenceFor(word);
-    const value = prompt(`Sentence for "${word.text}":`, current);
-    if (value === null) return;
-    word.sentence = value.trim();
-    saveState();
-    renderParent();
   }
 
   function addWord(text) {
