@@ -4147,15 +4147,87 @@ function speakText(text) {
   window.speechSynthesis.speak(utterance);
 }
 
-  function speakCurrentWord() {
-    const word = currentWord();
-    if (word) speakText(word.text);
+ /* =========================================================
+   RECORDED SPELLING WORD AUDIO
+========================================================= */
+
+let currentWordAudio = null;
+
+function wordAudioPath(wordText) {
+  const fileName = normalizeWord(wordText)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return `audio/words/${fileName}.mp3`;
+}
+
+function speakCurrentWord() {
+  const word = currentWord();
+
+  if (!word) return;
+
+  /*
+   * Stop any speech/audio already playing.
+   */
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
   }
 
-  function speakCurrentSentence() {
-    const word = currentWord();
-    if (word) speakText(sentenceFor(word));
+  if (currentWordAudio) {
+    currentWordAudio.pause();
+    currentWordAudio.currentTime = 0;
+    currentWordAudio = null;
   }
+
+  const audio = new Audio(
+    wordAudioPath(word.text)
+  );
+
+  currentWordAudio = audio;
+
+  let fallbackUsed = false;
+
+  const useFallbackVoice = () => {
+    if (fallbackUsed) return;
+
+    fallbackUsed = true;
+    currentWordAudio = null;
+
+    speakText(word.text);
+  };
+
+  /*
+   * If there is no MP3 for this word,
+   * use the existing browser voice instead.
+   */
+  audio.addEventListener(
+    "error",
+    useFallbackVoice,
+    { once:true }
+  );
+
+  audio.addEventListener(
+    "ended",
+    () => {
+      if (currentWordAudio === audio) {
+        currentWordAudio = null;
+      }
+    },
+    { once:true }
+  );
+
+  audio.play().catch(() => {
+    useFallbackVoice();
+  });
+}
+
+function speakCurrentSentence() {
+  const word = currentWord();
+
+  if (word) {
+    speakText(sentenceFor(word));
+  }
+}
 
   /* =========================================================
    PHONICS GAME
