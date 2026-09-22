@@ -1023,6 +1023,18 @@
     justify-content:center;
   }
 
+  /* =========================================================
+   PRACTICE MODE CARD VISIBILITY
+========================================================= */
+
+#phonicsPracticeCard{
+  display:none;
+}
+
+#phonicsPracticeCard.show{
+  display:flex;
+}
+
   .word-picker-wrap{
     display:flex;
     justify-content:center;
@@ -3937,13 +3949,17 @@ function renderLearningMode() {
     currentLearningMode() === "phonics";
 
 
-  /* TOGGLE */
+  /* =========================
+     TOGGLE
+  ========================= */
 
   els.learningModeToggle.checked =
     phonics;
 
 
-  /* TOP MODE LABEL */
+  /* =========================
+     TOP MODE LABEL
+  ========================= */
 
   els.modeTitle.textContent =
     phonics
@@ -3956,12 +3972,14 @@ function renderLearningMode() {
       : "Practise spelling words through five stages.";
 
 
-  /* PRACTICE HEADING */
+  /* =========================
+     PRACTICE HEADING
+  ========================= */
 
   els.practiceHeading.textContent =
     phonics
       ? "Phonics Practice"
-      : "Practice";
+      : "Spelling Practice";
 
   els.practiceDescription.textContent =
     phonics
@@ -3969,33 +3987,39 @@ function renderLearningMode() {
       : "Choose one word and work through each stage until it is mastered.";
 
 
-  /* PHONICS CARD */
-
-  els.phonicsPracticeCard.classList.toggle(
-    "show",
-    phonics
-  );
-
-
-  /* SPELLING CARDS */
+  /* =========================
+     MODE CARDS
+  ========================= */
 
   if (phonics) {
 
-  els.gameCard.style.display =
-    "none";
+    /* Hide spelling */
+    els.gameCard.style.display = "none";
 
-  els.masteredCard.classList.remove(
-    "show"
-  );
+    els.masteredCard.classList.remove(
+      "show"
+    );
 
-  renderPhonicsGame();
+    /* Show phonics */
+    els.phonicsPracticeCard.classList.add(
+      "show"
+    );
 
-} else {
+    renderPhonicsGame();
 
-  els.phonicsPracticeCard
-    .classList.remove("show");
+  } else {
 
-}
+    /* Hide phonics */
+    els.phonicsPracticeCard.classList.remove(
+      "show"
+    );
+
+    /*
+     * renderGame() has already decided whether
+     * the spelling card or completed card
+     * should be visible.
+     */
+  }
 }
 
   function normalizeWord(word) {
