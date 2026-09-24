@@ -1720,6 +1720,142 @@
   }
 
   /* =========================================================
+   REVIEW ACCOUNTABILITY POPUP
+========================================================= */
+
+.modal.review-reminder-modal{
+  z-index:110;
+  background:rgba(10,16,29,.68);
+  backdrop-filter:blur(5px);
+}
+
+.review-reminder-panel{
+  width:min(590px,100%);
+  padding:26px;
+  border-radius:26px;
+}
+
+.review-reminder-icon{
+  width:62px;
+  height:62px;
+  display:grid;
+  place-items:center;
+  margin-bottom:14px;
+  border-radius:19px;
+  background:#fff4d6;
+  font-size:31px;
+}
+
+.review-reminder-panel h2{
+  margin:0;
+  font-size:clamp(25px,5vw,34px);
+  letter-spacing:-.6px;
+}
+
+.review-reminder-intro{
+  margin:9px 0 18px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.55;
+  font-weight:750;
+}
+
+.review-reminder-rules{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+
+.review-rule-chip{
+  padding:8px 11px;
+  border-radius:999px;
+  background:#f5f7fb;
+  color:#536076;
+  font-size:11px;
+  font-weight:950;
+}
+
+.review-rule-chip.reward{
+  background:#eaf8f0;
+  color:#168652;
+}
+
+.review-rule-chip.penalty{
+  background:#fff0f1;
+  color:#c73540;
+}
+
+.review-reminder-list{
+  display:grid;
+  gap:9px;
+  margin-bottom:18px;
+}
+
+.review-reminder-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:13px 14px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:#fafbfe;
+}
+
+.review-reminder-word{
+  min-width:0;
+}
+
+.review-reminder-word strong{
+  display:block;
+  font-size:17px;
+}
+
+.review-reminder-word small{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+}
+
+.review-reminder-word small.overdue{
+  color:#c73540;
+}
+
+.review-reminder-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  flex-wrap:wrap;
+}
+
+@media (max-width:650px){
+
+  .review-reminder-panel{
+    padding:21px 17px;
+  }
+
+  .review-reminder-row{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .review-reminder-row .primary{
+    width:100%;
+  }
+
+  .review-reminder-actions{
+    flex-direction:column;
+  }
+
+  .review-reminder-actions button{
+    width:100%;
+  }
+}
+
+  /* =========================================================
    RESULT MODAL
 ========================================================= */
 
@@ -2534,6 +2670,59 @@
 
 <div class="reward-pop" id="rewardPop">+R$ 1</div>
 
+  <div
+  class="modal review-reminder-modal"
+  id="reviewReminderModal"
+  aria-hidden="true"
+>
+  <div
+    class="modal-panel review-reminder-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="reviewReminderTitle"
+  >
+
+    <div class="review-reminder-icon">
+      🧠
+    </div>
+
+    <h2 id="reviewReminderTitle">
+      Reviews waiting
+    </h2>
+
+    <p
+      class="review-reminder-intro"
+      id="reviewReminderIntro"
+    ></p>
+
+    <div class="review-reminder-rules">
+      <span class="review-rule-chip reward">
+        +R$ 5 for each review completed
+      </span>
+
+      <span class="review-rule-chip penalty">
+        −R$ 1 per missed day
+      </span>
+    </div>
+
+    <div
+      class="review-reminder-list"
+      id="reviewReminderList"
+    ></div>
+
+    <div class="review-reminder-actions">
+      <button
+        class="secondary"
+        id="closeReviewReminderBtn"
+        type="button"
+      >
+        Close for now
+      </button>
+    </div>
+
+  </div>
+</div>
+
   <div class="modal result-modal" id="resultModal" aria-hidden="true">
   <div
     class="modal-panel result-modal-panel"
@@ -2746,6 +2935,8 @@
   const CLOUD_PENDING_KEY = "spellingSteps_cloud_pending_v1";
   const CLOUD_LAST_REMOTE_KEY = "spellingSteps_cloud_last_remote_v1";
   const CLOUD_PROMPTED_KEY = "spellingSteps_cloud_prompted_v1";
+  const REVIEW_REWARD_AMOUNT = 5;
+const REVIEW_DAILY_PENALTY = 1;
 
   const AVATARS = {
     popstar: {
@@ -2997,6 +3188,20 @@ phonicsStageDots: document.getElementById("phonicsStageDots"),
     statAccuracy: document.getElementById("statAccuracy"),
     robuxBank: document.getElementById("robuxBank"),
     rewardPop: document.getElementById("rewardPop"),
+    reviewReminderModal:
+  document.getElementById("reviewReminderModal"),
+
+reviewReminderTitle:
+  document.getElementById("reviewReminderTitle"),
+
+reviewReminderIntro:
+  document.getElementById("reviewReminderIntro"),
+
+reviewReminderList:
+  document.getElementById("reviewReminderList"),
+
+closeReviewReminderBtn:
+  document.getElementById("closeReviewReminderBtn"),
 
 resultModal: document.getElementById("resultModal"),
 resultModalIcon: document.getElementById("resultModalIcon"),
@@ -3099,6 +3304,7 @@ let reviewCountsForSchedule = false;
 let hintUsedThisAttempt = false;
 let hintCountThisAttempt = 0;
 let resultModalAction = null;
+  let reviewReminderDismissedSignature = "";
 
   const cloudClient = window.supabase
     ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -3127,9 +3333,11 @@ let resultModalAction = null;
       rewardedStages: [],
       masterRewarded: false,
       masteredAt: null,
-      reviewDue: null,
-      reviewIndex: 0,
-      reviewComplete: false
+     reviewDue: null,
+reviewIndex: 0,
+reviewComplete: false,
+reviewHistory: []
+    
     };
   }
 
@@ -3285,6 +3493,13 @@ function ensurePhonicsData(
       masterBonus:5,
       history:[]
     },
+
+reviewAccountability:{
+  version:1,
+  startedDay:localDayKey(),
+  lastCheckedDay:null,
+  missedDays:[]
+},   
 
     streak:{
       current:0,
@@ -3445,6 +3660,11 @@ function ensurePhonicsData(
 
       p.words.forEach(w => {
 
+        w.reviewHistory =
+  Array.isArray(w.reviewHistory)
+    ? w.reviewHistory
+    : [];
+
         w.rewardedStages =
           Array.isArray(w.rewardedStages)
             ? w.rewardedStages
@@ -3487,6 +3707,31 @@ function ensurePhonicsData(
           w.reviewComplete = false;
         }
       });
+
+      p.reviewAccountability =
+  p.reviewAccountability &&
+  typeof p.reviewAccountability === "object"
+    ? p.reviewAccountability
+    : {
+        startedDay:localDayKey(),
+        lastCheckedDay:null,
+        missedDays:[]
+      };
+
+p.reviewAccountability.startedDay =
+  p.reviewAccountability.startedDay ||
+  localDayKey();
+
+p.reviewAccountability.lastCheckedDay =
+  p.reviewAccountability.lastCheckedDay ||
+  null;
+
+p.reviewAccountability.missedDays =
+  Array.isArray(
+    p.reviewAccountability.missedDays
+  )
+    ? p.reviewAccountability.missedDays
+    : [];
 
       p.streak = p.streak || {
         current:0,
@@ -4047,9 +4292,19 @@ function renderLearningMode() {
     const wrong = answers.length - correct;
     const words = new Set(answers.map(x => x.wordId || x.word).filter(Boolean)).size;
     const mastered = activity.filter(x => x.type === "mastered").length;
-    const robux = (p.rewards?.history || [])
-      .filter(x => x.amount && new Date(x.at).getTime() >= cutoff)
-      .reduce((sum,x) => sum + Number(x.amount || 0), 0);
+    const robux =
+  (p.rewards?.history || [])
+    .filter(
+      x =>
+        Number(x.amount || 0) > 0 &&
+        new Date(x.at).getTime() >= cutoff
+    )
+    .reduce(
+      (sum,x) =>
+        sum +
+        Number(x.amount || 0),
+      0
+    );
     return {
       words,
       mastered,
@@ -5522,27 +5777,475 @@ function useHint() {
   els.hintPanel.classList.add("show");
 }
 
+  /* =========================================================
+   REVIEW ACCOUNTABILITY
+========================================================= */
 
-function scheduleFirstReview(word) {
-    word.masteredAt = new Date().toISOString();
-    word.reviewIndex = 0;
-    word.reviewComplete = false;
-    word.reviewDue = addDaysKey(localDayKey(), 3);
+function ensureReviewAccountability(
+  learner = profile()
+) {
+
+  const current =
+    learner.reviewAccountability &&
+    typeof learner.reviewAccountability === "object"
+      ? learner.reviewAccountability
+      : {};
+
+  const needsInitialSave =
+    current.version !== 1;
+
+  learner.reviewAccountability = {
+    version:1,
+
+    startedDay:
+      current.startedDay ||
+      localDayKey(),
+
+    lastCheckedDay:
+      current.lastCheckedDay ||
+      null,
+
+    missedDays:
+      Array.isArray(current.missedDays)
+        ? current.missedDays
+        : []
+  };
+
+  return {
+    accountability:
+      learner.reviewAccountability,
+
+    needsInitialSave
+  };
+}
+
+
+function reviewWasOutstandingAtEndOfDay(
+  word,
+  dayKey
+) {
+
+  /*
+   * Previously completed review rounds allow us
+   * to reconstruct whether that review was still
+   * overdue at the end of an earlier day.
+   */
+  const history =
+    Array.isArray(word.reviewHistory)
+      ? word.reviewHistory
+      : [];
+
+  const historicalOutstanding =
+    history.some(entry => {
+
+      const due =
+        entry?.due || null;
+
+      const completedDay =
+        entry?.completedDay ||
+        (
+          entry?.completedAt
+            ? localDayKey(
+                new Date(entry.completedAt)
+              )
+            : null
+        );
+
+      if (
+        !due ||
+        !completedDay
+      ) {
+        return false;
+      }
+
+      /*
+       * Example:
+       * due Monday, completed Thursday.
+       *
+       * Monday, Tuesday and Wednesday count
+       * as missed days.
+       * Thursday does not, because the review
+       * was completed before that day ended.
+       */
+      return (
+        due <= dayKey &&
+        dayKey < completedDay
+      );
+    });
+
+  if (historicalOutstanding) {
+    return true;
   }
 
-  function completeScheduledReview(word) {
-    const intervals = [3,7,14];
-    const nextIndex = Number(word.reviewIndex || 0) + 1;
-    if (nextIndex >= intervals.length) {
-      word.reviewIndex = intervals.length;
-      word.reviewDue = null;
-      word.reviewComplete = true;
-    } else {
-      word.reviewIndex = nextIndex;
-      word.reviewDue = addDaysKey(localDayKey(), intervals[nextIndex]);
-      word.reviewComplete = false;
+  /*
+   * Current scheduled review has not yet been
+   * completed.
+   */
+  return Boolean(
+    word.mastered &&
+    !word.reviewComplete &&
+    word.reviewDue &&
+    word.reviewDue <= dayKey
+  );
+}
+
+
+function deductRobux(
+  amount,
+  reason,
+  wordText = ""
+) {
+
+  amount =
+    Math.max(
+      0,
+      Math.floor(
+        Number(amount) || 0
+      )
+    );
+
+  if (!amount) {
+    return 0;
+  }
+
+  const rewards =
+    ensureRewards();
+
+  const available =
+    Math.max(
+      0,
+      Math.floor(
+        Number(rewards.pending) || 0
+      )
+    );
+
+  /*
+   * Robux already marked as paid are never touched,
+   * and the current bank never goes below zero.
+   */
+  const deducted =
+    Math.min(
+      available,
+      amount
+    );
+
+  rewards.pending =
+    available - deducted;
+
+  if (deducted > 0) {
+
+    rewards.history.unshift({
+      amount:-deducted,
+      reason,
+      word:wordText || "",
+      at:new Date().toISOString()
+    });
+
+    rewards.history =
+      rewards.history.slice(
+        0,
+        30
+      );
+  }
+
+  renderRobuxTotals();
+
+  return deducted;
+}
+
+
+function applyReviewAccountability(
+  showPenaltyPopup = true
+) {
+
+  const learner =
+    profile();
+
+  const {
+    accountability,
+    needsInitialSave
+  } =
+    ensureReviewAccountability(
+      learner
+    );
+
+  const today =
+    localDayKey();
+
+  const yesterday =
+    addDaysKey(
+      today,
+      -1
+    );
+
+  let startDay =
+    accountability.lastCheckedDay
+      ? addDaysKey(
+          accountability.lastCheckedDay,
+          1
+        )
+      : accountability.startedDay;
+
+  /*
+   * Never retrospectively punish days before this
+   * feature was first activated for the learner.
+   */
+  if (
+    startDay <
+    accountability.startedDay
+  ) {
+    startDay =
+      accountability.startedDay;
+  }
+
+  let changed =
+    needsInitialSave;
+
+  let missedDays = 0;
+  let totalDeducted = 0;
+
+  /*
+   * Today is deliberately not assessed.
+   * Albie gets the whole day to complete reviews.
+   */
+  if (startDay <= yesterday) {
+
+    let cursor =
+      startDay;
+
+    let safety = 0;
+
+    while (
+      cursor <= yesterday &&
+      safety < 3660
+    ) {
+
+      const alreadyRecorded =
+        accountability.missedDays.includes(
+          cursor
+        );
+
+      const hadOutstandingReview =
+        learner.words.some(
+          word =>
+            reviewWasOutstandingAtEndOfDay(
+              word,
+              cursor
+            )
+        );
+
+      if (
+        hadOutstandingReview &&
+        !alreadyRecorded
+      ) {
+
+        accountability.missedDays.push(
+          cursor
+        );
+
+        missedDays++;
+
+        totalDeducted +=
+          deductRobux(
+            REVIEW_DAILY_PENALTY,
+            `Missed review · ${formatDayKey(cursor)}`
+          );
+
+        changed = true;
+      }
+
+      if (
+        accountability.lastCheckedDay !==
+        cursor
+      ) {
+        accountability.lastCheckedDay =
+          cursor;
+
+        changed = true;
+      }
+
+      cursor =
+        addDaysKey(
+          cursor,
+          1
+        );
+
+      safety++;
     }
   }
+
+  /*
+   * Keep enough history for accountability without
+   * letting this array grow forever.
+   */
+  if (
+    accountability.missedDays.length >
+    730
+  ) {
+
+    accountability.missedDays =
+      accountability.missedDays.slice(
+        -730
+      );
+
+    changed = true;
+  }
+
+  if (changed) {
+    saveState();
+  }
+
+  if (
+    showPenaltyPopup &&
+    totalDeducted > 0
+  ) {
+
+    showRewardPop(
+      -totalDeducted,
+      `${missedDays} missed review day${missedDays === 1 ? "" : "s"}`
+    );
+  }
+
+  return {
+    missedDays,
+    totalDeducted
+  };
+}
+
+
+function scheduleFirstReview(word) {
+
+  word.masteredAt =
+    new Date().toISOString();
+
+  word.reviewIndex = 0;
+
+  word.reviewComplete = false;
+
+  word.reviewDue =
+    addDaysKey(
+      localDayKey(),
+      3
+    );
+
+  word.reviewHistory =
+    Array.isArray(word.reviewHistory)
+      ? word.reviewHistory
+      : [];
+}
+
+
+function completeScheduledReview(word) {
+
+  /*
+   * First record any legitimately missed previous
+   * days while this review is still marked overdue.
+   */
+  applyReviewAccountability(false);
+
+  const dueKey =
+    word.reviewDue;
+
+  const completedDay =
+    localDayKey();
+
+  const completedAt =
+    new Date().toISOString();
+
+  word.reviewHistory =
+    Array.isArray(word.reviewHistory)
+      ? word.reviewHistory
+      : [];
+
+  let rewardEarned = 0;
+
+  const alreadyCompleted =
+    Boolean(
+      dueKey &&
+      word.reviewHistory.some(
+        entry =>
+          entry.due === dueKey
+      )
+    );
+
+  /*
+   * Each scheduled review occurrence can earn
+   * its R$5 exactly once.
+   */
+  if (
+    dueKey &&
+    !alreadyCompleted
+  ) {
+
+    word.reviewHistory.push({
+      due:dueKey,
+      completedDay,
+      completedAt,
+      reward:REVIEW_REWARD_AMOUNT
+    });
+
+    word.reviewHistory =
+      word.reviewHistory.slice(
+        -20
+      );
+
+    awardRobux(
+      REVIEW_REWARD_AMOUNT,
+      "Review complete",
+      word.text
+    );
+
+    rewardEarned =
+      REVIEW_REWARD_AMOUNT;
+
+    logActivity(
+      "review_complete",
+      word,
+      {
+        due:dueKey,
+        reward:rewardEarned
+      }
+    );
+  }
+
+  const intervals =
+    [3,7,14];
+
+  const nextIndex =
+    Number(
+      word.reviewIndex || 0
+    ) + 1;
+
+  if (
+    nextIndex >=
+    intervals.length
+  ) {
+
+    word.reviewIndex =
+      intervals.length;
+
+    word.reviewDue = null;
+
+    word.reviewComplete =
+      true;
+
+  } else {
+
+    word.reviewIndex =
+      nextIndex;
+
+    word.reviewDue =
+      addDaysKey(
+        localDayKey(),
+        intervals[nextIndex]
+      );
+
+    word.reviewComplete =
+      false;
+  }
+
+  return rewardEarned;
+}
 
   function isReviewDue(word) {
     return Boolean(word.mastered && !word.reviewComplete && word.reviewDue && word.reviewDue <= localDayKey());
@@ -5550,6 +6253,7 @@ function scheduleFirstReview(word) {
 
  function startReview(wordId, countsForSchedule = true) {
   clearPreview();
+   closeReviewReminder(false);
 
   const word =
     profile().words.find(
@@ -5806,22 +6510,38 @@ function setLearnerAvatar(profileId, avatarKey) {
   }
 
   function render() {
-    renderProfiles();
-    renderStats();
-    renderParent();
-    renderReviewDue();
-    renderMasteredWords();
 
-    /*
-     * Render spelling first.
-     * renderLearningMode() then decides whether
-     * spelling or phonics should be visible.
-     */
-    renderGame();
-    renderLearningMode();
+  /*
+   * Work out whether any full calendar days have
+   * passed with reviews still outstanding.
+   */
+  applyReviewAccountability(true);
 
-    setActiveTab(activeTab, false);
-  }
+  renderProfiles();
+  renderStats();
+  renderParent();
+  renderReviewDue();
+  renderMasteredWords();
+
+  /*
+   * Render spelling first.
+   * renderLearningMode() then decides whether
+   * spelling or phonics should be visible.
+   */
+  renderGame();
+  renderLearningMode();
+
+  setActiveTab(
+    activeTab,
+    false
+  );
+
+  /*
+   * The review warning belongs on the main app
+   * rather than being hidden inside Mastered.
+   */
+  maybeShowReviewReminder();
+}
 
   function renderProfiles() {
     els.profileSelect.innerHTML = "";
@@ -5966,10 +6686,238 @@ els.rewardMasterDisplay.textContent =
     if (locked) closeWordChooser();
   }
 
+  function getDueReviews() {
+
+  return profile().words
+    .filter(isReviewDue)
+    .sort(
+      (a,b) =>
+        String(a.reviewDue)
+          .localeCompare(
+            String(b.reviewDue)
+          ) ||
+        a.text.localeCompare(
+          b.text
+        )
+    );
+}
+
+
+function reviewReminderSignature(
+  dueReviews = getDueReviews()
+) {
+
+  return [
+    currentProfileId,
+    ...dueReviews.map(
+      word =>
+        `${word.id}:${word.reviewDue}`
+    )
+  ].join("|");
+}
+
+
+function closeReviewReminder(
+  rememberDismissal = true
+) {
+
+  if (
+    !els.reviewReminderModal
+  ) {
+    return;
+  }
+
+  if (rememberDismissal) {
+
+    reviewReminderDismissedSignature =
+      els.reviewReminderModal
+        .dataset
+        .signature ||
+      reviewReminderSignature();
+  }
+
+  els.reviewReminderModal
+    .classList.remove("open");
+
+  els.reviewReminderModal
+    .setAttribute(
+      "aria-hidden",
+      "true"
+    );
+}
+
+
+function maybeShowReviewReminder() {
+
+  if (
+    reviewMode ||
+    !els.reviewReminderModal
+  ) {
+    return;
+  }
+
+  /*
+   * Don't stack this on top of another important
+   * modal.
+   */
+  if (
+    els.parentModal.classList.contains("open") ||
+    els.cloudModal.classList.contains("open") ||
+    els.resultModal.classList.contains("open")
+  ) {
+    return;
+  }
+
+  const due =
+    getDueReviews();
+
+  if (!due.length) {
+
+    closeReviewReminder(false);
+
+    reviewReminderDismissedSignature =
+      "";
+
+    return;
+  }
+
+  const signature =
+    reviewReminderSignature(
+      due
+    );
+
+  if (
+    reviewReminderDismissedSignature ===
+    signature
+  ) {
+    return;
+  }
+
+  if (
+    els.reviewReminderModal
+      .classList.contains("open") &&
+    els.reviewReminderModal
+      .dataset.signature ===
+      signature
+  ) {
+    return;
+  }
+
+  els.reviewReminderModal
+    .dataset.signature =
+    signature;
+
+  els.reviewReminderTitle.textContent =
+    due.length === 1
+      ? "1 review waiting"
+      : `${due.length} reviews waiting`;
+
+  els.reviewReminderIntro.textContent =
+    `${profile().name}, complete your spelling reviews to keep them fresh. ` +
+    `Every scheduled review you pass earns R$ ${REVIEW_REWARD_AMOUNT}. ` +
+    `If any review is still outstanding when the day finishes, R$ ${REVIEW_DAILY_PENALTY} is deducted for that missed day.`;
+
+  els.reviewReminderList.innerHTML =
+    "";
+
+  due.forEach(word => {
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "review-reminder-row";
+
+
+    const info =
+      document.createElement(
+        "div"
+      );
+
+    info.className =
+      "review-reminder-word";
+
+
+    const strong =
+      document.createElement(
+        "strong"
+      );
+
+    strong.textContent =
+      word.text;
+
+
+    const small =
+      document.createElement(
+        "small"
+      );
+
+    const overdueBy =
+      Math.max(
+        0,
+        dayDiff(
+          word.reviewDue,
+          localDayKey()
+        ) || 0
+      );
+
+    if (overdueBy === 0) {
+
+      small.textContent =
+        "Due today";
+
+    } else {
+
+      small.textContent =
+        `${overdueBy} day${overdueBy === 1 ? "" : "s"} overdue`;
+
+      small.classList.add(
+        "overdue"
+      );
+    }
+
+    info.append(
+      strong,
+      small
+    );
+
+
+    const reviewButton =
+      button(
+        "Review word",
+        "primary",
+        () => {
+          startReview(
+            word.id,
+            true
+          );
+        }
+      );
+
+    row.append(
+      info,
+      reviewButton
+    );
+
+    els.reviewReminderList
+      .appendChild(row);
+  });
+
+  els.reviewReminderModal
+    .classList.add("open");
+
+  els.reviewReminderModal
+    .setAttribute(
+      "aria-hidden",
+      "false"
+    );
+}
+
   function renderReviewDue() {
-    const due = profile().words
-      .filter(isReviewDue)
-      .sort((a,b) => String(a.reviewDue).localeCompare(String(b.reviewDue)) || a.text.localeCompare(b.text));
+    const due =
+  getDueReviews();
 
     els.reviewDueCount.textContent = `${due.length} due`;
     els.reviewDueList.innerHTML = "";
@@ -6540,11 +7488,34 @@ function undoLetter() {
   showRewardPop(amount, reason);
 }
 
-  function showRewardPop(amount, reason) {
-    els.rewardPop.textContent = `+R$ ${amount} · ${reason}`;
-    els.rewardPop.classList.add("show");
-    setTimeout(() => els.rewardPop.classList.remove("show"), 1800);
-  }
+  function showRewardPop(
+  amount,
+  reason
+) {
+
+  const value =
+    Number(amount) || 0;
+
+  const prefix =
+    value > 0
+      ? "+"
+      : value < 0
+        ? "−"
+        : "";
+
+  els.rewardPop.textContent =
+    `${prefix}R$ ${Math.abs(value)} · ${reason}`;
+
+  els.rewardPop
+    .classList.add("show");
+
+  setTimeout(
+    () =>
+      els.rewardPop
+        .classList.remove("show"),
+    2200
+  );
+}
 
   function awardStageIfEligible(word, completedStage) {
     word.rewardedStages = Array.isArray(word.rewardedStages) ? word.rewardedStages : [];
@@ -6620,39 +7591,101 @@ if (entered === target) {
       recordCorrectWordForStreak(word);
 
       if (isReviewAttempt) {
-        if (reviewCountsForSchedule) completeScheduledReview(word);
-saveState();
-renderStats();
-renderParent();
-renderReviewDue();
-renderMasteredWords();
 
-setWordChangeLocked(true);
-lockCurrentInputs();
+  const scheduledReview =
+    Boolean(
+      reviewCountsForSchedule
+    );
 
-showFeedback(
-  `"${word.text}" passed its review.`,
-  true,
-  "Review passed!",
-  "Continue",
-  () => {
-    reviewMode = false;
-    reviewCountsForSchedule = false;
+  const reviewReward =
+    scheduledReview
+      ? completeScheduledReview(
+          word
+        )
+      : 0;
 
-    const remaining =
-      profile().words.filter(w => !w.mastered);
+  const remainingDue =
+    scheduledReview
+      ? getDueReviews()
+      : [];
 
-    currentWordId =
-      remaining.length
-        ? remaining[0].id
-        : null;
+  saveState();
 
-    render();
+  renderStats();
+  renderParent();
+  renderReviewDue();
+  renderMasteredWords();
+
+  setWordChangeLocked(true);
+  lockCurrentInputs();
+
+  let reviewMessage =
+    `"${word.text}" passed its review.`;
+
+  if (reviewReward > 0) {
+    reviewMessage +=
+      ` You earned R$ ${reviewReward}.`;
   }
-);
 
-return;
+  showFeedback(
+    reviewMessage,
+    true,
+    "Review passed!",
+    remainingDue.length
+      ? "Next review"
+      : "Continue",
+    () => {
+
+      /*
+       * Keep working through the review queue
+       * rather than dropping back into ordinary
+       * practice after every word.
+       */
+      if (
+        scheduledReview &&
+        remainingDue.length
+      ) {
+
+        reviewMode = true;
+
+        reviewCountsForSchedule =
+          true;
+
+        currentWordId =
+          remainingDue[0].id;
+
+        render();
+
+        setTimeout(
+          () =>
+            speakCurrentWord(),
+          150
+        );
+
+        return;
       }
+
+      reviewMode = false;
+
+      reviewCountsForSchedule =
+        false;
+
+      const remaining =
+        profile().words.filter(
+          w => !w.mastered
+        );
+
+      currentWordId =
+        remaining.length
+          ? remaining[0].id
+          : null;
+
+      render();
+    }
+  );
+
+  return;
+}
 
       const completedStage = Math.min(5, Math.max(1, word.stage || 1));
       awardStageIfEligible(word, completedStage);
@@ -7260,7 +8293,28 @@ renderLearnerSettings();
         left.textContent = `${item.reason}${item.word ? ` · ${item.word}` : ""}${when ? ` · ${when}` : ""}`;
 
         const right = document.createElement("strong");
-        right.textContent = item.amount ? `+R$ ${item.amount}` : "Paid ✓";
+const historyAmount =
+  Number(
+    item.amount || 0
+  );
+
+if (historyAmount > 0) {
+
+  right.textContent =
+    `+R$ ${historyAmount}`;
+
+} else if (
+  historyAmount < 0
+) {
+
+  right.textContent =
+    `−R$ ${Math.abs(historyAmount)}`;
+
+} else {
+
+  right.textContent =
+    "Paid ✓";
+}
 
         row.append(left,right);
         els.rewardHistory.appendChild(row);
@@ -7421,7 +8475,8 @@ row.append(info, actions);
     masteredAt:null,
     reviewDue:null,
     reviewIndex:0,
-    reviewComplete:false
+    reviewComplete:false,
+    reviewHistory:[]
   }));
 
   p.totals = {
@@ -7430,6 +8485,12 @@ row.append(info, actions);
   };
 
   p.activityLog = [];
+    p.reviewAccountability = {
+  version:1,
+  startedDay:localDayKey(),
+  lastCheckedDay:null,
+  missedDays:[]
+};
 
 
   /* =========================
@@ -7540,6 +8601,13 @@ reviewCountsForSchedule = false;
 
 clearPreview();
 
+    profile().reviewAccountability = {
+  version:1,
+  startedDay:localDayKey(),
+  lastCheckedDay:null,
+  missedDays:[]
+};
+
 saveState();
 render();
   }
@@ -7618,6 +8686,26 @@ saveState();
     }
   });
 
+  els.closeReviewReminderBtn.addEventListener(
+  "click",
+  () => {
+    closeReviewReminder(true);
+  }
+);
+
+els.reviewReminderModal.addEventListener(
+  "click",
+  e => {
+
+    if (
+      e.target ===
+      els.reviewReminderModal
+    ) {
+      closeReviewReminder(true);
+    }
+  }
+);
+
   els.closeCloudModal.addEventListener("click", closeCloudModal);
   els.cloudContinueOfflineBtn.addEventListener("click", closeCloudModal);
   els.cloudSignInBtn.addEventListener("click", signInCloud);
@@ -7652,11 +8740,32 @@ saveState();
     }
   });
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden" && cloudSession && navigator.onLine) {
+ document.addEventListener(
+  "visibilitychange",
+  () => {
+
+    if (
+      document.visibilityState === "hidden" &&
+      cloudSession &&
+      navigator.onLine
+    ) {
       uploadCloudState();
+      return;
     }
-  });
+
+    if (
+      document.visibilityState === "visible"
+    ) {
+      applyReviewAccountability(true);
+
+      renderStats();
+      renderReviewDue();
+      renderMasteredWords();
+
+      maybeShowReviewReminder();
+    }
+  }
+);
 
 
   els.profileSelect.addEventListener("change", () => {
@@ -7861,14 +8970,26 @@ els.newLearnerName.addEventListener("keydown", e => {
     if (e.key === "Enter" && !previewRunning) checkAnswer();
   });
 
-  document.addEventListener("keydown", e => {
-    if (e.key !== "Escape") return;
-    if (els.cloudModal.classList.contains("open")) {
-      closeCloudModal();
-      return;
-    }
-    if (els.parentModal.classList.contains("open")) closeParent();
-  });
+ document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+
+  if (els.cloudModal.classList.contains("open")) {
+    closeCloudModal();
+    return;
+  }
+
+  if (
+    els.reviewReminderModal
+      .classList.contains("open")
+  ) {
+    closeReviewReminder(true);
+    return;
+  }
+
+  if (els.parentModal.classList.contains("open")) {
+    closeParent();
+  }
+});
 
   loadSpellingVoice();
 
