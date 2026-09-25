@@ -2987,9 +2987,9 @@ const REVIEW_DAILY_PENALTY = 1;
 
   const PHONICS_STAGES = {
   1:{
-    title:"Stage 1 · Hear the sound",
-    help:"Listen to the clue, then choose the grapheme that represents the sound."
-  },
+  title:"Stage 1 · Hear the sound",
+  help:"Listen to the sound, then choose the letter or grapheme that represents it."
+},
   2:{
     title:"Stage 2 · Find the sound",
     help:"Find the grapheme from the choices."
@@ -3010,133 +3010,43 @@ const REVIEW_DAILY_PENALTY = 1;
 
 const PHONICS_LIBRARY = [
   {
-    id:"s",
-    grapheme:"s",
-    cueWord:"sun",
-    cuePosition:"first",
-    practiceWord:"sat",
-    chunks:["s","a","t"]
-  },
-  {
     id:"a",
     grapheme:"a",
+    audioFile:"a.mp3",
     cueWord:"apple",
     cuePosition:"first",
     practiceWord:"cat",
     chunks:["c","a","t"]
   },
   {
-    id:"t",
-    grapheme:"t",
-    cueWord:"tap",
+    id:"b",
+    grapheme:"b",
+    audioFile:"b.mp3",
+    cueWord:"bat",
     cuePosition:"first",
-    practiceWord:"tap",
-    chunks:["t","a","p"]
+    practiceWord:"bat",
+    chunks:["b","a","t"]
   },
   {
-    id:"p",
-    grapheme:"p",
-    cueWord:"pan",
+    id:"c",
+    grapheme:"c",
+    audioFile:"k.mp3",
+    cueWord:"cat",
     cuePosition:"first",
-    practiceWord:"pat",
-    chunks:["p","a","t"]
+    practiceWord:"cat",
+    chunks:["c","a","t"]
   },
   {
-    id:"i",
-    grapheme:"i",
-    cueWord:"insect",
+    id:"k",
+    grapheme:"k",
+    audioFile:"k.mp3",
+    cueWord:"kit",
     cuePosition:"first",
-    practiceWord:"sit",
-    chunks:["s","i","t"]
-  },
-  {
-    id:"n",
-    grapheme:"n",
-    cueWord:"net",
-    cuePosition:"first",
-    practiceWord:"nap",
-    chunks:["n","a","p"]
-  },
-  {
-    id:"m",
-    grapheme:"m",
-    cueWord:"map",
-    cuePosition:"first",
-    practiceWord:"map",
-    chunks:["m","a","p"]
-  },
-  {
-    id:"d",
-    grapheme:"d",
-    cueWord:"dog",
-    cuePosition:"first",
-    practiceWord:"dip",
-    chunks:["d","i","p"]
-  },
-  {
-    id:"sh",
-    grapheme:"sh",
-    cueWord:"ship",
-    cuePosition:"first",
-    practiceWord:"ship",
-    chunks:["sh","i","p"]
-  },
-  {
-    id:"ch",
-    grapheme:"ch",
-    cueWord:"chip",
-    cuePosition:"first",
-    practiceWord:"chip",
-    chunks:["ch","i","p"]
-  },
-  {
-    id:"th",
-    grapheme:"th",
-    cueWord:"thin",
-    cuePosition:"first",
-    practiceWord:"thin",
-    chunks:["th","i","n"]
-  },
-  {
-    id:"ng",
-    grapheme:"ng",
-    cueWord:"ring",
-    cuePosition:"last",
-    practiceWord:"ring",
-    chunks:["r","i","ng"]
-  },
-  {
-    id:"ai",
-    grapheme:"ai",
-    cueWord:"rain",
-    cuePosition:"middle",
-    practiceWord:"rain",
-    chunks:["r","ai","n"]
-  },
-  {
-    id:"ee",
-    grapheme:"ee",
-    cueWord:"seed",
-    cuePosition:"middle",
-    practiceWord:"seed",
-    chunks:["s","ee","d"]
-  },
-  {
-    id:"igh",
-    grapheme:"igh",
-    cueWord:"night",
-    cuePosition:"middle",
-    practiceWord:"night",
-    chunks:["n","igh","t"]
-  },
-  {
-    id:"oa",
-    grapheme:"oa",
-    cueWord:"goat",
-    cuePosition:"middle",
-    practiceWord:"goat",
-    chunks:["g","oa","t"]
+    practiceWord:"kit",
+    chunks:["k","i","t"]
   }
+
+  // your other phonics entries can remain below...
 ];
 
   const els = {
@@ -3345,6 +3255,7 @@ reviewHistory: []
   return {
     id:definition.id,
     grapheme:definition.grapheme,
+    audioFile:definition.audioFile || null,
     cueWord:definition.cueWord,
     cuePosition:definition.cuePosition,
     practiceWord:definition.practiceWord,
@@ -3365,6 +3276,7 @@ reviewHistory: []
     masteredAt:null
   };
 }
+
 
 function mergePhonicsSounds(existingSounds = []) {
 
@@ -3392,8 +3304,14 @@ function mergePhonicsSounds(existingSounds = []) {
       ...freshPhonicsSound(definition),
       ...old,
 
+      /*
+       * These values always come from the current
+       * phonics library, even if older progress
+       * already exists in local/cloud storage.
+       */
       id:definition.id,
       grapheme:definition.grapheme,
+      audioFile:definition.audioFile || null,
       cueWord:definition.cueWord,
       cuePosition:definition.cuePosition,
       practiceWord:definition.practiceWord,
@@ -4538,6 +4456,116 @@ function speakCurrentSentence() {
 }
 
   /* =========================================================
+   RECORDED PHONICS AUDIO
+========================================================= */
+
+let currentPhonicsAudio = null;
+
+function phonicsAudioPath(sound) {
+
+  if (!sound || !sound.audioFile) {
+    return "";
+  }
+
+  return `audio/phonics/${sound.audioFile}`;
+}
+
+
+function stopPhonicsAudio() {
+
+  if (currentPhonicsAudio) {
+    currentPhonicsAudio.pause();
+    currentPhonicsAudio.currentTime = 0;
+    currentPhonicsAudio = null;
+  }
+}
+
+
+function playPhonicsSound(sound) {
+
+  if (!sound) {
+    return;
+  }
+
+  const path = phonicsAudioPath(sound);
+
+  if (!path) {
+    alert(
+      `The phonics recording for "${sound.grapheme}" hasn't been added yet.`
+    );
+    return;
+  }
+
+  /*
+   * Stop browser-generated speech.
+   */
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  /*
+   * Stop spelling/sentence audio if it is playing.
+   */
+  if (currentWordAudio) {
+    currentWordAudio.pause();
+    currentWordAudio.currentTime = 0;
+    currentWordAudio = null;
+  }
+
+  /*
+   * Stop another phonics sound.
+   */
+  stopPhonicsAudio();
+
+  const audio = new Audio(path);
+
+  currentPhonicsAudio = audio;
+
+  let failed = false;
+
+  const audioUnavailable = () => {
+
+    if (failed) return;
+
+    failed = true;
+
+    if (currentPhonicsAudio === audio) {
+      currentPhonicsAudio = null;
+    }
+
+    alert(
+      `The phonics recording for "${sound.grapheme}" couldn't be loaded.`
+    );
+
+    console.warn(
+      "Missing phonics audio:",
+      path
+    );
+  };
+
+  audio.addEventListener(
+    "error",
+    audioUnavailable,
+    { once:true }
+  );
+
+  audio.addEventListener(
+    "ended",
+    () => {
+
+      if (currentPhonicsAudio === audio) {
+        currentPhonicsAudio = null;
+      }
+    },
+    { once:true }
+  );
+
+  audio.play().catch(
+    audioUnavailable
+  );
+}
+
+  /* =========================================================
    PHONICS GAME
 ========================================================= */
 
@@ -4993,19 +5021,32 @@ function renderPhonicsGame() {
   if (stage === 1) {
 
     els.phonicsPrompt.textContent =
-      "🔊 Listen carefully";
+  "🔊 Listen carefully";
 
-    els.phonicsSubPrompt.textContent =
-      `Which grapheme matches the ${sound.cuePosition} sound in "${sound.cueWord}"?`;
+els.phonicsSubPrompt.textContent =
+  "Listen to the sound, then choose the matching letter or grapheme.";
 
     const choices =
-      phonicsChoiceValues(
-        sound.grapheme,
-        data.sounds.map(
-          item =>
-            item.grapheme
-        )
-      );
+  phonicsChoiceValues(
+    sound.grapheme,
+
+    data.sounds
+      .filter(item => {
+
+        // Do not use another grapheme with the
+        // same phonics recording as a wrong answer.
+        // Example: c and k both use k.mp3.
+        return (
+          item.id === sound.id ||
+          item.audioFile !== sound.audioFile
+        );
+
+      })
+      .map(
+        item =>
+          item.grapheme
+      )
+  );
 
     renderPhonicsChoiceButtons(
       choices,
@@ -5015,14 +5056,14 @@ function renderPhonicsGame() {
     );
 
     els.phonicsActions.append(
-      button(
-        "🔊 Hear clue",
-        "audio-btn",
-        () =>
-          speakPhonicsClue(
-            sound
-          )
-      ),
+     button(
+  "🔊 Hear sound",
+  "audio-btn",
+  () =>
+    playPhonicsSound(
+      sound
+    )
+),
       button(
         "Choose another sound",
         "secondary",
