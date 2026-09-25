@@ -4887,10 +4887,65 @@ function speakPhonicsClue(sound) {
 
 function speakPhonicsWord(sound) {
 
-  if (!sound) return;
+  if (!sound || !sound.practiceWord) {
+    return;
+  }
 
-  speakText(
-    sound.practiceWord
+  // Stop browser-generated speech.
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  // Stop an isolated phonics sound.
+  stopPhonicsAudio();
+
+  // Stop another word or sentence recording.
+  if (currentWordAudio) {
+    currentWordAudio.pause();
+    currentWordAudio.currentTime = 0;
+    currentWordAudio = null;
+  }
+
+  const audio = new Audio(
+    wordAudioPath(sound.practiceWord)
+  );
+
+  currentWordAudio = audio;
+
+  let fallbackUsed = false;
+
+  const useFallbackVoice = () => {
+
+    if (fallbackUsed) return;
+
+    fallbackUsed = true;
+
+    if (currentWordAudio === audio) {
+      currentWordAudio = null;
+    }
+
+    // Whole words are safe to fall back to TTS.
+    speakText(sound.practiceWord);
+  };
+
+  audio.addEventListener(
+    "error",
+    useFallbackVoice,
+    { once:true }
+  );
+
+  audio.addEventListener(
+    "ended",
+    () => {
+      if (currentWordAudio === audio) {
+        currentWordAudio = null;
+      }
+    },
+    { once:true }
+  );
+
+  audio.play().catch(
+    useFallbackVoice
   );
 }
 
