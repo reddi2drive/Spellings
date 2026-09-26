@@ -3349,16 +3349,139 @@ function ensurePhonicsData(
       ? learner.phonics
       : {};
 
-  learner.phonics.sounds =
-    mergePhonicsSounds(
+  const existingSounds =
+    Array.isArray(
       learner.phonics.sounds
+    )
+      ? learner.phonics.sounds
+      : [];
+
+  const existingById =
+    new Map(
+      existingSounds.map(
+        sound => [
+          sound.id,
+          sound
+        ]
+      )
+    );
+
+  learner.phonics.sounds =
+    PHONICS_LIBRARY.map(
+      definition => {
+
+        let sound =
+          existingById.get(
+            definition.id
+          );
+
+        /*
+         * If this sound has never existed for
+         * this learner, create it.
+         */
+        if (!sound) {
+          return freshPhonicsSound(
+            definition
+          );
+        }
+
+        /*
+         * IMPORTANT:
+         * Update the existing object instead of
+         * replacing it with a new object.
+         */
+        sound.id =
+          definition.id;
+
+        sound.grapheme =
+          definition.grapheme;
+
+        sound.audioFile =
+          definition.audioFile || null;
+
+        sound.cueWord =
+          definition.cueWord;
+
+        sound.cuePosition =
+          definition.cuePosition;
+
+        sound.practiceWord =
+          definition.practiceWord;
+
+        sound.chunks =
+          [...definition.chunks];
+
+        sound.stage =
+          Math.min(
+            5,
+            Math.max(
+              1,
+              Number(
+                sound.stage || 1
+              )
+            )
+          );
+
+        sound.mastered =
+          Boolean(
+            sound.mastered
+          );
+
+        sound.correct =
+          Number(
+            sound.correct || 0
+          );
+
+        sound.incorrect =
+          Number(
+            sound.incorrect || 0
+          );
+
+        sound.attempts =
+          Number(
+            sound.attempts || 0
+          );
+
+        sound.lastPractised =
+          sound.lastPractised || null;
+
+        sound.rewardedStages =
+          Array.isArray(
+            sound.rewardedStages
+          )
+            ? sound.rewardedStages
+            : [];
+
+        sound.masterRewarded =
+          Boolean(
+            sound.masterRewarded
+          );
+
+        sound.masteredAt =
+          sound.masteredAt || null;
+
+        return sound;
+      }
     );
 
   learner.phonics.totals =
-    learner.phonics.totals || {
-      correct:0,
-      incorrect:0
-    };
+    learner.phonics.totals &&
+    typeof learner.phonics.totals === "object"
+      ? learner.phonics.totals
+      : {
+          correct:0,
+          incorrect:0
+        };
+
+  learner.phonics.totals.correct =
+    Number(
+      learner.phonics.totals.correct || 0
+    );
+
+  learner.phonics.totals.incorrect =
+    Number(
+      learner.phonics.totals.incorrect || 0
+    );
 
   learner.phonics.activityLog =
     Array.isArray(
